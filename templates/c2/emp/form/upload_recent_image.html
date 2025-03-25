@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="cols-lg-12">
+            <h2>Upload Recent Image</h2>
+
+<form class="mt-3" enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label class="form-label">SBU</label>
+        {% render_field form.sbu class="form-select" %}
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Facility</label>
+        {% render_field form.facility class="form-select" %}
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Assessment Title</label>
+        {% render_field form.title class="form-control" %}
+    </div>
+
+
+    <div class="mb-3">
+        <label class="form-label">Recent Image</label>
+        {% render_field form.recent_image class="form-control" %}
+    </div>
+
+    <button class="btn btn-primary" type="submit">Upload</button>
+</form>
+
+<!-- <a class="btn btn-secondary mt-3" href="#">View All Recent Images</a> -->
+ <script>
+        $(document).ready(function() {
+            // When Facility changes, update Standard Image with the same value
+            $("#facility").change(function() {
+                $("#standard_image").val($(this).val());
+            });
+        });
+ </script>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

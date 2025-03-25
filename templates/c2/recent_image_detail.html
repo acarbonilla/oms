@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+         <h2>Recent Image Details</h2>
+        <div class="col-6">
+             <h5>Recent Image</h5>
+                {% if image.recent_image %}
+                    <img src="{{ image.recent_image.url }}" class="img-fluid rounded" alt="Recent Image">
+                {% else %}
+                    <p>No Image Available</p>
+                {% endif %}
+        </div>
+        <div class="col-6">
+
+                <h5>Standard Image</h5>
+                {% if image.s_image %}
+                    <img src="{{ image.s_image.standard_image.url }}" class="img-fluid rounded" alt="Standard Image">
+                {% else %}
+                    <p>No Standard Image Available</p>
+                {% endif %}
+        </div>
+    </div>
+
+
+    <div class="card">
+        <div class="card-header">
+            <strong>Title: {{ image.title }}</strong>
+        </div>
+        <div class="card-body">
+             <p><strong>Location:</strong> {{ image.s_image.facility }}</p>
+            <p><strong>Status:</strong> {{ image.status }}</p>
+            <p><strong>Remarks:</strong> {{ image.remarks| safe }}</p>
+            <p><strong>Re-Schedule:</strong> {{ image.re_schedule|default:"Not Scheduled" }}</p>
+            <p><strong>Evaluated By:</strong> {{ image.remark_by.first_name }} {{ image.remark_by.last_name }}</p>
+            <p><strong>Last Updated:</strong> {{ image.updated }}</p>
+
+
+
+            <a href="{% url 'assessment' %}" class="btn btn-secondary">Back</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

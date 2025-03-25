@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<style>
+    .zoom-img {
+            transition: transform 0.3s ease-in-out;
+        }
+</style>
+
+<script>
+    $(document).ready(function(){
+        $(".zoom-img").hover(function(){
+            $(this).css("transform", "scale(1.5)");
+        }, function(){
+            $(this).css("transform", "scale(1)");
+        });
+    });
+</script>
+
+<div class="container">
+    <div class="row">
+        <div class="col-3 border text-center">
+            <form enctype="multipart/form-data" method="POST">
+                {% csrf_token %}
+                {{form.media}}
+                <!-- Adding Snippets to check the error in form -->
+                {% if form.errors %}
+                <div class="alert alert-danger mb-3">
+                    <strong>Error!</strong> Please correct the following:
+                    <ul>
+                        {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                        <li>{{ field|title }}: {{ error }}</li>
+                        {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                <!-- End here the snippet -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text topName">Remarks:</span>
+                    {% render_field form.remarks id='id_remarks'%}
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text topName">Status:</span>
+                    {% render_field form.status class="form-select"%}
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text topName">Re-Schedule:</span>
+                    {% render_field form.re_schedule class="form-control" type="date"%}
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text topName">Remark By:</span>
+                    {% render_field form.remark_by class="form-select"%}
+                </div>
+                <a
+                        class="btn btn-primary formSubmitButton"
+                        href="
+                                {%url 'assessment' %}"
+                        role="button"
+                >Cancel
+                </a>
+                <input
+                        aria-controls="offcanvasTop"
+                        class="btn btn-primary formSubmitButton"
+                        data-bs-target="#offcanvasTop"
+                        data-bs-toggle="offcanvas"
+                        type="submit"
+                        value="Submit"
+                />
+
+
+        </div>
+
+        <div class="col-5 border text-center">
+            <div class="input-group mb-3">
+                <span class="input-group-text topName">Recent Image</span>
+                {% if form.instance.recent_image %}
+                <img alt="Recent Image" class="img-fluid rounded zoom-img" data-zoom-image="{{ form.instance.recent_image.url }}"
+                     id="zoomImage"
+                     src="{{ form.instance.recent_image.url }}"
+                     style="height: 500px; width: 700px;">
+                {% else %}
+                <p class="form-control">No Image Available</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- jQuery & ElevateZoom -->
+        <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js"></script>
+
+        <script>
+            $(document).ready(function(){
+                $("#zoomImage").elevateZoom({
+                    zoomType: "lens", // "inner", "lens", "window"
+                   lensShape: "round",
+                    lensSize: 200,
+                    scrollZoom: true, // Allows zooming in/out with the scroll wheel
+                    zoomLevel: 1
+                });
+            });
+        </script>
+
+        <div class="col-4 border text-center">
+            <div class="input-group mb-3">
+                <span class="input-group-text topName">Standard Image</span>
+                {% if form.instance.s_image and form.instance.s_image.standard_image %}
+                <img alt="Standard" class="img-fluid rounded" src="{{ form.instance.s_image.standard_image.url }}"
+                     style="height: 500px; width: 700px">
+                {% else %}
+                <p class="form-control">No Image Available</p>
+                {% endif %}
+            </div>
+
+        </div>
+        </form>
+    </div>
+
+</div>
+
+
+{% endblock %}

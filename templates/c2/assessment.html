@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .thead-dark{
+    color:white;
+    background-color: #333333;
+    }
+
+    #table-mar{
+    margin:auto;
+    }
+    #scrollComps {
+    overflow-y: scroll;
+    height: 1024px;
+
+}
+
+</style>
+<h4> Assessment Page</h4>
+<div class="container-fluid">
+   <div class="row">
+       <div class="col-lg-12" id="scrollComps">
+           <h3 class="text-center">Recent Images and Latest Standard per Facility</h3>
+
+    <table class="text-center table-bordered" id="table-mar">
+        <thead class="thead-dark">
+            <tr>
+                <th class="p-5">Location</th>
+                <th>Assessment Title</th>
+                <th>Standard Image</th>
+                <th>Recent Image</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in combined_data %}
+            <tr>
+                <td class="p-5">{{ item.s_image}}</td> <!--Alter this later -->
+                <td> {{ item.title }} </td>
+
+                 <td>
+                    {% if item.standard_image %}
+                        <img src="{{ item.standard_image }}" alt="Standard Image" width="300" height="300">
+                    {% else %}
+                        No Standard Image
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if item.recent_image %}
+
+                        <img src="{{ item.recent_image }}" alt="Recent Image" width="300" height="300">
+
+                    {% else %}
+                        No Recent Image
+                    {% endif %}
+                </td>
+
+                <td>
+                    <a class="btn btn-secondary" href="{% url 'update_recent_image' item.id%}">Evaluate</a>
+                    <br/><br/>
+                    <a class="btn btn-secondary" href="{% url 'recent_image_detail' item.id %}">Details</a>
+                </td>
+
+
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No data available</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+           <br/><br/><br/>
+       </div>
+   </div>
+
+</div>
+
+
+{% endblock %}
