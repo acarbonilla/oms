@@ -1,0 +1,102 @@
+<style>
+    /* ZFC Navigation Bar */
+#navAnchor {
+  color: brown;
+  font-size: 15px;
+  font-weight: bolder;
+}
+#navAnchor:hover {
+  background-color: #023020;
+  color: #f0e68c;
+  margin-left: 2px;
+  font-size: 18px;
+  font-weight: bolder;
+  border-radius: 30px 30px;
+  text-align: center;
+}
+</style>
+<nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
+    <div class="container-fluid sticky-top">
+        <a class="navbar-brand" href="#">ZFC-C2</a>
+        <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+                class="navbar-toggler"
+                data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a aria-current="page" class="nav-link active" href="{% url 'evMember' %}">Home</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'standard_image_ev' %}">Standard Image</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'assessment'%}">Facility</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"
+                       role="button">
+                        Record
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{%url 'failed_list' %}">Failed</a></li>
+                        <li><a class="dropdown-item" href="#">Pass</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"
+                       role="button">
+                        File
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'download_pdf' %}">ALL-PDF Download</a></li>
+                        <li><a class="dropdown-item" href="{% url 'download_selected_pdf'%}">Selected PDF</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+
+                </li>
+
+            </ul>
+
+            <!-- This area is for user profile -->
+            {% if user.is_authenticated %}
+            <nav class="d-flex">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item dropdown">
+                        <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"
+                           id="topA" role="button">
+                            {{user}}
+                        </a>
+
+                        <ul class="dropdown-menu" id="ulID">
+
+                            <li>
+                                <a class="dropdown-item" href="{% url 'omsLogout'%}" id="navAnchor">Sign Out</a>
+                            </li>
+                            {% else %}
+                            <li>
+                                <a class="dropdown-item" href="{% url 'omsLogin'%}" id="navAnchor">Login</a>
+                            </li>
+                            {% endif %}
+
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+
+
+        </div>
+    </div>
+</nav>

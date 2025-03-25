@@ -1,0 +1,62 @@
+03/13/2025
+    > Create models in core app
+    > Create members app
+    > C2 app
+    > Separate each SBU
+03/18/2025
+    > Create page for comparison or assessment (Done Initial)
+    > Simple dashboard
+        - Newly Updated image from recent image or updated from standard image.
+        - Only One location per output
+
+    > Form for upload
+
+Suggested By Sir Nobil
+Evaluator: Do evaluation
+Manager and IS: Have a column that they can comment the Evaluator
+"Green Belt Initiative"
+Number 1 Issue: QR code will redirect to each location(s_image) Pray for it (Done: 3/23/25)
+Show: Time and Date (Done: 3/23/25)
+
+_______Activity I did today 3/21/2025 (Done: 3/23/25)
+Need to removed (Accomplished)
+1. c2 models.py
+	class C2RecentImage
+		facility (Reason: Redundant from s_image cause it is already link)
+
+	> c2 models line 57 (done)
+	> c2 views line 52 and 57(alter to s_image.facility) (done)
+	> c2 forms line10 and 22 (done)
+	> am assessment.html line 38 (done)
+	> am recent_image_detail.html line (possible)
+
+2. created and update should be datetimefield (Done)
+
+
+------------------
+Not yet
+Add to System
+1. c2 models.py
+	class C2RecentImage
+	employee (If employee the field can see the eval_comment, manager comment, his/her comment, picture, date, other)
+	manager  same with employeee
+	evaluator same with employee and manager
+Note: Evaluator will replace the Manager can be change the restriction from views.py
+
+2. Team Member
+
+3. Add Group EV (Done: 3/23/25)
+
+
+1. Generate Logo sa JWS every report and SBU if RR Cebu or C2 Cebu
+2. FM VisMin Team (Apil sa report)
+
+Logo JWS - C2 Cebu - FM Vismin Team
+
+Completed
+1. QR scan (Done)
+2. Evaluator Standard App - All Standard (Done)
+3. Failed Report (PDF Download with JWS-FM logo and SBU)
+4. Assessment Report (Has indicator how many failed within 30 days) (Done)
+5. Added EV group (Done)
+

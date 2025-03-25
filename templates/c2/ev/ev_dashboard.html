@@ -1,13 +1,8 @@
 
 {% extends 'base.html' %}
 {% block content %}
-<h1>This is for Evaluator</h1>
-{% for facility in facilities %}
-    <h2>{{ facility.name }}</h2>
-    <a href="{% url 'facility_qr_upload' facility.id %}">Upload Recent Image</a>
-{% empty %}
-    <p>No facilities found.</p>
-{% endfor %}
+<h1>This is for Evaluator Dashboard</h1>
+
 <h1>{{user}}</h1>
 
 {% endblock %}

@@ -1,16 +1,27 @@
+import os
+
 from django.contrib.auth.models import User
 from django.db import models
 
 from core.models import StandardImage, RecentImage, SBU
 from django.db.models import OuterRef, Subquery  # Query for only one and most updated
 
+# QR Code
+
+import qrcode
+from io import BytesIO
+from django.core.files.base import ContentFile
+
+# Naming every upload image
+from django.utils.text import slugify
+
 
 class C2User(models.Model):
     position = (
-        ("AM", "AM"), ("EMP", "EMP")
+        ("AM", "AM"), ("EMP", "EMP"), ("EV", "EV")
     )
     sbu = models.ForeignKey(SBU, on_delete=models.CASCADE)
-    name = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.OneToOneField(User, on_delete=models.CASCADE, related_name="users")
     position = models.CharField(
         max_length=20,
         choices=position,
@@ -18,6 +29,7 @@ class C2User(models.Model):
         default='EMP'
 
     )
+    facility = models.ForeignKey('C2Facility', on_delete=models.CASCADE, null=True, blank=True)  # ✅ NEW
 
     created = models.DateField(auto_now_add=True)
     updated = models.DateField(auto_now=True)
@@ -39,13 +51,31 @@ class C2StandardManager(models.Manager):
 
 
 class C2Standard(StandardImage):
-    facility = models.ForeignKey('C2Facility', on_delete=models.CASCADE)
+    facility = models.ForeignKey('C2Facility', on_delete=models.CASCADE, related_name="standards")
     standard_image = models.ImageField(upload_to="img/standard_images/")
-
     objects = C2StandardManager()  # Attach custom manager
 
     def __str__(self):
         return f"{self.facility}"
+
+
+# This is naming every upload image
+def recent_image_upload_path(instance, filename):
+    """Generates a unique filename based on facility name and an incrementing number."""
+    facility_name = slugify(instance.s_image.facility.name)  # Convert facility name to a safe format
+    base_dir = "img/recent_images"
+
+    # Find existing files for this facility
+    existing_files = [
+        f for f in os.listdir(os.path.join("media", base_dir))
+        if f.startswith(facility_name)
+    ]
+
+    # Get next number (increment by 1)
+    next_number = len(existing_files) + 1
+    new_filename = f"{facility_name}_{next_number}.png"
+
+    return os.path.join(base_dir, new_filename)
 
 
 class C2RecentImage(RecentImage):
@@ -54,21 +84,38 @@ class C2RecentImage(RecentImage):
         ("Failed", "Failed"),
         ("Pending", "Pending")
     ]
-    facility = models.ForeignKey('C2Facility', on_delete=models.CASCADE)  # Remove Redundant from s_image.
     s_image = models.ForeignKey(C2Standard, on_delete=models.CASCADE)
-    recent_image = models.ImageField(upload_to="img/recent_images/")
+    recent_image = models.ImageField(upload_to=recent_image_upload_path)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Pending")
-    uploaded_by = models.ForeignKey(C2User, on_delete=models.CASCADE)
-    remark_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-
-    # Need to add who is the AM update
-
-    def __str__(self):
-        return f"{self.title} - {self.status}"
+    uploaded_by = models.ForeignKey(C2User, on_delete=models.CASCADE, related_name="uploaded_images")
+    remark_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="remarked_images")
 
 
 class C2Facility(models.Model):
     name = models.CharField(max_length=50, verbose_name="Facility")
+    qr_code = models.ImageField(upload_to="qrcodes/", blank=True, null=True)
+
+    def generate_qr_code(self):
+        """Generate and save QR code for this facility."""
+
+        # ✅ Convert facility name to a safe filename
+        sanitized_name = self.name.replace(" ", "_").lower()
+        filename = f"qr_{sanitized_name}.png"
+
+        # ✅ Ensure QR code is generated even if it exists
+        qr_url = f"http://127.0.0.1:8000/c2/c2/facility/{self.id}/upload/"
+        qr = qrcode.make(qr_url)
+
+        buffer = BytesIO()
+        qr.save(buffer, format="PNG")
+
+        # ✅ Delete old QR code if it exists
+        if self.qr_code:
+            self.qr_code.delete(save=False)
+
+        # ✅ Save the new QR code
+        self.qr_code.save(filename, ContentFile(buffer.getvalue()), save=True)
+        self.save()
 
     def __str__(self):
-        return f"{self.name}"
+        return self.name

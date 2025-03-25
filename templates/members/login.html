@@ -1,0 +1,65 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+
+<style>
+#loginTitle {
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+}
+
+#loginInputs{
+  border-radius: 50px 50px;
+}
+#login {
+  background-color: block; /* For browsers that do not support gradients */
+  background-image: linear-gradient(to bottom right, #c33764, #1d2671);
+  border-radius: 15px 50px;
+  padding: 15px;
+}
+
+</style>
+
+<div class="container mt-4">
+
+  <div class="row mt-5">
+    <div class="col-3"></div>
+
+    <div class="col-sm-4 m-3 p-4" id="login">
+      <h1 class="text-center p-3 formTitle" id="loginTitle">ZFC-C2</h1>
+      <form action="" method="POST">
+        {%csrf_token%}
+        <div class="mb-3 p-2">
+          <input
+            aria-describedby="emailHelp"
+            class="form-control"
+            name="username"
+            placeholder="Username"
+            type="text"
+            id="loginInputs"
+          />
+        </div>
+        <div class="mb-3 p-2">
+          <input
+            class="form-control"
+            name="password"
+            placeholder="********"
+            type="password"
+            id="loginInputs"
+           value="$Everyday23"
+          />
+        </div>
+        <button
+          class="primaryAction mt-2 mb-3 btn btn-primary text-white formSubmitButton"
+          type="submit"
+          id="submitButton"
+        >
+          Sign In
+        </button>
+
+      </form>
+    </div>
+
+     <div class="col-3"></div>
+  </div>
+</div>
+
+{% endblock %}

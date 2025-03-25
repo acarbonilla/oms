@@ -1,0 +1,37 @@
+# 🔥 Ignore Python compiled files
+*.pyc
+*.pyo
+__pycache__/
+
+# 🔥 Ignore environment files (virtual environments)
+venv/
+.env
+*.env
+*.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# 🔥 Ignore database files (if using SQLite)
+db.sqlite3
+db.sqlite3-journal
+
+# 🔥 Ignore Django secret keys & credentials
+secret.json
+config/settings_local.py
+
+# Ignore Documentation folder
+Documentation/
+account.txt
+Legent.txt
+saveCode.txt
+Tasklist.txt
+
+
+# 🔥 Ignore local IDE settings
+.vscode/
+.idea/
+*.iml
+
+# 🔥 Ignore Django migrations (optional: only ignore auto-generated files)
+**/migrations/*.pyc
+**/migrations/__pycache__/

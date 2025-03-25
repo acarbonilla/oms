@@ -1,82 +1,92 @@
 {% extends 'base.html' %}
 {% block content %}
-<style>
-    .thead-dark{
-    color:white;
-    background-color: #333333;
-    }
+<div class="container mt-4">
+    <h2>📊 Assessment Report</h2>
 
-    #table-mar{
-    margin:auto;
-    }
-    #scrollComps {
-    overflow-y: scroll;
-    height: 1024px;
+    <!-- Search Bar -->
+    <form method="GET" action="{% url 'assessment' %}" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="search" class="form-control" placeholder="Search by Facility Name..." value="{{ search_query }}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </form>
 
-}
+    {% if page_obj %}
+        {% for item in page_obj %}
+        <div class="card mb-4">
+            <div class="card-header {% if item.failed_count > 1 %} bg-danger text-white
+                {% elif item.failed_count == 1 %} bg-warning
+                {% else %} bg-secondary text-white
+                {% endif %}">
+                {% if item.failed_count > 1%}
+                <h4>{{ item.s_image }} - {{ item.failed_count }} Failed Reports</h4>
+                {% elif item.failed_count == 1 %}
+                <h4>{{ item.s_image }} - {{ item.failed_count }} Failed Reports</h4>
+                {% else %}
+                <h4>{{ item.s_image }} - {{ item.failed_count }} Failed Report</h4>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Left: Standard Image -->
+                    <div class="col-md-6 text-center">
+                        <h5>Standard Image</h5>
+                        {% if item.standard_image %}
+                            <img src="{{ item.standard_image }}" alt="Standard Image" class="img-fluid rounded shadow-lg" style="max-width: 100%; height: auto;">
+                        {% else %}
+                            <p class="text-muted">No Image Available</p>
+                        {% endif %}
+                    </div>
 
-</style>
-<h4> Assessment Page</h4>
-<div class="container-fluid">
-   <div class="row">
-       <div class="col-lg-12" id="scrollComps">
-           <h3 class="text-center">Recent Images and Latest Standard per Facility</h3>
+                    <!-- Right: Recent Failed Image -->
+                    <div class="col-md-6 text-center">
+                        <h5>Recent Failed Image</h5>
+                        {% if item.recent_image %}
+                            <img src="{{ item.recent_image }}" alt="Recent Image" class="img-fluid rounded shadow-lg" style="max-width: 100%; height: auto;">
+                        {% else %}
+                            <p class="text-muted">No Image Available</p>
+                        {% endif %}
+                    </div>
+                </div>
 
-    <table class="text-center table-bordered" id="table-mar">
-        <thead class="thead-dark">
-            <tr>
-                <th class="p-5">Location</th>
-                <th>Assessment Title</th>
-                <th>Standard Image</th>
-                <th>Recent Image</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in combined_data %}
-            <tr>
-                <td class="p-5">{{ item.s_image}}</td> <!--Alter this later -->
-                <td> {{ item.title }} </td>
+                <!-- ✅ Restore "Details" and "Evaluation" Buttons -->
+                <div class="text-center mt-3">
+                    <a href="{% url 'update_recent_image' item.id %}" class="btn btn-success">📝 Evaluation</a>
+                    <a href="{% url 'recent_image_detail' item.id %}" class="btn btn-info">📄 Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
 
-                 <td>
-                    {% if item.standard_image %}
-                        <img src="{{ item.standard_image }}" alt="Standard Image" width="300" height="300">
-                    {% else %}
-                        No Standard Image
-                    {% endif %}
-                </td>
+        <!-- Pagination Controls -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?search={{ search_query }}&page=1">First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?search={{ search_query }}&page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
 
-                <td>
-                    {% if item.recent_image %}
+                <li class="page-item disabled">
+                    <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                </li>
 
-                        <img src="{{ item.recent_image }}" alt="Recent Image" width="300" height="300">
-
-                    {% else %}
-                        No Recent Image
-                    {% endif %}
-                </td>
-
-                <td>
-                    <a class="btn btn-secondary" href="{% url 'update_recent_image' item.id%}">Evaluate</a>
-                    <br/><br/>
-                    <a class="btn btn-secondary" href="{% url 'recent_image_detail' item.id %}">Details</a>
-                </td>
-
-
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3">No data available</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-           <br/><br/><br/>
-       </div>
-   </div>
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?search={{ search_query }}&page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?search={{ search_query }}&page={{ page_obj.paginator.num_pages }}">Last</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% else %}
+        <p class="alert alert-success">✅ No failed images found!</p>
+    {% endif %}
 
 </div>
-
-
 {% endblock %}

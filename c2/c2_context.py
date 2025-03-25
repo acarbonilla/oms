@@ -23,3 +23,15 @@ def emp_group(request):
         emp = None
         all_emp = None
     return {"all_emp": all_emp, "emp": emp}
+
+
+def ev_group(request):
+    if request.user.is_authenticated:
+        ev = Group.objects.get(name="EV")
+
+        # Get all users in this group
+        all_ev = ev.user_set.all()
+    else:
+        ev = None
+        all_ev = None
+    return {"all_ev": all_ev, "ev": ev}
