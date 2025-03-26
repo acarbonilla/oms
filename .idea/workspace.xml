@@ -5,40 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="66939e78-aa53-4976-9238-052a50849d6b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Documentation/Legend.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Documentation/Legend.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Documentation/Tasklist.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Documentation/Tasklist.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Documentation/saveCode.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Documentation/saveCode.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/c2/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/c2/c2_context.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/c2_context.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/c2/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/c2/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/c2/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/c2/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/members/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/members/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/am/am_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/am/am_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/assessment.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/assessment.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/emp/emp_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/emp/emp_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/emp/emp_qr_upload.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/emp/emp_qr_upload.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/emp/form/upload_recent_image.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/emp/form/upload_recent_image.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/emp/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/emp/navbar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/ev/ev_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev/ev_dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/ev/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev/navbar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/ev/s_image_standard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev/s_image_standard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/ev/standard_image_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev/standard_image_details.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/ev/upload_recent_image_qr.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev/upload_recent_image_qr.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/ev_update_recent_image.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev_update_recent_image.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/failed_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/failed_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/recent_image_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/recent_image_detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/report.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/report.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/report_selection.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/report_selection.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/members/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/members/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/navbar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oms/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/oms/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,18 +23,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "acarbonilla"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;acarbonilla&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/acarbonilla/oms.git",
-    "accountId": "099785d8-ec68-411a-af5c-edb1b2b893b3"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/acarbonilla/oms.git&quot;,
+    &quot;accountId&quot;: &quot;099785d8-ec68-411a-af5c-edb1b2b893b3&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -76,13 +44,13 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/dc/PycharmProjects/oms/static/report_logo"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/dc/PycharmProjects/oms/static/report_logo&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\dc\PycharmProjects\oms\static\report_logo" />
