@@ -5,8 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="66939e78-aa53-4976-9238-052a50849d6b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/templates/c2/ev/not_visited_facilities_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/c2/pass_list.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Documentation/Tasklist.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Documentation/Tasklist.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oms/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/oms/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/c2/ev/ev_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev/ev_dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/c2/ev/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev/navbar.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

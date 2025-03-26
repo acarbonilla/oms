@@ -94,6 +94,8 @@ class C2RecentImage(RecentImage):
 class C2Facility(models.Model):
     name = models.CharField(max_length=50, verbose_name="Facility")
     qr_code = models.ImageField(upload_to="qrcodes/", blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def generate_qr_code(self):
         """Generate and save QR code for this facility."""
@@ -102,7 +104,7 @@ class C2Facility(models.Model):
         sanitized_name = self.name.replace(" ", "_").lower()
         filename = f"qr_{sanitized_name}.png"
 
-        # ✅ Ensure QR code is generated even if it exists
+        # ✅ Generate the QR code with the facility URL
         qr_url = f"http://127.0.0.1:8000/c2/c2/facility/{self.id}/upload/"
         qr = qrcode.make(qr_url)
 
@@ -114,8 +116,14 @@ class C2Facility(models.Model):
             self.qr_code.delete(save=False)
 
         # ✅ Save the new QR code
-        self.qr_code.save(filename, ContentFile(buffer.getvalue()), save=True)
-        self.save()
+        self.qr_code.save(filename, ContentFile(buffer.getvalue()), save=False)
+
+    def save(self, *args, **kwargs):
+        """Override save method to generate QR code on creation."""
+        super().save(*args, **kwargs)  # Save first to get an ID
+        if not self.qr_code:  # Generate only if QR does not exist
+            self.generate_qr_code()
+            super().save(*args, **kwargs)  # Save again with QR code
 
     def __str__(self):
         return self.name

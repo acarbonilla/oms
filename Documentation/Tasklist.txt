@@ -56,7 +56,16 @@ Logo JWS - C2 Cebu - FM Vismin Team
 Completed
 1. QR scan (Done)
 2. Evaluator Standard App - All Standard (Done)
-3. Failed Report (PDF Download with JWS-FM logo and SBU)
+3. Failed Report (PDF Download with JWS-FM logo and SBU) (DONE)
 4. Assessment Report (Has indicator how many failed within 30 days) (Done)
 5. Added EV group (Done)
+6. Camera (Done)
+
+Task 3/26/2025
+1. Dashboard(Focus)
+2. Access will determine on Friday after the meeting.
+3. Study the self.serve SSL
+4. Copy from zfc project(etc setup)
+5. 404 or 503 error page
+
 

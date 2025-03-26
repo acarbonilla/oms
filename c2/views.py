@@ -34,12 +34,66 @@ from django.db.models import Q
 from .models import C2RecentImage  # Ensure correct model import
 from django.contrib.staticfiles import finders
 
+# local time
+from django.utils.timezone import localtime
 
-@login_required(login_url='omsLogin')
+
+# This is for only user belong to EV group can access the upload_recent_image_qr
+def ev_group_required(user):
+    return user.groups.filter(name="EV").exists()
+
+
+@user_passes_test(ev_group_required, login_url='omsLogin')  # ✅ Redirect if not in "EV" group
 def evMember(request):
-    facilities = C2Facility.objects.all()  # ✅ Fetch all facilities
-    name = User.objects.all()
-    context = {'name': name, 'facilities': facilities}
+    # Get current time in Philippine Time
+    ph_time_now = localtime(now())
+
+    # Get the start of this week (Monday)
+    start_of_week = ph_time_now - timedelta(days=ph_time_now.weekday())
+
+    # Get the start of this month
+    start_of_month = ph_time_now.replace(day=1)
+
+    # Get the start of this year
+    start_of_year = ph_time_now.replace(month=1, day=1)
+
+    # ✅ Count form entries for this week, month, and year
+    weekly_count = C2RecentImage.objects.filter(created__gte=start_of_week).count()
+    monthly_count = C2RecentImage.objects.filter(created__gte=start_of_month).count()
+    yearly_count = C2RecentImage.objects.filter(created__gte=start_of_year).count()
+
+    # ✅ Get Passed Facilities within this month
+    search_query = request.GET.get("search", "")
+
+    passed_facilities = C2RecentImage.objects.filter(
+        status="Pass",
+        created__gte=start_of_month
+    ).values("id", "s_image__facility__name", "created").distinct()
+
+    # ✅ Apply search filter
+    if search_query:
+        passed_facilities = passed_facilities.filter(s_image__facility__name__icontains=search_query)
+
+    # ✅ Pagination (10 per page)
+    paginator = Paginator(passed_facilities, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        "failed_sites_count": C2RecentImage.objects.filter(
+            status="Failed",
+            created__gte=ph_time_now - timedelta(days=30)
+        ).count(),
+        "total_facilities": C2Facility.objects.count(),
+        "passed_facilities_count": passed_facilities.count(),
+        "page_obj": page_obj,
+        "search_query": search_query,
+
+        # ✅ New Data for Weekly, Monthly, Yearly Form Counts
+        "weekly_count": weekly_count,
+        "monthly_count": monthly_count,
+        "yearly_count": yearly_count,
+    }
     return render(request, 'c2/ev/ev_dashboard.html', context)
 
 
@@ -109,11 +163,6 @@ def amAssessment(request):
         "search_query": search_query
     }
     return render(request, "c2/assessment.html", context)
-
-
-# This is for only user belong to EV group can access the upload_recent_image_qr
-def ev_group_required(user):
-    return user.groups.filter(name="EV").exists()
 
 
 @user_passes_test(ev_group_required, login_url='omsLogin')  # ✅ Redirect if not in "EV" group
@@ -442,3 +491,96 @@ def generate_selected_pdf(request):
     response = HttpResponse(buffer, content_type="application/pdf")
     response["Content-Disposition"] = 'attachment; filename="Selected_C2RecentImage_Report.pdf"'
     return response
+
+
+# This is for Pass List
+@login_required(login_url='omsLogin')
+def pass_list(request):
+    """View to list all 'Pass' statuses within 30 days and 1 year, sorted by date, with search & pagination."""
+
+    # ✅ Get current time
+    ph_time_now = localtime(now())
+
+    # ✅ Get 30 days ago and 1 year ago
+    thirty_days_ago = ph_time_now - timedelta(days=30)
+    one_year_ago = ph_time_now - timedelta(days=365)
+
+    # ✅ Get search query from request
+    search_query = request.GET.get("search", "")
+
+    # ✅ Query for records marked as "Pass"
+    recent_passes = C2RecentImage.objects.filter(
+        status="Pass",
+        created__gte=thirty_days_ago  # ✅ Passed within the last 30 days
+    ).order_by("-created")
+
+    old_passes = C2RecentImage.objects.filter(
+        status="Pass",
+        created__gte=one_year_ago,
+        created__lt=thirty_days_ago  # ✅ Passed after 30 days but within a year
+    ).order_by("-created")
+
+    # ✅ Apply search filter
+    if search_query:
+        recent_passes = recent_passes.filter(
+            Q(title__icontains=search_query) |
+            Q(s_image__facility__name__icontains=search_query)
+        )
+        old_passes = old_passes.filter(
+            Q(title__icontains=search_query) |
+            Q(s_image__facility__name__icontains=search_query)
+        )
+
+    # ✅ Pagination (10 per page)
+    paginator_recent = Paginator(recent_passes, 10)
+    paginator_old = Paginator(old_passes, 10)
+    page_number_recent = request.GET.get("recent_page")
+    page_number_old = request.GET.get("old_page")
+    recent_page_obj = paginator_recent.get_page(page_number_recent)
+    old_page_obj = paginator_old.get_page(page_number_old)
+
+    context = {
+        "recent_page_obj": recent_page_obj,  # ✅ Recent passes within 30 days
+        "old_page_obj": old_page_obj,        # ✅ Older passes within 1 year
+        "search_query": search_query,        # ✅ Preserve search input
+    }
+    return render(request, 'c2/pass_list.html', context)
+
+
+@login_required(login_url='omsLogin')
+def not_visited_facilities_list(request):
+    """View to list facilities that have NOT been visited within the last month."""
+
+    # ✅ Get current time in Philippine Time
+    ph_time_now = localtime(now())
+
+    # ✅ Get the start of the current month
+    one_month_ago = ph_time_now - timedelta(days=30)
+
+    # ✅ Get search query from request
+    search_query = request.GET.get("search", "")
+
+    # ✅ Get all facilities that WERE visited within the last month
+    visited_facilities = C2RecentImage.objects.filter(
+        created__gte=one_month_ago
+    ).values_list("s_image__facility__id", flat=True).distinct()
+
+    # ✅ Get facilities that were NOT visited within the last month
+    not_visited_facilities = C2Facility.objects.exclude(id__in=visited_facilities).order_by("name")
+
+    # ✅ Apply search filter
+    if search_query:
+        not_visited_facilities = not_visited_facilities.filter(
+            Q(name__icontains=search_query)
+        )
+
+    # ✅ Pagination (10 per page)
+    paginator = Paginator(not_visited_facilities, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        "page_obj": page_obj,  # ✅ List of facilities not visited
+        "search_query": search_query,  # ✅ Preserve search input
+    }
+    return render(request, 'c2/ev/not_visited_facilities_list.html', context)

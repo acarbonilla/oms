@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">📋 Pass Reports</h2>
+
+    <!-- Search Bar -->
+    <form method="GET" class="mb-3">
+        <input type="text" name="search" class="form-control" placeholder="Search by title or facility..." value="{{ search_query }}">
+        <button type="submit" class="btn btn-primary mt-2">Search</button>
+    </form>
+
+    <!-- Recent Passes (Within 30 Days) -->
+    <div class="card mt-4">
+        <div class="card-header bg-success text-white">✅ Recently Passed (Last 30 Days)</div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Facility</th>
+                        <th>Title</th>
+                        <th>Date Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pass in recent_page_obj %}
+                    <tr>
+                        <td>{{ pass.id }}</td>
+                        <td>{{ pass.s_image.facility.name }}</td>
+                        <td>{{ pass.title }}</td>
+                        <td>{{ pass.created|date:"F d, Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No recent pass records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Pagination for Recent Passes -->
+            <nav aria-label="Recent Passes Pagination">
+                <ul class="pagination justify-content-center mt-3">
+                    {% if recent_page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?search={{ search_query }}&recent_page=1">&laquo; First</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?search={{ search_query }}&recent_page={{ recent_page_obj.previous_page_number }}">Previous</a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item active"><span class="page-link">{{ recent_page_obj.number }}</span></li>
+
+                    {% if recent_page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?search={{ search_query }}&recent_page={{ recent_page_obj.next_page_number }}">Next</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?search={{ search_query }}&recent_page={{ recent_page_obj.paginator.num_pages }}">Last &raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Older Passes (After 30 Days But Within 1 Year) -->
+    <div class="card mt-4">
+        <div class="card-header bg-info text-white">📅 Passed After 30 Days (Within 1 Year)</div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Facility</th>
+                        <th>Title</th>
+                        <th>Date Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pass in old_page_obj %}
+                    <tr>
+                        <td>{{ pass.id }}</td>
+                        <td>{{ pass.s_image.facility.name }}</td>
+                        <td>{{ pass.title }}</td>
+                        <td>{{ pass.created|date:"F d, Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No older pass records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Pagination for Older Passes -->
+            <nav aria-label="Older Passes Pagination">
+                <ul class="pagination justify-content-center mt-3">
+                    {% if old_page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?search={{ search_query }}&old_page=1">&laquo; First</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?search={{ search_query }}&old_page={{ old_page_obj.previous_page_number }}">Previous</a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item active"><span class="page-link">{{ old_page_obj.number }}</span></li>
+
+                    {% if old_page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?search={{ search_query }}&old_page={{ old_page_obj.next_page_number }}">Next</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?search={{ search_query }}&old_page={{ old_page_obj.paginator.num_pages }}">Last &raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

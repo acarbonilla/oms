@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (empMember, amMember, amAssessment, upload_recent_image_qr, update_recent_image,
                     recent_image_detail, evMember, standard_image_ev, failed_list, generate_pdf,
-                    generate_selected_pdf, standard_image_ev_details,
+                    generate_selected_pdf, standard_image_ev_details, pass_list, not_visited_facilities_list,
                     )
 
 urlpatterns = [
@@ -21,6 +21,14 @@ urlpatterns = [
 
     # Failed List
     path("failed-list/", failed_list, name="failed_list"),
+
+    # Pass List
+    path('pass/', pass_list, name='pass_list'),
+
+    # Not Visited List
+    path('not-visited/', not_visited_facilities_list, name='not_visited_facilities_list'),
+
+
 
     # PDF
     path("download-pdf/", generate_pdf, name="download_pdf"),

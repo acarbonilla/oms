@@ -33,9 +33,6 @@
                     <a class="nav-link" href="{% url 'standard_image_ev' %}">Standard Image</a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'assessment'%}">Facility</a>
-                </li>
                 <li class="nav-item dropdown">
                     <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"
                        role="button">
@@ -43,11 +40,13 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{%url 'failed_list' %}">Failed</a></li>
-                        <li><a class="dropdown-item" href="#">Pass</a></li>
+                        <li><a class="dropdown-item" href="{%url 'pass_list' %}">Passed</a></li>
+                        <li><a class="dropdown-item" href="{% url 'assessment'%}">Pending</a></li>
+
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        <li><a class="dropdown-item" href="{% url 'not_visited_facilities_list' %}">Not Visited</a></li>
                     </ul>
 
                 </li>
