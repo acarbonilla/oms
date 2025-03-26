@@ -22,7 +22,7 @@ config/settings_local.py
 # Ignore Documentation folder
 Documentation/
 account.txt
-Legent.txt
+Legend.txt
 saveCode.txt
 Tasklist.txt
 
