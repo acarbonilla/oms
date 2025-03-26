@@ -1,10 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
+<style>
+    img.assessment-image {
+    width: 350px; /* Set a fixed width */
+    height: 400px; /* Set a fixed height */
+    object-fit: cover; /* Crop image to fit */
+    border-radius: 8px; /* Optional: Rounded corners */
+}
+    #shadow {
+  box-shadow: 10px 10px 5px lightblue;
+}
+}
+</style>
 <div class="container mt-4">
     <h2>📊 Assessment Report</h2>
 
     <!-- Search Bar -->
-    <form method="GET" action="{% url 'assessment' %}" class="mb-4">
+    <form method="GET" action="{% url 'assessment' %}" class="mb-4" id="shadow">
         <div class="input-group">
             <input type="text" name="search" class="form-control" placeholder="Search by Facility Name..." value="{{ search_query }}">
             <button type="submit" class="btn btn-primary">Search</button>
@@ -13,7 +25,7 @@
 
     {% if page_obj %}
         {% for item in page_obj %}
-        <div class="card mb-4">
+        <div class="card mb-5 " id="shadow">
             <div class="card-header {% if item.failed_count > 1 %} bg-danger text-white
                 {% elif item.failed_count == 1 %} bg-warning
                 {% else %} bg-secondary text-white
@@ -32,7 +44,8 @@
                     <div class="col-md-6 text-center">
                         <h5>Standard Image</h5>
                         {% if item.standard_image %}
-                            <img src="{{ item.standard_image }}" alt="Standard Image" class="img-fluid rounded shadow-lg" style="max-width: 100%; height: auto;">
+                            <img src="{{ item.standard_image }}" alt="Standard Image"
+                                 class="img-fluid rounded shadow-lg assessment-image">
                         {% else %}
                             <p class="text-muted">No Image Available</p>
                         {% endif %}
@@ -42,7 +55,8 @@
                     <div class="col-md-6 text-center">
                         <h5>Recent Failed Image</h5>
                         {% if item.recent_image %}
-                            <img src="{{ item.recent_image }}" alt="Recent Image" class="img-fluid rounded shadow-lg" style="max-width: 100%; height: auto;">
+                            <img src="{{ item.recent_image }}" alt="Recent Image"
+                                 class="img-fluid rounded shadow-lg assessment-image">
                         {% else %}
                             <p class="text-muted">No Image Available</p>
                         {% endif %}

@@ -1,10 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
+<style>
+    img.assessment-imageF {
+    width: 200px; /* Set a fixed width */
+    height: 250px; /* Set a fixed height */
+    object-fit: cover; /* Crop image to fit */
+    border-radius: 8px; /* Optional: Rounded corners */
+}
+    #shadow {
+  box-shadow: 10px 10px 5px lightblue;
+}
+
+</style>
 <div class="container mt-4">
     <h2>🚨 Failed Images Report</h2>
 
     <!-- Search Bar -->
-    <form method="GET" action="{% url 'failed_list' %}" class="mb-4">
+    <form method="GET" action="{% url 'failed_list' %}" class="mb-4" id="shadow">
         <div class="input-group">
             <input type="text" name="search" class="form-control" placeholder="Search by Facility Name..." value="{{ search_query }}">
             <button type="submit" class="btn btn-primary">Search</button>
@@ -13,7 +25,7 @@
 
     {% if page_obj %}
         {% for facility_data in page_obj %}
-        <div class="card mb-4">
+        <div class="card mb-4" id="shadow">
             <div class="card-header bg-danger text-white">
                 <h4>{{ facility_data.facility.name }} - {{ facility_data.failed_count }} Failed Reports</h4>
             </div>
@@ -23,8 +35,12 @@
                 <div class="row">
                     {% for image in facility_data.recent_failed_images %}
                     <div class="col-md-4 text-center">
-                        <img src="{{ image.recent_image.url }}" alt="Failed Image" class="img-fluid rounded shadow-lg" style="max-width: 100%; height: auto;">
-                        <p class="mt-2"><strong>Failed Date:</strong> {{ image.created|date:"F d, Y" }}</p>
+                        <img src="{{ image.recent_image.url }}" alt="Failed Image"
+                             class="img-fluid rounded shadow-lg assessment-imageF">
+                        <p class="mt-2"><strong>Failed Date:</strong> {{ image.created|date:"F d, Y" }}<br/>
+                            <strong>ID #:</strong> {{ image.id}}
+                        </p>
+
                     </div>
                     {% endfor %}
                 </div>
@@ -89,6 +105,6 @@
         <p class="alert alert-success">✅ No failed images in the last 30 days!</p>
     {% endif %}
 
-    <a href="{% url 'assessment' %}" class="btn btn-primary">Back to Assessment</a>
+    <a href="{% url 'assessment' %}" class="btn btn-primary mb-4">Back to Pending</a>
 </div>
 {% endblock %}

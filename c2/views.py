@@ -22,7 +22,6 @@ from django.core.paginator import Paginator  # ✅ Import Paginator
 from django.db.models import Q, Count
 
 # pdf
-
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
@@ -33,6 +32,9 @@ from django.http import HttpResponse
 from django.db.models import Q
 from .models import C2RecentImage  # Ensure correct model import
 from django.contrib.staticfiles import finders
+from reportlab.lib.utils import ImageReader, simpleSplit
+from reportlab.lib.styles import getSampleStyleSheet
+import textwrap
 
 # local time
 from django.utils.timezone import localtime
@@ -439,28 +441,43 @@ def generate_selected_pdf(request):
 
         y_position = height - 100
         pdf.setFont("Helvetica", 12)
+
         pdf.drawString(50, y_position, f"Title: {img.title}")
         pdf.drawString(50, y_position - 20, f"Facility: {img.s_image.facility.name}")
         pdf.drawString(50, y_position - 40, f"Status: {img.status}")
-        pdf.drawString(50, y_position - 60, f"Remarks: {img.remarks if img.remarks else 'N/A'}")
-        pdf.drawString(50, y_position - 80, f"Re-Schedule: {img.re_schedule if img.re_schedule else 'N/A'}")
-        pdf.drawString(50, y_position - 100, f"Evaluated By: {img.remark_by if img.remark_by else 'N/A'}")
-        pdf.drawString(50, y_position - 120,
+        y_position -= 60  # Adjust position after status
+
+        # ✅ Process and Wrap Remarks (Max 400 Words)
+        remarks_text = img.remarks if img.remarks else 'N/A'
+        words = remarks_text.split()[:400]  # Limit to 400 words
+        wrapped_remarks = textwrap.wrap(" ".join(words), width=90)  # Adjust width as needed
+
+        pdf.drawString(50, y_position, "Remarks:")
+        y_position -= 20  # Move down for remarks
+        for line in wrapped_remarks:
+            pdf.drawString(70, y_position, line)  # Indented remarks
+            y_position -= 15  # Line spacing for remarks
+
+        pdf.drawString(50, y_position - 10, f"Re-Schedule: {img.re_schedule if img.re_schedule else 'N/A'}")
+        pdf.drawString(50, y_position - 30, f"Evaluated By: {img.remark_by if img.remark_by else 'N/A'}")
+        pdf.drawString(50, y_position - 50,
                        f"Updated: {img.updated.strftime('%Y-%m-%d %H:%M:%S') if img.updated else 'N/A'}")
-        pdf.drawString(50, y_position - 140,
+        pdf.drawString(50, y_position - 70,
                        f"Created: {img.created.strftime('%Y-%m-%d %H:%M:%S') if img.created else 'N/A'}")
 
-        # ✅ Fetch Assigned Users for the Facility
+        # ✅ Fetch Assigned Users
         assigned_users = C2User.objects.filter(facility=img.s_image.facility)
         user_names = ", ".join(
             [user.name.username for user in assigned_users]) if assigned_users else "No Assigned Users"
-        pdf.drawString(50, y_position - 160, f"In-charge: {user_names}")
+        pdf.drawString(50, y_position - 90, f"In-charge: {user_names}")
+        y_position -= 110  # Adjust spacing
 
         # ✅ Include Image
         if img.recent_image:
             try:
                 img_path = img.recent_image.path
-                pdf.drawImage(ImageReader(img_path), 50, y_position - 310, width=200, height=150)
+                pdf.drawImage(ImageReader(img_path), 50, y_position - 160, width=200, height=150)
+                y_position -= 180  # Adjust spacing for the image
             except Exception as e:
                 print(f"Error loading image: {e}")
 

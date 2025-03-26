@@ -5,6 +5,9 @@
     .zoom-img {
             transition: transform 0.3s ease-in-out;
         }
+    #shadow {
+  box-shadow: 10px 10px 5px lightblue;
+}
 </style>
 
 <script>
@@ -17,9 +20,9 @@
     });
 </script>
 
-<div class="container">
+<div class="container border" id="shadow">
     <div class="row">
-        <div class="col-3 border text-center">
+        <div class="col-3 text-center">
             <form enctype="multipart/form-data" method="POST">
                 {% csrf_token %}
                 {{form.media}}
@@ -37,8 +40,8 @@
                 </div>
                 {% endif %}
                 <!-- End here the snippet -->
-                <div class="input-group mb-3">
-                    <span class="input-group-text topName">Remarks:</span>
+                <div class="input-group mb-3 mt-2">
+                    <span class="input-group-text topName mb-2">Remarks:</span>
                     {% render_field form.remarks id='id_remarks'%}
                 </div>
                 <div class="input-group mb-3">
@@ -55,7 +58,7 @@
                     {% render_field form.remark_by class="form-select"%}
                 </div>
                 <a
-                        class="btn btn-primary formSubmitButton"
+                        class="btn btn-primary formSubmitButton mb-2"
                         href="
                                 {%url 'assessment' %}"
                         role="button"
@@ -63,7 +66,7 @@
                 </a>
                 <input
                         aria-controls="offcanvasTop"
-                        class="btn btn-primary formSubmitButton"
+                        class="btn btn-primary formSubmitButton mb-2"
                         data-bs-target="#offcanvasTop"
                         data-bs-toggle="offcanvas"
                         type="submit"
@@ -74,8 +77,8 @@
         </div>
 
         <div class="col-5 border text-center">
-            <div class="input-group mb-3">
-                <span class="input-group-text topName">Recent Image</span>
+            <div class="input-group mb-3 mt-2">
+                <span class="input-group-text topName mb-2">Recent Image</span>
                 {% if form.instance.recent_image %}
                 <img alt="Recent Image" class="img-fluid rounded zoom-img" data-zoom-image="{{ form.instance.recent_image.url }}"
                      id="zoomImage"
@@ -104,8 +107,8 @@
         </script>
 
         <div class="col-4 border text-center">
-            <div class="input-group mb-3">
-                <span class="input-group-text topName">Standard Image</span>
+            <div class="input-group mb-3 mt-2">
+                <span class="input-group-text topName mb-2">Standard Image</span>
                 {% if form.instance.s_image and form.instance.s_image.standard_image %}
                 <img alt="Standard" class="img-fluid rounded" src="{{ form.instance.s_image.standard_image.url }}"
                      style="height: 500px; width: 700px">

@@ -1,12 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
-
-<div class="container mt-4">
-    <h2 class="mb-3">Recent Image Details</h2>
+<style>
+#shadow {
+  box-shadow: 10px 10px 5px lightblue;
+}
+</style>
+<div class="container mt-4 border-top rounded-end" id="shadow">
+    <h2 class="mb-3 mt-4">Recent Image Details</h2>
 
     <div class="row">
         <!-- ✅ Left Side: Information -->
-        <div class="col-md-4">
+        <div class="col-md-4 mb-3">
             <ul class="list-group">
                 <li class="list-group-item"><strong>ID #:</strong> {{ image.id }}</li>
                 <li class="list-group-item"><strong>Title:</strong> {{ image.title }}</li>
@@ -32,7 +36,7 @@
         </div>
     </div>
 
-    <a href="{% url 'assessment' %}" class="btn btn-secondary mt-3">Back</a>
+    <a href="{% url 'assessment' %}" class="btn btn-secondary mt-2 mb-2">Back</a>
 </div>
 
 {% endblock %}

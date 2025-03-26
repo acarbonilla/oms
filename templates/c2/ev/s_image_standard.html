@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
+<style>
+    #shadow {
+  box-shadow: 10px 10px 5px lightblue;
+}
+
+</style>
 
 <div class="container mt-4">
     <h2 class="mb-3">Standard Images</h2>
@@ -8,17 +14,18 @@
     <form method="GET" class="mb-3">
         <div class="row">
             <div class="col-md-6">
-                <input type="text" name="search" value="{{ search_query }}" class="form-control" placeholder="Search by Facility Name">
+                <input type="text" name="search" value="{{ search_query }}" class="form-control"
+                       placeholder="Search by Facility Name" id="shadow">
             </div>
             <div class="col-md-3">
-                <select name="sort" class="form-select">
+                <select name="sort" class="form-select" id="shadow">
                     <option value="asc" {% if sort_order == "asc" %}selected{% endif %}>Sort A-Z</option>
                     <option value="desc" {% if sort_order == "desc" %}selected{% endif %}>Sort Z-A</option>
                 </select>
             </div>
             <div class="col-md-3">
-                <button type="submit" class="btn btn-primary">Apply</button>
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" id="shadow">Apply</button>
+                <button type="submit" class="btn btn-primary" id="shadow">
                     <a class="text-white" href="{% url 'standard_image_ev'%}" style="text-decoration:none;">
                          Refresh
                     </a>
@@ -31,8 +38,8 @@
     <!-- ✅ Standard Image List -->
     <div class="row">
         {% for image in s_standard %}
-            <div class="col-md-4 mb-4">
-                <div class="card">
+            <div class="col-md-4 mb-4" >
+                <div class="card" id="shadow">
                     <img src="{{ image.standard_image.url }}" width="200" height="300" class="card-img-top" alt="Standard Image">
                     <div class="card-body">
                         <h5 class="card-title">{{ image.facility }}</h5>
