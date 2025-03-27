@@ -6,15 +6,17 @@
   <component name="ChangeListManager">
     <list default="true" id="66939e78-aa53-4976-9238-052a50849d6b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/c2/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oms/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/oms/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/assessment.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/assessment.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/ev/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev/navbar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/ev/s_image_standard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev/s_image_standard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/ev/standard_image_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev/standard_image_details.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/ev_update_recent_image.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev_update_recent_image.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/failed_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/failed_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/recent_image_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/recent_image_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/migrations/0002_alter_c2recentimage_remark_by_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/migrations/0003_c2recentimage_qr_code.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/migrations/0004_c2user_facility.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/migrations/0005_remove_c2recentimage_qr_code.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/migrations/0006_c2facility_qr_code.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/migrations/0007_alter_c2recentimage_recent_image.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/migrations/0008_alter_c2recentimage_recent_image.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/migrations/0009_c2facility_created_c2facility_updated.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/migrations/0001_initial.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
