@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
+
+
 <div class="container mt-4">
     <h2>📄 Select Records for PDF Report ({{ current_year }})</h2>
 
@@ -12,8 +14,15 @@
     <form action="{% url 'download_selected_pdf' %}" class="mb-4" method="GET">
         <div class="input-group">
             <input class="form-control" name="search" placeholder="Search by Title or Facility..." type="text"
-                   value="{{ search_query }}">
-            <button class="btn btn-primary" type="submit">Search</button>
+                   value="{{ search_query }}"> &nbsp;
+            <button class="btn btn-primary" type="submit">Search</button> &nbsp;
+
+              <button class="btn btn-primary" type="submit">
+                  <a href="{% url 'download_selected_pdf'%}" class="text-white" style="text-decoration:none;">
+                  Refresh
+                  </a>
+              </button>
+
         </div>
     </form>
 
@@ -29,7 +38,8 @@
                 <th>Status</th>
                 <th>Created Date</th>  <!-- ✅ Add Created Date -->
                 <th>Uploaded By</th>
-                <th>Recent Image</th>
+                <th>Standard Image</th>
+                <th>Latest Image</th>
             </tr>
             </thead>
             <tbody>
@@ -45,10 +55,18 @@
                 <td>{{ img.uploaded_by }}</td>
                 <td>
                     {% if img.recent_image %}
-                    <img alt="Recent Image" class="img-thumbnail" src="{{ img.recent_image.url }}"
-                         style="max-width: 100px;">
+                    <img alt="Standard Image" class="img-thumbnail" width="100" height="100" src="{{ img.s_image.standard_image.url }}"
+                       >
                     {% else %}
-                    <img alt="No Image" class="img-thumbnail" src="/static/dummy_recent.jpg" style="max-width: 100px;">
+                    <img alt="No Image" class="img-thumbnail" src="/static/dummy_recent.jpg">
+                    {% endif %}
+                </td>
+                <td>
+                    {% if img.recent_image %}
+                    <img alt="Recent Image" class="img-thumbnail" width="100" height="100" src="{{ img.recent_image.url }}"
+                        >
+                    {% else %}
+                    <img alt="No Image" class="img-thumbnail" src="/static/dummy_recent.jpg" >
                     {% endif %}
                 </td>
             </tr>

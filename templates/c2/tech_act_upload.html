@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Upload Technical Activity</h2>
+    <form class="card p-4 shadow-sm" enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label class="form-label" for="id_name">Activity Name:</label>
+            <input class="form-control" id="id_name" name="name" placeholder="Enter activity name"
+                   type="text" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="id_location">Location:</label>
+            <input class="form-control" id="id_location" name="location" placeholder="Enter location"
+                   required type="text">
+        </div>
+
+       <div class="mb-3">
+            <label class="form-label" for="image-input">Upload Images:</label><br/>
+            <input type="file" name="image" id="image-input" multiple accept="image/*" required>
+        </div>
+
+
+        <!-- ✅ Image Preview Area -->
+        <div class="d-flex flex-wrap" id="preview-container"></div>
+
+        <button class="btn btn-primary mt-3" type="submit">Upload Activity</button>
+    </form>
+</div>
+
+<!-- ✅ JavaScript for Image Preview -->
+<script>
+    document.getElementById('image-input').addEventListener('change', function(event) {
+        let previewContainer = document.getElementById('preview-container');
+        previewContainer.innerHTML = ""; // Clear previous previews
+
+        for (let file of event.target.files) {
+            let reader = new FileReader();
+
+            reader.onload = function(e) {
+                let img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.width = "100px";
+                img.style.margin = "5px";
+                img.style.borderRadius = "8px";
+                img.style.boxShadow = "0 0 5px rgba(0,0,0,0.2)";
+                previewContainer.appendChild(img);
+            };
+
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+
+{% endblock %}

@@ -17,7 +17,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "192.168.1.20",
-    "192.11.200.9",  # ✅ Add your local IP here
+    "*",
 ]
 
 # Application definition
@@ -88,14 +88,15 @@ WSGI_APPLICATION = 'oms.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'oms5',
-        'USER': 'oms',  # carbonillaat
-        'PASSWORD': 'XiaCarb@123',  #  $Everyday23
+        'NAME': 'oms',
+        'USER': 'carbonillaat',
+        'PASSWORD': '$Everyday23',
         'HOST': 'localhost',
         'PORT': '3306',
     }
 }
-
+# carbonillaat # oms
+#  $Everyday23 # XiaCarb@123
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 

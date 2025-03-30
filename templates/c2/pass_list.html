@@ -21,6 +21,7 @@
                         <th>Facility</th>
                         <th>Title</th>
                         <th>Date Created</th>
+
                     </tr>
                 </thead>
                 <tbody>
@@ -30,6 +31,9 @@
                         <td>{{ pass.s_image.facility.name }}</td>
                         <td>{{ pass.title }}</td>
                         <td>{{ pass.created|date:"F d, Y" }}</td>
+                        <td>
+                            <a href="{% url 'update_recent_image' pass.id %}" class="btn btn-success">📝 Re-Evaluate</a>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>

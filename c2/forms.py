@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 
-from .models import C2RecentImage, C2User
+from .models import C2RecentImage, C2User, C2TechActivities, C2Facility, C2TechActivityImage
 
 
 class C2RecentImageForm(forms.ModelForm):
@@ -50,3 +50,20 @@ class C2RecentImageFormUpdate(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+
+class TechnicalActivitiesForm(forms.ModelForm):
+
+    class Meta:
+        model = C2TechActivities
+        fields = ['name', 'location']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # No need to modify 'uploaded_by' here; handled in the view
+
+
+class TechActivityImageForm(forms.ModelForm):
+    class Meta:
+        model = C2TechActivityImage
+        fields = ['image']

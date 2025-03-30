@@ -7,10 +7,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 # This is for QR
 from django.urls import reverse
+from django.utils.html import strip_tags
+from reportlab.lib import colors
 
-from c2.forms import C2RecentImageForm, C2RecentImageFormUpdate
+from c2.forms import C2RecentImageForm, C2RecentImageFormUpdate, TechnicalActivitiesForm
 # from c2.filters import FacilityFilter
-from c2.models import C2Standard, C2RecentImage, C2User, C2Facility
+from c2.models import C2Standard, C2RecentImage, C2User, C2Facility, C2TechActivities, C2TechActivityImage
 
 from django.db.models import OuterRef, Subquery
 
@@ -22,7 +24,7 @@ from django.core.paginator import Paginator  # ✅ Import Paginator
 from django.db.models import Q, Count
 
 # pdf
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import letter, landscape
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 from io import BytesIO
@@ -39,13 +41,38 @@ import textwrap
 # local time
 from django.utils.timezone import localtime
 
+# Decorators
+from django.http import HttpResponseForbidden
+from functools import wraps
+
+
+# This decorator prohibits the EMP group to access the page
+
+def restrict_emp_group(redirect_url="access_denied/"):  # Redirect to "access_denied"
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped_view(request, *args, **kwargs):
+            if request.user.groups.filter(name="EMP").exists():
+                messages.warning(request, "🚫 You are not authorized to access this page.")
+                return redirect(redirect_url)
+            return view_func(request, *args, **kwargs)
+
+        return _wrapped_view
+
+    return decorator
+
+
+def access_denied(request):
+    return render(request, "forbidden/access_denied.html")
+
 
 # This is for only user belong to EV group can access the upload_recent_image_qr
 def ev_group_required(user):
     return user.groups.filter(name="EV").exists()
 
 
-@user_passes_test(ev_group_required, login_url='omsLogin')  # ✅ Redirect if not in "EV" group
+@restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
+@login_required(login_url='omsLogin')
 def evMember(request):
     # Get current time in Philippine Time
     ph_time_now = localtime(now())
@@ -114,6 +141,7 @@ def amMember(request):
     return render(request, 'c2/am/am_list.html', context)
 
 
+@restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
 def amAssessment(request):
     """Show the latest failed recent images per facility with search and pagination."""
@@ -208,11 +236,9 @@ def upload_recent_image_qr(request, facility_id):
     return render(request, 'c2/ev/upload_recent_image_qr.html', {'form': form, 'facility': facility})
 
 
-# This is for QR code creation and link
-
 # This section is for uploading or updating the recent image.
 
-@login_required(login_url='omsLogin')
+@user_passes_test(ev_group_required, login_url='omsLogin')  # ✅ Redirect if not in "EV" group
 def update_recent_image(request, pk):
     """Update an existing C2RecentImage and automatically assign remark_by."""
 
@@ -237,6 +263,7 @@ def update_recent_image(request, pk):
 
 
 # Details Section
+@restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
 def recent_image_detail(request, pk):
     """Displays details of a recent image and shows assigned users of the facility."""
@@ -253,7 +280,8 @@ def recent_image_detail(request, pk):
 
 
 # This is for EV Standard Image
-@user_passes_test(ev_group_required, login_url='omsLogin')  # ✅ Redirect if not in "EV" group
+@restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
+@login_required(login_url='omsLogin')
 def standard_image_ev(request):
     """Displays standard images with search, sorting, and pagination."""
 
@@ -289,7 +317,8 @@ def standard_image_ev(request):
     return render(request, 'c2/ev/s_image_standard.html', context)
 
 
-@user_passes_test(ev_group_required, login_url='omsLogin')  # ✅ Redirect if not in "EV" group
+@restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
+@login_required(login_url='omsLogin')
 def standard_image_ev_details(request, pk):
     """View details of a specific standard image and show the assigned user."""
 
@@ -305,6 +334,7 @@ def standard_image_ev_details(request, pk):
 
 
 # This is for everyone
+@restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
 def failed_list(request):
     """Show up to 3 'Failed' images within 30 days & keep a yearly history, with search and pagination."""
@@ -350,6 +380,7 @@ def failed_list(request):
     return render(request, 'c2/failed_list.html', {'page_obj': page_obj, 'search_query': search_query})
 
 
+@restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
 def generate_pdf(request):
     """Generate and download a PDF report of C2RecentImage entries within the current year."""
@@ -394,27 +425,28 @@ def generate_pdf(request):
             y_position = height - 50
             pdf.setFont("Helvetica", 12)
 
-    pdf.showPage()
     pdf.save()
-
     buffer.seek(0)
     response = HttpResponse(buffer, content_type="application/pdf")
     response["Content-Disposition"] = 'attachment; filename="C2RecentImage_Report.pdf"'
     return response
 
 
+@restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
 def generate_selected_pdf(request):
-    """Generate a PDF report with images, ensuring each selected record is on a single page."""
-
+    """Generate a landscape PDF report with watermark, images, and details."""
     selected_ids = request.GET.getlist("selected_ids", [])
     search_query = request.GET.get("search", "")
     current_year = now().year
-
     images = C2RecentImage.objects.filter(created__year=current_year).exclude(status="Pending")
 
     if search_query:
-        images = images.filter(Q(title__icontains=search_query) | Q(s_image__facility__name__icontains=search_query))
+        images = images.filter(Q(title__icontains=search_query) | Q(s_image__facility__name__icontains=search_query)
+                               | Q(status__icontains=search_query)
+                               | Q(uploaded_by__name__first_name__icontains=search_query)
+                               | Q(id__icontains=search_query)
+                               )
 
     if not images.exists():
         return render(request, "c2/report_selection.html", {
@@ -430,83 +462,110 @@ def generate_selected_pdf(request):
         })
 
     images = images.filter(id__in=selected_ids)
-
     buffer = BytesIO()
-    pdf = canvas.Canvas(buffer, pagesize=letter)
-    width, height = letter
+    pdf = canvas.Canvas(buffer, pagesize=landscape(letter))
+    width, height = landscape(letter)
 
-    for img in images:
+    def add_watermark(pdf, width, height):
+        try:
+            watermark_path = finders.find("report_logo/fm_2.png")
+            if watermark_path:
+                pdf.saveState()
+                pdf.setFillAlpha(0.1)  # Transparency
+                pdf.drawImage(ImageReader(watermark_path), width / 3, height / 3, width=300, height=150, mask='auto')
+                pdf.restoreState()
+        except Exception as e:
+            print(f"Error adding watermark: {e}")
+
+    for index, img in enumerate(images):  # Added index to track the first page
+        if index > 0:  # Only add a new page after the first iteration
+            pdf.showPage()  # ✅ Now it correctly starts a new page for each report
+
+        # add_watermark(pdf, width, height)  # Add watermark
+        add_watermark(pdf, width, height)  # Add watermark
+        # Border
+        pdf.setStrokeColor(colors.black)
+        pdf.setLineWidth(2)
+        pdf.rect(20, 20, width - 40, height - 40)
+
         pdf.setFont("Helvetica-Bold", 16)
-        pdf.drawString(150, height - 50, f"Selected C2 Recent Image Report - {current_year}")
-
-        y_position = height - 100
+        pdf.drawString(250, height - 50, "Facility Management Inspection Report")
         pdf.setFont("Helvetica", 12)
 
-        pdf.drawString(50, y_position, f"Title: {img.title}")
-        pdf.drawString(50, y_position - 20, f"Facility: {img.s_image.facility.name}")
-        pdf.drawString(50, y_position - 40, f"Status: {img.status}")
-        y_position -= 60  # Adjust position after status
+        col1_x, col2_x, col3_x = 50, 300, 550
+        img_width, img_height = 200, 150
+        y_position = height - 100
 
-        # ✅ Process and Wrap Remarks (Max 400 Words)
-        remarks_text = img.remarks if img.remarks else 'N/A'
-        words = remarks_text.split()[:400]  # Limit to 400 words
-        wrapped_remarks = textwrap.wrap(" ".join(words), width=90)  # Adjust width as needed
+        # Column 1: Information
+        pdf.drawString(col1_x, y_position, f"ID: {img.id}")
+        pdf.drawString(col1_x, y_position - 20, f"Title: {img.title}")
+        pdf.drawString(col1_x, y_position - 40, f"Facility: {img.s_image.facility.name}")
+        pdf.drawString(col1_x, y_position - 60, f"Status: {img.status}")
 
-        pdf.drawString(50, y_position, "Remarks:")
-        y_position -= 20  # Move down for remarks
-        for line in wrapped_remarks:
-            pdf.drawString(70, y_position, line)  # Indented remarks
-            y_position -= 15  # Line spacing for remarks
+        y_position -= 80
+        pdf.drawString(col1_x, y_position - 10, f"Re-Schedule: {img.re_schedule if img.re_schedule else 'N/A'}")
+        pdf.drawString(
+            col1_x, y_position - 30,
+            f"Evaluated By: {img.remark_by.first_name} {img.remark_by.last_name}" if img.remark_by else "Evaluated "
+                                                                                                        "By: N/A"
+        )
 
-        pdf.drawString(50, y_position - 10, f"Re-Schedule: {img.re_schedule if img.re_schedule else 'N/A'}")
-        pdf.drawString(50, y_position - 30, f"Evaluated By: {img.remark_by if img.remark_by else 'N/A'}")
-        pdf.drawString(50, y_position - 50,
-                       f"Updated: {img.updated.strftime('%Y-%m-%d %H:%M:%S') if img.updated else 'N/A'}")
-        pdf.drawString(50, y_position - 70,
-                       f"Created: {img.created.strftime('%Y-%m-%d %H:%M:%S') if img.created else 'N/A'}")
+        pdf.drawString(col1_x, y_position - 50,
+                       f"Updated: {localtime(img.updated).strftime('%Y-%m-%d %H:%M:%S') if img.updated else 'N/A'}")
+        pdf.drawString(col1_x, y_position - 70,
+                       f"Created: {localtime(img.created).strftime('%Y-%m-%d %H:%M:%S') if img.created else 'N/A'}")
+        y_position -= 90
 
-        # ✅ Fetch Assigned Users
-        assigned_users = C2User.objects.filter(facility=img.s_image.facility)
-        user_names = ", ".join(
-            [user.name.username for user in assigned_users]) if assigned_users else "No Assigned Users"
-        pdf.drawString(50, y_position - 90, f"In-charge: {user_names}")
-        y_position -= 110  # Adjust spacing
+        # Column 2: Standard Image
+        if img.s_image and img.s_image.standard_image:
+            try:
+                pdf.drawString(col2_x, y_position, "Standard Image")
+                pdf.drawImage(ImageReader(img.s_image.standard_image.path), col2_x, height - 230, width=img_width,
+                              height=img_height)
+            except Exception as e:
+                print(f"Error loading standard image: {e}")
 
-        # ✅ Include Image
+        # Column 3: Latest Image
         if img.recent_image:
             try:
-                img_path = img.recent_image.path
-                pdf.drawImage(ImageReader(img_path), 50, y_position - 160, width=200, height=150)
-                y_position -= 180  # Adjust spacing for the image
+                pdf.drawString(col3_x, y_position, "Latest Image")
+                pdf.drawImage(ImageReader(img.recent_image.path), col3_x, height - 230, width=img_width,
+                              height=img_height)
             except Exception as e:
-                print(f"Error loading image: {e}")
+                print(f"Error loading latest image: {e}")
 
-        # ✅ Add logos at the bottom
+        # Remove HTML tags and prepare remarks text
+        remarks_text = strip_tags(img.remarks) if img.remarks else 'N/A'
+
+        # Wrap text for proper formatting in PDF
+        wrapped_remarks = textwrap.wrap(" ".join(remarks_text.split()[:150]), width=120)
+
+        pdf.drawString(col1_x, y_position, "Remarks:")
+
+        # Indented text
+        y_position -= 50
+        indentation = 20  # Adjust this value for indentation
+
+        for line in wrapped_remarks:
+            pdf.drawString(col1_x + indentation, y_position, line)  # Apply indentation
+            y_position -= 25  # Line spacing
+
+        # End of Report
         pdf.setFont("Helvetica-Bold", 14)
-        pdf.drawString(200, 100, "End of Report")
+        pdf.drawString(280, y_position - 20, "-----End of Report-----")
 
         try:
-            logo1_path = finders.find("report_logo/JWS-FM Logo.JPG")
             logo2_path = finders.find("report_logo/zfc-logo.png")
 
-            if logo1_path:
-                pdf.drawImage(ImageReader(logo1_path), 50, 50, width=100, height=50)
-            else:
-                print("Error: JWS-FM Logo not found")
-
             if logo2_path:
-                pdf.drawImage(ImageReader(logo2_path), 200, 50, width=100, height=50)
-            else:
-                print("Error: ZFC Logo not found")
+                pdf.drawImage(ImageReader(logo2_path), 30, height - 75, width=100, height=50)
         except Exception as e:
             print(f"Error loading logos: {e}")
-
-        pdf.showPage()  # ✅ Ensure each entry starts on a new page
 
     pdf.save()
     buffer.seek(0)
     response = HttpResponse(buffer, content_type="application/pdf")
-    response["Content-Disposition"] = 'attachment; filename="Selected_C2RecentImage_Report.pdf"'
+    response["Content-Disposition"] = 'attachment; filename="Facility Mgt Inspection Report.pdf"'
     return response
 
 
@@ -558,12 +617,13 @@ def pass_list(request):
 
     context = {
         "recent_page_obj": recent_page_obj,  # ✅ Recent passes within 30 days
-        "old_page_obj": old_page_obj,        # ✅ Older passes within 1 year
-        "search_query": search_query,        # ✅ Preserve search input
+        "old_page_obj": old_page_obj,  # ✅ Older passes within 1 year
+        "search_query": search_query,  # ✅ Preserve search input
     }
     return render(request, 'c2/pass_list.html', context)
 
 
+@restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
 def not_visited_facilities_list(request):
     """View to list facilities that have NOT been visited within the last month."""
@@ -601,3 +661,98 @@ def not_visited_facilities_list(request):
         "search_query": search_query,  # ✅ Preserve search input
     }
     return render(request, 'c2/ev/not_visited_facilities_list.html', context)
+
+
+# This is for Technical Activities
+@login_required(login_url='omsLogin')
+def tech_act_upload(request, pk=None):
+    tech = get_object_or_404(C2TechActivities, id=pk) if pk else None
+
+    if request.method == "POST":
+        form = TechnicalActivitiesForm(request.POST, instance=tech)
+
+        if form.is_valid():
+            tech_activity = form.save(commit=False)
+
+            # ✅ Correctly get the C2User instance
+            tech_activity.uploaded_by = C2User.objects.get(name__id=request.user.id)
+
+            tech_activity.save()
+
+            # ✅ Handle multiple image uploads
+            files = request.FILES.getlist('image')
+            for file in files:
+                C2TechActivityImage.objects.create(activity=tech_activity, image=file)
+
+            return redirect('empMember')
+    else:
+        form = TechnicalActivitiesForm(instance=tech)
+
+    return render(request, "c2/tech_act_upload.html", {"activity_form": form})
+
+
+# This is for tech view list
+@login_required(login_url='omsLogin')
+def activity_list(request):
+    """View for listing activities with search, filter, and pagination."""
+
+    search_query = request.GET.get("search", "")
+    filter_option = request.GET.get("filter", "all")
+    page_number = request.GET.get("page", 1)
+
+    today = now()
+
+    # Determine filter date range
+    if filter_option == "week":
+        start_date = today - timedelta(days=7)
+    elif filter_option == "month":
+        start_date = today - timedelta(days=30)
+    elif filter_option == "year":
+        start_date = today - timedelta(days=365)
+    else:
+        start_date = None  # Show all records
+
+    # Apply filters
+    activities = C2TechActivities.objects.all().prefetch_related("images")
+    if start_date:
+        activities = activities.filter(created__gte=start_date)
+    if search_query:
+        activities = activities.filter(name__icontains=search_query)  # Search by activity name
+
+    # Add pagination
+    paginator = Paginator(activities, 5)  # Show 5 activities per page
+    activities_page = paginator.get_page(page_number)
+
+    return render(
+        request,
+        "c2/activity_list.html",
+        {
+            "activities": activities_page,
+            "filter_option": filter_option,
+            "search_query": search_query
+        }
+    )
+
+
+@login_required(login_url='omsLogin')
+def activity_detail(request, activity_id):
+    """View to show details of a specific activity with images."""
+    activity = get_object_or_404(C2TechActivities, id=activity_id)
+    return render(request, "c2/activity_detail.html", {"activity": activity})
+
+
+# This is for Errors
+def custom_403(request, exception=None):
+    return render(request, "forbidden/403.html", status=403)
+
+
+def custom_404(request, exception):
+    return render(request, "forbidden/404.html", status=404)
+
+
+def custom_500(request):
+    return render(request, "forbidden/500.html", status=500)
+
+
+def trigger_500(request):
+    raise ValueError("Intentional Server Error")

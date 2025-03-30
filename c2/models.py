@@ -29,7 +29,7 @@ class C2User(models.Model):
         default='EMP'
 
     )
-    facility = models.ForeignKey('C2Facility', on_delete=models.CASCADE, null=True, blank=True)  # ✅ NEW
+    facility = models.ForeignKey('C2Facility', on_delete=models.SET_NULL, null=True, blank=True)  # ✅ NEW
 
     created = models.DateField(auto_now_add=True)
     updated = models.DateField(auto_now=True)
@@ -51,7 +51,7 @@ class C2StandardManager(models.Manager):
 
 
 class C2Standard(StandardImage):
-    facility = models.ForeignKey('C2Facility', on_delete=models.CASCADE, related_name="standards")
+    facility = models.ForeignKey('C2Facility', on_delete=models.SET_NULL, null=True, related_name="standards")
     standard_image = models.ImageField(upload_to="img/standard_images/")
     objects = C2StandardManager()  # Attach custom manager
 
@@ -84,11 +84,25 @@ class C2RecentImage(RecentImage):
         ("Failed", "Failed"),
         ("Pending", "Pending")
     ]
-    s_image = models.ForeignKey(C2Standard, on_delete=models.CASCADE)
+    s_image = models.ForeignKey(C2Standard, on_delete=models.SET_NULL, null=True,)
     recent_image = models.ImageField(upload_to=recent_image_upload_path)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Pending")
     uploaded_by = models.ForeignKey(C2User, on_delete=models.CASCADE, related_name="uploaded_images")
     remark_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="remarked_images")
+
+
+def technical_activities_path(instance, filename):
+    """Generates a unique filename based on facility name and an incrementing number."""
+    facility_name = slugify(instance.location.name)  # Convert facility name to a safe format
+    base_dir = "media/img/technical_images"
+
+    # Ensure directory exists before listing
+    if not os.path.exists(base_dir):
+        os.makedirs(base_dir)
+
+    existing_files = [f for f in os.listdir(base_dir) if f.startswith(facility_name)]
+    next_number = len(existing_files) + 1
+    return os.path.join("img/technical_images", f"{facility_name}_{next_number}.png")
 
 
 class C2Facility(models.Model):
@@ -105,8 +119,8 @@ class C2Facility(models.Model):
         filename = f"qr_{sanitized_name}.png"
 
         # ✅ Generate the QR code with the facility URL
-        qr_url = f"https://192.168.1.20:8000/c2/c2/facility/{self.id}/upload/"
-        # qr_url = f"http://127.0.0.1:8000/c2/c2/facility/{self.id}/upload/"
+        # qr_url = f"https://192.168.1.20:8000/c2/c2/facility/{self.id}/upload/"
+        qr_url = f"http://127.0.0.1:8000/c2/c2/facility/{self.id}/upload/"
         qr = qrcode.make(qr_url)
 
         buffer = BytesIO()
@@ -128,3 +142,26 @@ class C2Facility(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class C2TechActivities(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Activity")
+    location = models.CharField(max_length=100)
+    uploaded_by = models.ForeignKey(C2User, on_delete=models.CASCADE, related_name="uploaded_images_by")
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-updated']
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class C2TechActivityImage(models.Model):
+    activity = models.ForeignKey(C2TechActivities, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to="media/img/technical_images")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Image for {self.activity.name}"

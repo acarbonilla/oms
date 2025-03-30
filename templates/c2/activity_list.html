@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Technical Activities</h2>
+
+    <!-- Search Bar -->
+    <form method="GET" class="mb-3 d-flex">
+        <input type="text" name="search" class="form-control me-2"
+               placeholder="Search activities..." value="{{ search_query }}">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    <!-- Filter Options -->
+    <form method="GET" class="mb-3">
+        <label>Filter by:</label>
+        <select name="filter" class="form-select" onchange="this.form.submit()">
+            <option value="all" {% if filter_option == "all" %}selected{% endif %}>All</option>
+            <option value="week" {% if filter_option == "week" %}selected{% endif %}>Last Week</option>
+            <option value="month" {% if filter_option == "month" %}selected{% endif %}>Last Month</option>
+            <option value="year" {% if filter_option == "year" %}selected{% endif %}>Last Year</option>
+        </select>
+    </form>
+
+    <!-- Activities List -->
+    <div class="row">
+        {% for activity in activities %}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ activity.name }}</h5>
+                    <p class="card-text"><strong>Location:</strong> {{ activity.location }}</p>
+                    <p class="card-text"><small class="text-muted">{{ activity.created }}</small></p>
+
+                    <!-- Display images -->
+                    <div class="d-flex flex-wrap">
+                        {% for image in activity.images.all %}
+                            <img src="{{ image.image.url }}" class="img-thumbnail me-2"
+                                 style="width: 100px; height: 100px;">
+                        {% empty %}
+                            <p>No images available.</p>
+                        {% endfor %}
+                    </div>
+                     <p class="card-text"><small class="text-muted">
+                      <a href="{% url 'activity_detail' activity.id %}" style="text-decoration:none;"> See More...</a>
+                    </small>
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>No activities found.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <nav>
+        <ul class="pagination">
+            {% if activities.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1&search={{ search_query }}&filter={{ filter_option }}">First</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ activities.previous_page_number }}&search={{ search_query }}&filter={{ filter_option }}">Previous</a></li>
+            {% endif %}
+
+            <li class="page-item disabled"><a class="page-link">Page {{ activities.number }} of {{ activities.paginator.num_pages }}</a></li>
+
+            {% if activities.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ activities.next_page_number }}&search={{ search_query }}&filter={{ filter_option }}">Next</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ activities.paginator.num_pages }}&search={{ search_query }}&filter={{ filter_option }}">Last</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+</div>
+
+{% endblock %}

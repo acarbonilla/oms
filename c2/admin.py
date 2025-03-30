@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import mark_safe
 
-from .models import C2Standard, C2RecentImage, C2Facility, C2User
+from .models import C2Standard, C2RecentImage, C2Facility, C2User, C2TechActivities, C2TechActivityImage
 
 
 # This is for QR code
@@ -26,6 +26,8 @@ class C2FacilityAdmin(admin.ModelAdmin):
     show_qr_code.short_description = "QR Code"
 
 
+admin.site.register(C2TechActivityImage)
+admin.site.register(C2TechActivities)
 admin.site.register(C2Facility, C2FacilityAdmin)
 admin.site.register(C2Standard)
 admin.site.register(C2User)

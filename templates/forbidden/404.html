@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Lost in Space</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            overflow: hidden;
+        }
+        .container {
+            position: absolute;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        h1 {
+            font-size: 5rem;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        .home-btn {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            color: white;
+            background: #ff6600;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .home-btn:hover {
+            background: #ff4500;
+        }
+        .astronaut {
+            position: absolute;
+            width: 150px;
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>404</h1>
+        <p>Oops! Looks like you're lost in space...</p>
+        <a href="/" class="home-btn">Take me home</a>
+    </div>
+    <img src="{% static 'img/astro.png' %}" alt="Astronaut" class="astronaut" style="top:30%; left:50%;">
+</body>
+</html>
