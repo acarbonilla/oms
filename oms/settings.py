@@ -88,9 +88,9 @@ WSGI_APPLICATION = 'oms.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'oms', # db name
-        'USER': 'oms',
-        'PASSWORD': 'XiaCarb@123',
+        'NAME': 'oms6',  # db name
+        'USER': 'carbonillaat',
+        'PASSWORD': '$Everyday23',
         'HOST': 'localhost',
         'PORT': '3306',
     }

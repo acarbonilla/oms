@@ -173,7 +173,7 @@ class C2TechActivities(models.Model):
 
 class C2TechActivityImage(models.Model):
     activity = models.ForeignKey(C2TechActivities, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to="media/img/technical_images")
+    image = models.ImageField(upload_to=technical_activities_path)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
