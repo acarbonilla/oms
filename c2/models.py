@@ -6,7 +6,7 @@ from django.db import models
 
 from core.models import StandardImage, RecentImage, SBU
 from django.db.models import OuterRef, Subquery  # Query for only one and most updated
-
+import re
 # QR Code
 
 import qrcode
@@ -64,27 +64,29 @@ class C2Standard(StandardImage):
 # This is naming every upload image
 def recent_image_upload_path(instance, filename):
     """Generates a unique filename based on facility name and an incrementing number."""
-    facility_name = slugify(instance.s_image.facility.name)  # Convert facility name to a safe format
 
-    # This is for server-setup
-    base_dir = os.path.join(settings.MEDIA_ROOT, "img/production/recent_images")  # This is for server-setu
+    facility_name = slugify(instance.s_image.facility.name)
+    facility_name = re.sub(r'[^a-zA-Z0-9_-]', '', facility_name)  # Remove unsafe characters
+
+    # Correct base directory setup
+    base_dir = os.path.join(settings.MEDIA_ROOT, "img/production/recent_images")
+
     # Ensure the directory exists
-    os.makedirs(base_dir, exist_ok=True)  # Creates the directory if it does not exist for Server
+    os.makedirs(base_dir, exist_ok=True)
 
-    # This is for Development setup
-    # base_dir = "img/development/recent_images"  # This setup is for development
-
-    # Find existing files for this facility
+    # Find existing files
     existing_files = [
-        f for f in os.listdir(os.path.join("media", base_dir))
-        if f.startswith(facility_name)
+        f for f in os.listdir(base_dir) if f.startswith(facility_name)
     ]
 
     # Get next number (increment by 1)
     next_number = len(existing_files) + 1
-    new_filename = f"{facility_name}_{next_number}.png"
 
-    return os.path.join(base_dir, new_filename)
+    # Get correct file extension
+    ext = filename.split(".")[-1]
+    new_filename = f"{facility_name}_{next_number}.{ext}"
+
+    return os.path.join("img/production/recent_images", new_filename)
 
 
 class C2RecentImage(RecentImage):
