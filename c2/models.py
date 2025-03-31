@@ -68,7 +68,7 @@ def recent_image_upload_path(instance, filename):
 
     # This is for server-setup
     # base_dir = os.path.join(settings.MEDIA_ROOT, "img/production/recent_images")  # This is for server-setup
-    base_dir = "img/production/recent_images"
+    base_dir = "/var/www/oms/media/img/production/recent_images"
     # Ensure the directory exists
     os.makedirs(base_dir, exist_ok=True)  # Creates the directory if it does not exist for Server
 
