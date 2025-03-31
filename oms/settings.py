@@ -130,13 +130,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 # Media files (user uploads) Development
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 # This for Server Setup Production
 # Media files (user uploads)
-MEDIA_ROOT = "/oms/media/"
-MEDIA_URL = "/media/"
+# MEDIA_ROOT = "/oms/media/"
+# MEDIA_URL = "/media/"
 
 
 # Static files (CSS, JS, images)
