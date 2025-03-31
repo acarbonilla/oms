@@ -5,73 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="66939e78-aa53-4976-9238-052a50849d6b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/static/img/astro.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/report_logo/fm_2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/c2/activity_detail.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/c2/activity_list.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/c2/tech_act_upload.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/forbidden/403.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/forbidden/404.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/forbidden/500.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/forbidden/access_denied.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/c2/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/c2/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/c2/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/c2/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/c2/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/after_5s.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/after_5s_Sl6ARLX.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/before_5s.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/before_5s_WSp9cb7.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/before_5s_qq8bTG5.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/captured-image.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/clean_desk.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/gen-office01_1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/gen-office01_2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/jws-fm01_1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/messy_desk.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/messy_desk_61yvPqg.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/messy_desk_7yfOXMP.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/messy_desk_9fwQ2Um.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/messy_desk_lNkIG0F.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/messy_desk_sQq5pip.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/qr_engr01.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/server-room01_1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/standard.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/after_5s_jqT9sOw.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/clean_desk.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/clean_desk_EoGlgkp.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/clean_desk_YXtiUnM.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/clean_desk_rXzlnG7.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/form_for_emp_.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/qr1.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/qr1_0LBtG1b.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/qr1_7f0kaqH.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/qr1_S4oUwq6.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/qr1_VlG0Wwf.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/qr1_bgkCM1D.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/standard.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/standard_6Q79VjB.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/standard_LnunQFq.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/standard_mns476k.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/standard_nO0iGsQ.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/standard_te5qx7R.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/standard_yMBuyCB.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/qrcodes/qr_engr01.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/qrcodes/qr_gen-office01.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/qrcodes/qr_jws-fm01.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/qrcodes/qr_logistics_2nd_floor.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/qrcodes/qr_osh01.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/qrcodes/qr_qa-kitchen.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/qrcodes/qr_server-room01.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/recent_image_upload_path/captured-image.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/oms/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/oms/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oms/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/oms/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/emp/emp_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/emp/emp_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/ev/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev/navbar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/pass_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/pass_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/report_selection.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/report_selection.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

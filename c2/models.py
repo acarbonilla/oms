@@ -1,4 +1,5 @@
 import os
+from django.conf import settings
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -63,7 +64,14 @@ class C2Standard(StandardImage):
 def recent_image_upload_path(instance, filename):
     """Generates a unique filename based on facility name and an incrementing number."""
     facility_name = slugify(instance.s_image.facility.name)  # Convert facility name to a safe format
-    base_dir = "img/recent_images"
+
+    # This is for server-setup
+    base_dir = os.path.join(settings.MEDIA_ROOT, "img/recent_images")  # This is for server-setup
+    # Ensure the directory exists
+    os.makedirs(base_dir, exist_ok=True)  # Creates the directory if it does not exist for Server
+
+    # This is for Development setup
+    # base_dir = "img/recent_images" # This setup is for development
 
     # Find existing files for this facility
     existing_files = [
@@ -84,7 +92,7 @@ class C2RecentImage(RecentImage):
         ("Failed", "Failed"),
         ("Pending", "Pending")
     ]
-    s_image = models.ForeignKey(C2Standard, on_delete=models.SET_NULL, null=True,)
+    s_image = models.ForeignKey(C2Standard, on_delete=models.SET_NULL, null=True, )
     recent_image = models.ImageField(upload_to=recent_image_upload_path)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Pending")
     uploaded_by = models.ForeignKey(C2User, on_delete=models.CASCADE, related_name="uploaded_images")
@@ -94,7 +102,12 @@ class C2RecentImage(RecentImage):
 def technical_activities_path(instance, filename):
     """Generates a unique filename based on facility name and an incrementing number."""
     facility_name = slugify(instance.location.name)  # Convert facility name to a safe format
-    base_dir = "media/img/technical_images"
+
+    # This is for Server Setup
+    base_dir = os.path.join(settings.MEDIA_ROOT, "media/img/technical_images")  # Use absolute path
+
+    # This is for Development setup
+    # base_dir = "media/img/technical_images"
 
     # Ensure directory exists before listing
     if not os.path.exists(base_dir):
