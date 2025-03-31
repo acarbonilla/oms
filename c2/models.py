@@ -104,7 +104,7 @@ def technical_activities_path(instance, filename):
     facility_name = slugify(instance.location.name)  # Convert facility name to a safe format
 
     # This is for Server Setup
-    base_dir = os.path.join(settings.MEDIA_ROOT, "media/img/technical_images")  # Use absolute path
+    base_dir = os.path.join(settings.MEDIA_ROOT, "var/www/oms/media/img/technical_images")  # Use absolute path
 
     # This is for Development setup
     # base_dir = "media/img/technical_images"
