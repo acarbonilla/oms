@@ -7,32 +7,6 @@
     <list default="true" id="66939e78-aa53-4976-9238-052a50849d6b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/c2/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/guard-house_1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/recent_images/guard-house_2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/after_5s.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/clean_desk.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/img/standard_images/standard.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/astro.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/astro_LACrhRl.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/before_5s.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/call-out.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/fm_2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/fm_logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/fm_logo_BWOyIPZ.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/form_for_emp_.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/form_for_emp__vQGXeq0.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/form_for_emp__x5VA1JT.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/messy_desk.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/overlapping_pdf_report.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/overlapping_pdf_report_ZYl9Tgm.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/qr_download.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/qr_download_qUM1nHm.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/report.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/media/img/technical_images/report_cxJdvCL.JPG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/qrcodes/qr_engineering01.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/qrcodes/qr_guard_house.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/qrcodes/qr_jws-fm.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oms/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/oms/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
