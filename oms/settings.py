@@ -135,9 +135,8 @@ USE_TZ = True
 
 # This for Server Setup Production
 # Media files (user uploads)
-# MEDIA_ROOT = "/var/www/oms/media/"
+MEDIA_ROOT = "/oms/media/"
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # Static files (CSS, JS, images)
