@@ -121,7 +121,7 @@ def recent_image_upload_path_development(instance, filename):
     facility_name = slugify(instance.s_image.facility.name)  # Convert facility name to a safe format
 
     # This is for Development setup
-    base_dir = "img/development/recent_images"  # This setup is for development
+    base_dir = "img/production/recent_images"  # This setup is for development
 
     # Find existing files for this facility
     existing_files = [
@@ -143,7 +143,7 @@ class C2RecentImage(RecentImage):
         ("Pending", "Pending")
     ]
     s_image = models.ForeignKey(C2Standard, on_delete=models.SET_NULL, null=True, )
-    recent_image = models.ImageField(upload_to=recent_image_upload_path)
+    recent_image = models.ImageField(upload_to=recent_image_upload_path_development)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Pending")
     uploaded_by = models.ForeignKey(C2User, on_delete=models.CASCADE, related_name="uploaded_images")
     remark_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="remarked_images")
