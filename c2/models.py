@@ -77,7 +77,7 @@ def standard_image_upload_path(instance, filename):
 
 class C2Standard(StandardImage):
     facility = models.ForeignKey('C2Facility', on_delete=models.SET_NULL, null=True, related_name="standards")
-    standard_image = models.ImageField(upload_to=standard_image_upload_path)
+    standard_image = models.ImageField(upload_to="img/production/standard_images")
     # standard_image = models.ImageField(upload_to="img/production/standard_images/")
     objects = C2StandardManager()  # Attach custom manager
 

@@ -208,7 +208,6 @@ def amMember(request):
     return render(request, 'c2/am/am_list.html', context)
 
 
-
 @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
 def amAssessment(request):
