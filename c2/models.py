@@ -51,10 +51,34 @@ class C2StandardManager(models.Manager):
         return self.filter(id=Subquery(latest_standard))
 
 
+# This is path function for C2Standard
+def standard_image_upload_path(instance, filename):
+    """Generates a unique filename based on facility name and an incrementing number."""
+    facility_name = slugify(instance.facility.name)  # Convert facility name to a safe format
+
+    # Define base directory for images
+    # base_dir = os.path.join(settings.MEDIA_ROOT, "img/development/standard_images")  # Change path dynamically
+    base_dir = os.path.join(settings.MEDIA_ROOT, "img/production/standard_images")
+    # Ensure the directory exists
+    os.makedirs(base_dir, exist_ok=True)
+
+    # Find existing files for this facility
+    existing_files = [
+        f for f in os.listdir(base_dir)
+        if f.startswith(facility_name)
+    ]
+
+    # Get next number (increment by 1)
+    next_number = len(existing_files) + 1
+    new_filename = f"{facility_name}_{next_number}.png"
+
+    return os.path.join("img/development/standard_images", new_filename)
+
+
 class C2Standard(StandardImage):
     facility = models.ForeignKey('C2Facility', on_delete=models.SET_NULL, null=True, related_name="standards")
-    # standard_image = models.ImageField(upload_to="img/development/standard_images/")
-    standard_image = models.ImageField(upload_to="img/production/standard_images/")
+    standard_image = models.ImageField(upload_to=standard_image_upload_path)
+    # standard_image = models.ImageField(upload_to="img/production/standard_images/")
     objects = C2StandardManager()  # Attach custom manager
 
     def __str__(self):
@@ -70,6 +94,7 @@ def recent_image_upload_path(instance, filename):
 
     # Correct base directory setup
     base_dir = os.path.join(settings.MEDIA_ROOT, "img/production/recent_images")
+    # base_dir = os.path.join(settings.MEDIA_ROOT, "img/development/recent_images")
 
     # Ensure the directory exists
     os.makedirs(base_dir, exist_ok=True)
@@ -86,7 +111,29 @@ def recent_image_upload_path(instance, filename):
     ext = filename.split(".")[-1]
     new_filename = f"{facility_name}_{next_number}.{ext}"
 
-    return os.path.join("img/production/recent_images", new_filename)
+    return os.path.join("img/development/recent_images", new_filename)
+    # return os.path.join("img/production/recent_images", new_filename)
+
+
+# This is for Development Only
+def recent_image_upload_path_development(instance, filename):
+    """Generates a unique filename based on facility name and an incrementing number."""
+    facility_name = slugify(instance.s_image.facility.name)  # Convert facility name to a safe format
+
+    # This is for Development setup
+    base_dir = "img/development/recent_images"  # This setup is for development
+
+    # Find existing files for this facility
+    existing_files = [
+        f for f in os.listdir(os.path.join("media", base_dir))
+        if f.startswith(facility_name)
+    ]
+
+    # Get next number (increment by 1)
+    next_number = len(existing_files) + 1
+    new_filename = f"{facility_name}_{next_number}.png"
+
+    return os.path.join(base_dir, new_filename)
 
 
 class C2RecentImage(RecentImage):
@@ -107,10 +154,10 @@ def technical_activities_path(instance, filename):
     facility_name = slugify(instance.location.name)  # Convert facility name to a safe format
 
     # This is for Server Setup
-    # base_dir = os.path.join(settings.MEDIA_ROOT, "media/img/technical_images")  # Use absolute path
+    base_dir = os.path.join(settings.MEDIA_ROOT, "media/img/technical_images")  # Use absolute path
 
     # This is for Development setup
-    base_dir = "media/img/technical_images"
+    # base_dir = "media/img/technical_images"
 
     # Ensure directory exists before listing
     if not os.path.exists(base_dir):
@@ -124,7 +171,7 @@ def technical_activities_path(instance, filename):
 class C2Facility(models.Model):
     name = models.CharField(max_length=50, verbose_name="Facility")
     # qr_code = models.ImageField(upload_to="img/development/qrcodes/", blank=True, null=True)  # Ready for Development
-    qr_code = models.ImageField(upload_to="img/production/qrcodes/", blank=True, null=True) # Ready for Production
+    qr_code = models.ImageField(upload_to="img/production/qrcodes/", blank=True, null=True)  # Ready for Production
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 

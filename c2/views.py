@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 # Decorator for only allowing eV group
 from django.contrib.auth.decorators import user_passes_test
+from django.db.models.functions import TruncMonth
 
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -30,7 +31,7 @@ from reportlab.lib.utils import ImageReader
 from io import BytesIO
 from django.utils.timezone import now
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.db.models import Q
 from .models import C2RecentImage  # Ensure correct model import
 from django.contrib.staticfiles import finders
@@ -44,6 +45,10 @@ from django.utils.timezone import localtime
 # Decorators
 from django.http import HttpResponseForbidden
 from functools import wraps
+
+# This is for dashboard time
+from django.utils.timezone import make_aware, is_naive
+import datetime
 
 
 # This decorator prohibits the EMP group to access the page
@@ -136,9 +141,72 @@ def empMember(request):
 
 @login_required(login_url='omsLogin')
 def amMember(request):
+    # Get all users
     name = User.objects.all()
-    context = {'name': name}
+
+    # Get the current time with timezone awareness
+    today = datetime.datetime.now().astimezone()
+
+    # Start of the week (Monday)
+    week_start = today.replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=today.weekday())
+
+    # Start of the month
+    month_start = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    # Start of the year
+    year_start = today.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    # Ensure they are timezone-aware
+    if is_naive(week_start):
+        week_start = make_aware(week_start)
+
+    if is_naive(month_start):
+        month_start = make_aware(month_start)
+
+    if is_naive(year_start):
+        year_start = make_aware(year_start)
+
+    # Now you can use them in queries
+    weekly_general_activities = C2RecentImage.objects.filter(created__gte=week_start).count()
+    monthly_general_activities = C2RecentImage.objects.filter(created__gte=month_start).count()
+    yearly_general_activities = C2RecentImage.objects.filter(created__gte=year_start).count()
+
+    # Facility Statistics
+    facility_reg_count = C2Facility.objects.count()
+    # ✅ Get all facilities that WERE visited within the last month
+    facility_visited_week = C2RecentImage.objects.filter(
+        created__gte=week_start).values_list("s_image__facility__id", flat=True).distinct().count()
+    facility_not_visited_week = facility_reg_count - facility_visited_week
+
+    # Status Breakdown
+    passed_count = C2RecentImage.objects.filter(status="Pass").count()
+    failed_count = C2RecentImage.objects.filter(status="Failed").count()
+    pending_count = C2RecentImage.objects.filter(status="Pending").count()
+
+    # Technical Activities (C2TechActivities) Counts
+    weekly_tech_activities = C2TechActivities.objects.filter(created__gte=week_start).count()
+    print(f"Weekly: {weekly_tech_activities}")
+    monthly_tech_activities = C2TechActivities.objects.filter(created__gte=month_start).count()
+    yearly_tech_activities = C2TechActivities.objects.filter(created__gte=year_start).count()
+
+    context = {
+        'name': name,
+        'weekly_general_activities': weekly_general_activities,
+        'monthly_general_activities': monthly_general_activities,
+        'yearly_general_activities': yearly_general_activities,
+        'facility_reg_count': facility_reg_count,
+        'facility_visited_week': facility_visited_week,
+        'facility_not_visited_week': facility_not_visited_week,
+        'passed_count': passed_count,
+        'failed_count': failed_count,
+        'pending_count': pending_count,
+        'weekly_tech_activities': weekly_tech_activities,
+        'monthly_tech_activities': monthly_tech_activities,
+        'yearly_tech_activities': yearly_tech_activities,
+
+    }
     return render(request, 'c2/am/am_list.html', context)
+
 
 
 @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page

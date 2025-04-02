@@ -13,7 +13,7 @@
         </div>
         {% endif %}
 
-        <form enctype="multipart/form-data" method="POST" class="needs-validation" novalidate>
+        <form class="needs-validation" enctype="multipart/form-data" method="POST" novalidate>
             {% csrf_token %}
 
             <!-- Title Input -->
@@ -24,24 +24,29 @@
 
             <!-- Live Camera Preview -->
             <div class="text-center mb-3">
-                <video id="cameraPreview" class="border rounded shadow" autoplay style="width:100%; max-width: 400px;"></video>
+                <video autoplay class="border rounded shadow" id="cameraPreview"
+                       style="width:100%; max-width: 400px;"></video>
             </div>
 
             <!-- Capture Button -->
             <div class="text-center mb-3">
-                <button type="button" id="captureBtn" class="btn btn-success"><i class="fas fa-camera"></i> Capture Photo</button>
+                <button class="btn btn-success" id="captureBtn" type="button"><i class="fas fa-camera"></i> Capture
+                    Photo
+                </button>
             </div>
 
             <!-- Hidden Canvas for Processing -->
             <canvas id="canvas" style="display:none;"></canvas>
 
             <!-- Hidden File Input (Camera Image) -->
-            <input type="file" id="imageUpload" name="recent_image" accept="image/*" capture="environment" style="display:none;">
+            <input accept="image/*" capture="environment" id="imageUpload" name="recent_image" style="display:none;"
+                   type="file">
 
             <!-- Upload & Cancel Buttons -->
             <div class="text-center">
                 <button class="btn btn-primary px-4" type="submit"><i class="fas fa-upload"></i> Upload</button>
-                <a class="btn btn-secondary px-4" href="{% url 'facility_qr_upload' facility.id %}"><i class="fas fa-times"></i> Cancel</a>
+                <a class="btn btn-secondary px-4" href="{% url 'facility_qr_upload' facility.id %}"><i
+                        class="fas fa-times"></i> Cancel</a>
             </div>
         </form>
     </div>
@@ -50,30 +55,40 @@
 <!-- JavaScript for Camera -->
 <script>
     let video = document.getElementById("cameraPreview");
-    let captureBtn = document.getElementById("captureBtn");
-    let canvas = document.getElementById("canvas");
-    let imageUpload = document.getElementById("imageUpload");
+  let captureBtn = document.getElementById("captureBtn");
+  let canvas = document.getElementById("canvas");
+  let imageUpload = document.getElementById("imageUpload");
 
-    // Start Camera
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then((stream) => { video.srcObject = stream; })
-        .catch((error) => { console.error("Camera access denied:", error); });
+  // Start Camera with back camera preference
+  navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { exact: "environment" } }  // Forces back camera
+  })
+  .then((stream) => {
+      video.srcObject = stream;
+  })
+  .catch((error) => {
+      console.error("Camera access denied or back camera not available:", error);
+      // Fallback to front camera if back camera is unavailable
+      navigator.mediaDevices.getUserMedia({ video: true })
+      .then((fallbackStream) => { video.srcObject = fallbackStream; })
+      .catch((fallbackError) => { console.error("No camera available:", fallbackError); });
+  });
 
-    // Capture Photo
-    captureBtn.addEventListener("click", function() {
-        let context = canvas.getContext("2d");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  // Capture Photo
+  captureBtn.addEventListener("click", function() {
+      let context = canvas.getContext("2d");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Convert to Image File
-        canvas.toBlob(function(blob) {
-            let file = new File([blob], "captured-image.png", { type: "image/png" });
-            let dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            imageUpload.files = dataTransfer.files;
-        }, "image/png");
-    });
+      // Convert to Image File
+      canvas.toBlob(function(blob) {
+          let file = new File([blob], "captured-image.png", { type: "image/png" });
+          let dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          imageUpload.files = dataTransfer.files;
+      }, "image/png");
+  });
 </script>
 
 {% endblock %}
