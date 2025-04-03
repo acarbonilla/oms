@@ -34,6 +34,6 @@ Documentation/
 **/migrations/__pycache__/
 
 # Ignore the development
-media/img/development/
+# media/img/development/
 
 
