@@ -1,5 +1,0 @@
-
-# 🔥 Ignore static & media files (optional: keep them in cloud storage)
-staticfiles/
-media/
-*.log

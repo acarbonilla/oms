@@ -1,4 +1,0 @@
-📌 Reload the page and check if the color conditions now work:
-✔ If failed count > 1 → Red (bg-danger)
-✔ If failed count = 1 → Yellow (bg-warning)
-✔ If failed count = 0 → Grey (bg-secondary)
