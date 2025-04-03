@@ -77,7 +77,7 @@ def standard_image_upload_path(instance, filename):
 
 class C2Standard(StandardImage):
     facility = models.ForeignKey('C2Facility', on_delete=models.SET_NULL, null=True, related_name="standards")
-    standard_image = models.ImageField(upload_to="img/production/standard_images")
+    standard_image = models.ImageField(upload_to=standard_image_upload_path)
     # standard_image = models.ImageField(upload_to="img/production/standard_images/")
     objects = C2StandardManager()  # Attach custom manager
 
@@ -121,7 +121,7 @@ def recent_image_upload_path_development(instance, filename):
     facility_name = slugify(instance.s_image.facility.name)  # Convert facility name to a safe format
 
     # This is for Development setup
-    base_dir = "img/production/recent_images"  # This setup is for development
+    base_dir = "img/development/recent_images"  # This setup is for development
 
     # Find existing files for this facility
     existing_files = [
