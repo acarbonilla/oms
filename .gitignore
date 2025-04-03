@@ -21,10 +21,7 @@ config/settings_local.py
 
 # Ignore Documentation folder
 Documentation/
-account.txt
-Legend.txt
-saveCode.txt
-Tasklist.txt
+
 
 
 # 🔥 Ignore local IDE settings
@@ -35,3 +32,8 @@ Tasklist.txt
 # 🔥 Ignore Django migrations (optional: only ignore auto-generated files)
 **/migrations/*.pyc
 **/migrations/__pycache__/
+
+# Ignore the development
+media/img/development/
+
+

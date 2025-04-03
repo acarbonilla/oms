@@ -121,7 +121,7 @@ def recent_image_upload_path_development(instance, filename):
     facility_name = slugify(instance.s_image.facility.name)  # Convert facility name to a safe format
 
     # This is for Development setup
-    base_dir = "img/development/recent_images"  # This setup is for development
+    base_dir = "img/production/recent_images"  # This setup is for development
 
     # Find existing files for this facility
     existing_files = [
@@ -147,25 +147,6 @@ class C2RecentImage(RecentImage):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Pending")
     uploaded_by = models.ForeignKey(C2User, on_delete=models.CASCADE, related_name="uploaded_images")
     remark_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="remarked_images")
-
-
-def technical_activities_path(instance, filename):
-    """Generates a unique filename based on facility name and an incrementing number."""
-    facility_name = slugify(instance.location.name)  # Convert facility name to a safe format
-
-    # This is for Server Setup
-    base_dir = os.path.join(settings.MEDIA_ROOT, "media/img/technical_images")  # Use absolute path
-
-    # This is for Development setup
-    # base_dir = "media/img/technical_images"
-
-    # Ensure directory exists before listing
-    if not os.path.exists(base_dir):
-        os.makedirs(base_dir)
-
-    existing_files = [f for f in os.listdir(base_dir) if f.startswith(facility_name)]
-    next_number = len(existing_files) + 1
-    return os.path.join("img/technical_images", f"{facility_name}_{next_number}.png")
 
 
 class C2Facility(models.Model):
