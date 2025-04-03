@@ -90,7 +90,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'oms',  # db name
         'USER': 'acarbonilla',
-        'PASSWORD': '$Everyday23',
+        'PASSWORD': 'jw$25FM',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -108,7 +108,7 @@ DATABASES = {
 # Production C2 Server
 # dbname: oms
 # user: acarbonilla
-# pword: $Everyday23
+# pword: jw$25FM
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
