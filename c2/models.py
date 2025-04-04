@@ -164,8 +164,9 @@ class C2Facility(models.Model):
         filename = f"qr_{sanitized_name}.png"
 
         # ✅ Generate the QR code with the facility URL
-        qr_url = f"https://192.168.1.20/c2/c2/facility/{self.id}/upload/"
-        # qr_url = f"http://127.0.0.1:8000/c2/c2/facility/{self.id}/upload/"
+        # qr_url = f"https://192.168.1.20/c2/c2/facility/{self.id}/upload/"
+        qr_url = f"https://192.11.200.14/c2/c2/facility/{self.id}/upload/" # JFC Server
+        # qr_url = f"http://127.0.0.1:8000/c2/c2/facility/{self.id}/upload/" # Development
         qr = qrcode.make(qr_url)
 
         buffer = BytesIO()
