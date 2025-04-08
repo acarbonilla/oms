@@ -1,55 +1,100 @@
 <style>
-    /* ZFC Navigation Bar */
-#navAnchor {
-  color: brown;
-  font-size: 15px;
-  font-weight: bolder;
+    /* OMS Navigation Bar */
+
+#nav {
+  background-color: block; /* For browsers that do not support gradients */
+  background-image: linear-gradient(to bottom right, #09203f, #537895);
 }
-#navAnchor:hover {
-  background-color: #023020;
-  color: #f0e68c;
-  margin-left: 2px;
-  font-size: 18px;
+
+#glow {
+  text-shadow: 2px 2px 4px blue;
+  font-size: 20px;
   font-weight: bolder;
-  border-radius: 30px 30px;
+  color: red;
   text-align: center;
+  animation: glow 1s ease-in-out infinite alternate;
+}
+@-webkit-keyframes glow {
+  from {
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e60073,
+      0 0 40px #e60073, 0 0 50px #e60073, 0 0 60px #e60073, 0 0 70px #e60073;
+  }
+
+  to {
+    text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6,
+      0 0 50px #ff4da6, 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
+  }
 }
 </style>
+<nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top" id="nav">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#" id="glow">PQFI</a>
+        <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+                class="navbar-toggler"
+                data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a aria-current="page" class="nav-link active text-white" href="{% url 'amMember' %}">Home</a>
+                </li>
 
-<nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">ZFC-C2</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="{% url 'amMember' %}">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'assessment'%}">Facility</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Dropdown
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Another action</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
-          </ul>
-        </li>
+                <li class="nav-item dropdown">
+                    <a aria-expanded="false" class="nav-link dropdown-toggle text-white" data-bs-toggle="dropdown" href="#"
+                       role="button">
+                        Gen_Activities
+                    </a>
+                    <ul class="dropdown-menu">
+                         <li><a class="dropdown-item" href="{% url 'standard_image_ev' %}">Standard Image</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
 
-      </ul>
+                        <li><a class="dropdown-item" href="{% url 'assessment'%}">Pending</a></li>
+                        <li><a class="dropdown-item" href="{%url 'failed_list' %}">Failed</a></li>
+                        <li><a class="dropdown-item" href="{%url 'pass_list' %}">Passed</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="{% url 'not_visited_facilities_list' %}">Not Visited</a></li>
+                    </ul>
+
+                </li>
+
+                 <li class="nav-item dropdown">
+                    <a aria-expanded="false" class="nav-link dropdown-toggle text-white" data-bs-toggle="dropdown" href="#"
+                       role="button">
+                        Tech_Activities
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'tech_act_upload' %}">Tech-Activities Form</a></li>
+                        <li><a class="dropdown-item" href="{% url 'activity_list' %}">Activity List</a></li>
+                    </ul>
+
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a aria-expanded="false" class="nav-link dropdown-toggle text-white" data-bs-toggle="dropdown" href="#"
+                       role="button">
+                        File
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'download_pdf' %}">ALL-PDF Download</a></li>
+                        <li><a class="dropdown-item" href="{% url 'download_selected_pdf'%}">Selected PDF</a></li>
+
+                    </ul>
+
+                </li>
+
+            </ul>
 
             <!-- This area is for user profile -->
             {% if user.is_authenticated %}
             <nav class="d-flex">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item dropdown">
-                        <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"
+                        <a aria-expanded="false" class="nav-link dropdown-toggle text-white" data-bs-toggle="dropdown" href="#"
                            id="topA" role="button">
                             {{user}}
                         </a>
@@ -69,6 +114,8 @@
                     </li>
                 </ul>
             </nav>
+
+
+        </div>
     </div>
-  </div>
 </nav>

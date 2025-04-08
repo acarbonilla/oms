@@ -78,7 +78,6 @@ def standard_image_upload_path(instance, filename):
 class C2Standard(StandardImage):
     facility = models.ForeignKey('C2Facility', on_delete=models.SET_NULL, null=True, related_name="standards")
     standard_image = models.ImageField(upload_to=standard_image_upload_path)
-    # standard_image = models.ImageField(upload_to="img/production/standard_images/")
     objects = C2StandardManager()  # Attach custom manager
 
     def __str__(self):
@@ -164,8 +163,9 @@ class C2Facility(models.Model):
         filename = f"qr_{sanitized_name}.png"
 
         # ✅ Generate the QR code with the facility URL
-        # qr_url = f"https://192.168.1.20/c2/c2/facility/{self.id}/upload/"
-        qr_url = f"https://192.11.200.14/c2/c2/facility/{self.id}/upload/" # JFC Server
+        qr_url = f"https://143.198.217.58/c2/c2/facility/{self.id}/upload/" # online
+        # qr_url = f"https://192.168.1.20/c2/c2/facility/{self.id}/upload/" # mine
+        # qr_url = f"https://192.11.200.14/c2/c2/facility/{self.id}/upload/" # JFC Server
         # qr_url = f"http://127.0.0.1:8000/c2/c2/facility/{self.id}/upload/" # Development
         qr = qrcode.make(qr_url)
 

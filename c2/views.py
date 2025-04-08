@@ -1,54 +1,47 @@
+import datetime
+import textwrap
+# This for time
+from datetime import timedelta
+# Decorators
+from functools import wraps
+from io import BytesIO
+
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 # Decorator for only allowing eV group
 from django.contrib.auth.decorators import user_passes_test
-from django.db.models.functions import TruncMonth
-
-from django.shortcuts import render, redirect, get_object_or_404
-
+from django.contrib.auth.models import User
+from django.contrib.staticfiles import finders
+from django.core.paginator import Paginator  # ✅ Import Paginator
+from django.db.models import Count
+from django.db.models import OuterRef, Subquery
+from django.db.models import Q
+from django.http import HttpResponse
+from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import render
 # This is for QR
 from django.urls import reverse
 from django.utils.html import strip_tags
+# local time
+from django.utils.timezone import localtime
+# This is for dashboard time
+from django.utils.timezone import make_aware, is_naive
+from django.utils.timezone import now
 from reportlab.lib import colors
+# pdf
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen import canvas
 
 from c2.forms import C2RecentImageForm, C2RecentImageFormUpdate, TechnicalActivitiesForm
 # from c2.filters import FacilityFilter
-from c2.models import C2Standard, C2RecentImage, C2User, C2Facility, C2TechActivities, C2TechActivityImage
-
-from django.db.models import OuterRef, Subquery
-
-from django.contrib import messages
-# This for time
-from django.utils.timezone import now
-from datetime import timedelta
-from django.core.paginator import Paginator  # ✅ Import Paginator
-from django.db.models import Q, Count
-
-# pdf
-from reportlab.lib.pagesizes import letter, landscape
-from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
-from io import BytesIO
-from django.utils.timezone import now
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
-from django.db.models import Q
+from c2.models import C2Standard, C2User, C2Facility, C2TechActivities, C2TechActivityImage
 from .models import C2RecentImage  # Ensure correct model import
-from django.contrib.staticfiles import finders
-from reportlab.lib.utils import ImageReader, simpleSplit
-from reportlab.lib.styles import getSampleStyleSheet
-import textwrap
 
-# local time
-from django.utils.timezone import localtime
-
-# Decorators
-from django.http import HttpResponseForbidden
-from functools import wraps
-
-# This is for dashboard time
-from django.utils.timezone import make_aware, is_naive
-import datetime
+# This is for Technical Activities
+import base64
+from django.core.files.base import ContentFile
+import json
 
 
 # This decorator prohibits the EMP group to access the page
@@ -127,6 +120,7 @@ def evMember(request):
         "weekly_count": weekly_count,
         "monthly_count": monthly_count,
         "yearly_count": yearly_count,
+        "title": "Evaluator Dashboard",
     }
     return render(request, 'c2/ev/ev_dashboard.html', context)
 
@@ -135,7 +129,7 @@ def evMember(request):
 def empMember(request):
     facilities = C2Facility.objects.all()  # ✅ Fetch all facilities
     name = User.objects.all()
-    context = {'name': name, 'facilities': facilities}
+    context = {'name': name, 'facilities': facilities, 'title': 'Employee'}
     return render(request, 'c2/emp/emp_list.html', context)
 
 
@@ -203,6 +197,7 @@ def amMember(request):
         'weekly_tech_activities': weekly_tech_activities,
         'monthly_tech_activities': monthly_tech_activities,
         'yearly_tech_activities': yearly_tech_activities,
+        'title': "Managers' Dashboard",
 
     }
     return render(request, 'c2/am/am_list.html', context)
@@ -248,6 +243,7 @@ def amAssessment(request):
             "recent_image": recent.recent_image.url if recent.recent_image else None,
             "standard_image": recent.s_image.standard_image.url if recent.s_image.standard_image else None,
             "failed_count": failed_count,  # ✅ Now guaranteed to be passed correctly
+
         })
 
     # ✅ PAGINATION - Show 5 items per page
@@ -257,7 +253,8 @@ def amAssessment(request):
 
     context = {
         "page_obj": page_obj,
-        "search_query": search_query
+        "search_query": search_query,
+        "title": "Assessment List",
     }
     return render(request, "c2/assessment.html", context)
 
@@ -295,12 +292,17 @@ def upload_recent_image_qr(request, facility_id):
             return redirect(reverse('update_recent_image', kwargs={'pk': recent_image.id}))
 
         else:
-            messages.error(request, ", ".join([str(error) for error in form.errors.values()]))
+            error_messages = []
+            for field, errors in form.errors.items():
+                for error in errors:
+                    error_messages.append(f"{field.capitalize()}: {error}")
+            messages.error(request, " | ".join(error_messages))
 
     else:
         form = C2RecentImageForm(request.user)
 
-    return render(request, 'c2/ev/upload_recent_image_qr.html', {'form': form, 'facility': facility})
+    return render(request, 'c2/ev/upload_recent_image_qr.html',
+                  {'form': form, 'facility': facility, 'title': "Upload Form"})
 
 
 # This section is for uploading or updating the recent image.
@@ -326,7 +328,8 @@ def update_recent_image(request, pk):
     else:
         form = C2RecentImageFormUpdate(instance=recent_image, user=request.user)  # ✅ Pass request.user
 
-    return render(request, 'c2/ev_update_recent_image.html', {'form': form, 'recent_image': recent_image})
+    return render(request, 'c2/ev_update_recent_image.html', {'form': form, 'recent_image': recent_image,
+                                                              'title': "Update Form"})
 
 
 # Details Section
@@ -343,11 +346,12 @@ def recent_image_detail(request, pk):
     return render(request, 'c2/recent_image_detail.html', {
         'image': image,
         'assigned_users': assigned_users,  # ✅ Pass assigned users to template
+        "title": "Present Image Details"
     })
 
 
 # This is for EV Standard Image
-@restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
+# @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
 def standard_image_ev(request):
     """Displays standard images with search, sorting, and pagination."""
@@ -384,7 +388,7 @@ def standard_image_ev(request):
     return render(request, 'c2/ev/s_image_standard.html', context)
 
 
-@restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
+# @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
 def standard_image_ev_details(request, pk):
     """View details of a specific standard image and show the assigned user."""
@@ -401,7 +405,7 @@ def standard_image_ev_details(request, pk):
 
 
 # This is for everyone
-@restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
+# @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
 def failed_list(request):
     """Show up to 3 'Failed' images within 30 days & keep a yearly history, with search and pagination."""
@@ -444,7 +448,9 @@ def failed_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'c2/failed_list.html', {'page_obj': page_obj, 'search_query': search_query})
+    context = {'page_obj': page_obj, 'search_query': search_query,
+               'title': f"Failed List "}
+    return render(request, 'c2/failed_list.html', context)
 
 
 @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
@@ -686,6 +692,7 @@ def pass_list(request):
         "recent_page_obj": recent_page_obj,  # ✅ Recent passes within 30 days
         "old_page_obj": old_page_obj,  # ✅ Older passes within 1 year
         "search_query": search_query,  # ✅ Preserve search input
+        "title": "Passed List",
     }
     return render(request, 'c2/pass_list.html', context)
 
@@ -726,6 +733,7 @@ def not_visited_facilities_list(request):
     context = {
         "page_obj": page_obj,  # ✅ List of facilities not visited
         "search_query": search_query,  # ✅ Preserve search input
+        "title": "Not Visited List",
     }
     return render(request, 'c2/ev/not_visited_facilities_list.html', context)
 
@@ -740,22 +748,29 @@ def tech_act_upload(request, pk=None):
 
         if form.is_valid():
             tech_activity = form.save(commit=False)
-
-            # ✅ Correctly get the C2User instance
             tech_activity.uploaded_by = C2User.objects.get(name__id=request.user.id)
-
             tech_activity.save()
 
-            # ✅ Handle multiple image uploads
+            # Handle uploaded image files
             files = request.FILES.getlist('image')
             for file in files:
                 C2TechActivityImage.objects.create(activity=tech_activity, image=file)
 
-            return redirect('empMember')
+            # Handle captured images (Base64 format)
+            captured_images = request.POST.get('captured_images')
+            if captured_images:
+                images = json.loads(captured_images)
+                for idx, img_data in enumerate(images):
+                    format, imgstr = img_data.split(';base64,')
+                    ext = format.split('/')[-1]
+                    file_data = ContentFile(base64.b64decode(imgstr), name=f"captured_{tech_activity.id}_{idx}.{ext}")
+                    C2TechActivityImage.objects.create(activity=tech_activity, image=file_data)
+
+            return redirect('activity_list')
     else:
         form = TechnicalActivitiesForm(instance=tech)
 
-    return render(request, "c2/tech_act_upload.html", {"activity_form": form})
+    return render(request, "c2/tech_act_upload.html", {"activity_form": form, "title": "Tech-Activity Form"})
 
 
 # This is for tech view list
@@ -796,7 +811,8 @@ def activity_list(request):
         {
             "activities": activities_page,
             "filter_option": filter_option,
-            "search_query": search_query
+            "search_query": search_query,
+            "title": "Tech-Activity List"
         }
     )
 
@@ -805,7 +821,38 @@ def activity_list(request):
 def activity_detail(request, activity_id):
     """View to show details of a specific activity with images."""
     activity = get_object_or_404(C2TechActivities, id=activity_id)
-    return render(request, "c2/activity_detail.html", {"activity": activity})
+    return render(request, "c2/activity_detail.html",
+                  {"activity": activity, "title": f" Activity-Details: {activity.name}"})
+
+
+# This is for downloading the QR code from facility
+def generate_qr_code(request, facility_id):
+    # Get the facility by ID
+    facility = get_object_or_404(C2Facility, id=facility_id)
+
+    # Return the QR code image as a downloadable response
+    with open(facility.qr_code.path, 'rb') as qr_file:
+        response = HttpResponse(qr_file.read(), content_type='image/png')
+        response['Content-Disposition'] = f'attachment; filename={facility.qr_code.name.split("/")[-1]}'
+        return response
+
+
+def facility_list(request):
+    # Get the search query from the request
+    query = request.GET.get('search', '')
+
+    # Filter facilities by name if a search query is provided
+    facilities = C2Facility.objects.filter(name__icontains=query)
+
+    # Pagination
+    paginator = Paginator(facilities, 5)  # Show 5 facilities per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'c2/facility_list.html', {
+        'page_obj': page_obj,
+        'query': query
+    })
 
 
 # This is for Errors

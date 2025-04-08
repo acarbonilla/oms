@@ -1,17 +1,25 @@
 import os
 from pathlib import Path
+import environ
 
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Read .env file
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(7lautl&czpyt85#tet=f5g(_0h76603yug@nf7qo#0-vao)8y'
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
+# Usage
+DEBUG = env('DEBUG')
+SECRET_KEY = env('SECRET_KEY')
 
 ALLOWED_HOSTS = [
     "localhost",
@@ -90,27 +98,14 @@ WSGI_APPLICATION = 'oms.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'oms',  # db name
-        'USER': 'acarbonilla',
-        'PASSWORD': 'jw$25FM',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': env('DATABASE_NAME'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASSWORD'),
+        'HOST': env('DATABASE_HOST'),
+        'PORT': env('DATABASE_PORT'),
     }
 }
-# Development
-# dbname: oms
-# user: carbonillaat
-# pword: $Everyday23
-
-# Production myserver
-# dbname: oms
-# user: oms
-# pword: XiaCarb@123
-
-# Production C2 Server
-# dbname: oms
-# user: acarbonilla
-# pword: jw$25FM
+print("DB Password:", env('DATABASE_PASSWORD'))
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

@@ -31,9 +31,11 @@
                         <td>{{ pass.s_image.facility.name }}</td>
                         <td>{{ pass.title }}</td>
                         <td>{{ pass.created|date:"F d, Y" }}</td>
+                        {% if user in all_ev %}
                         <td>
                             <a href="{% url 'update_recent_image' pass.id %}" class="btn btn-success">📝 Re-Evaluate</a>
                         </td>
+                        {% endif %}
                     </tr>
                     {% empty %}
                     <tr>

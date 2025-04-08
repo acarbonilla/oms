@@ -65,7 +65,9 @@
 
                 <!-- ✅ Restore "Details" and "Evaluation" Buttons -->
                 <div class="text-center mt-3">
+                    {% if user in all_ev %}
                     <a href="{% url 'update_recent_image' item.id %}" class="btn btn-success">📝 Evaluation</a>
+                    {% endif %}
                     <a href="{% url 'recent_image_detail' item.id %}" class="btn btn-info">📄 Details</a>
                 </div>
             </div>

@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block content %}
+ <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .search-bar input {
+            padding: 10px;
+            width: 300px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .facility-list {
+            list-style: none;
+            padding: 0;
+        }
+        .facility-list li {
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .facility-list li p {
+            margin: 0;
+            font-size: 18px;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .pagination a {
+            padding: 8px 16px;
+            margin: 0 5px;
+            text-decoration: none;
+            color: #4CAF50;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .pagination a:hover {
+            background-color: #ddd;
+        }
+    </style>
+
+ <div class="container">
+    <div class="search-bar">
+        <form method="get">
+            <input type="text" name="search" value="{{ query }}" placeholder="Search facilities..." />
+        </form>
+    </div>
+
+    <ul class="facility-list">
+        {% for facility in page_obj %}
+        <li>
+            <p>{{ facility.name }}</p>
+            <a href="{% url 'download_qr_code' facility.id %}" class="button">Download QR</a>
+        </li>
+        {% empty %}
+        <p>No facilities found.</p>
+        {% endfor %}
+    </ul>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1&search={{ query }}">First</a>
+                <a href="?page={{ page_obj.previous_page_number }}&search={{ query }}">Previous</a>
+            {% endif %}
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&search={{ query }}">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}&search={{ query }}">Last</a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+
+
+{% endblock %}

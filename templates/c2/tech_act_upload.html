@@ -17,30 +17,119 @@
                    required type="text">
         </div>
 
-       <div class="mb-3">
-            <label class="form-label" for="image-input">Upload Images:</label><br/>
-            <input type="file" name="image" id="image-input" multiple accept="image/*" required>
+        <div class="mb-3">
+            <label class="form-label">Image Input Method:</label><br>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="input_method" id="uploadRadio" value="upload" checked>
+                <label class="form-check-label" for="uploadRadio">Upload</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="input_method" id="cameraRadio" value="camera">
+                <label class="form-check-label" for="cameraRadio">Camera</label>
+            </div>
         </div>
 
+        <!-- Upload Section -->
+        <div class="mb-3" id="upload-section">
+            <label class="form-label" for="image-input">Upload Images:</label>
+            <input type="file" name="image" id="image-input" multiple accept="image/*">
+        </div>
 
-        <!-- ✅ Image Preview Area -->
+        <!-- Camera Section -->
+        <div class="mb-3 d-none" id="camera-section">
+            <video id="cameraPreview" autoplay playsinline style="width: 100%; max-width: 400px;"></video>
+            <button type="button" class="btn btn-secondary mt-2" id="captureBtn">Capture Photo</button>
+            <input type="hidden" name="captured_images" id="captured-images">
+            <div class="d-flex flex-wrap mt-2" id="captured-images-preview"></div>
+        </div>
+
+        <!-- Image Previews -->
         <div class="d-flex flex-wrap" id="preview-container"></div>
 
         <button class="btn btn-primary mt-3" type="submit">Upload Activity</button>
     </form>
 </div>
 
-<!-- ✅ JavaScript for Image Preview -->
 <script>
-    document.getElementById('image-input').addEventListener('change', function(event) {
-        let previewContainer = document.getElementById('preview-container');
-        previewContainer.innerHTML = ""; // Clear previous previews
+    const uploadRadio = document.getElementById('uploadRadio');
+    const cameraRadio = document.getElementById('cameraRadio');
+    const uploadSection = document.getElementById('upload-section');
+    const cameraSection = document.getElementById('camera-section');
+    const capturedImagesInput = document.getElementById('captured-images');
+    const capturedImagesPreview = document.getElementById('captured-images-preview');
+    let stream;
+
+    uploadRadio.addEventListener('change', toggleInputMethod);
+    cameraRadio.addEventListener('change', toggleInputMethod);
+
+    function toggleInputMethod() {
+        if (uploadRadio.checked) {
+            uploadSection.classList.remove('d-none');
+            cameraSection.classList.add('d-none');
+            stopCamera();
+        } else {
+            uploadSection.classList.add('d-none');
+            cameraSection.classList.remove('d-none');
+            startCamera();
+        }
+    }
+
+    function startCamera() {
+        const constraints = {
+            video: {
+                facingMode: { ideal: "environment" }
+            }
+        };
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(mediaStream => {
+                stream = mediaStream;
+                const video = document.getElementById('cameraPreview');
+                video.srcObject = mediaStream;
+            })
+            .catch(error => {
+                console.error("Camera access error:", error);
+                alert("Unable to access camera.");
+            });
+    }
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+    }
+
+    document.getElementById('captureBtn').addEventListener('click', () => {
+        const canvas = document.createElement('canvas');
+        const video = document.getElementById('cameraPreview');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const base64Image = canvas.toDataURL('image/png');
+
+        const img = document.createElement('img');
+        img.src = base64Image;
+        img.style.width = '100px';
+        img.style.margin = '5px';
+        img.style.borderRadius = '8px';
+        img.style.boxShadow = '0 0 5px rgba(0,0,0,0.2)';
+        capturedImagesPreview.appendChild(img);
+
+        let images = capturedImagesInput.value ? JSON.parse(capturedImagesInput.value) : [];
+        images.push(base64Image);
+        capturedImagesInput.value = JSON.stringify(images);
+    });
+
+    document.getElementById('image-input').addEventListener('change', function (event) {
+        const previewContainer = document.getElementById('preview-container');
+        previewContainer.innerHTML = ""; // Clear previews
 
         for (let file of event.target.files) {
-            let reader = new FileReader();
-
-            reader.onload = function(e) {
-                let img = document.createElement('img');
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = document.createElement('img');
                 img.src = e.target.result;
                 img.style.width = "100px";
                 img.style.margin = "5px";
@@ -48,10 +137,13 @@
                 img.style.boxShadow = "0 0 5px rgba(0,0,0,0.2)";
                 previewContainer.appendChild(img);
             };
-
             reader.readAsDataURL(file);
         }
     });
+
+    // Stop camera on unload
+    window.addEventListener("beforeunload", stopCamera);
 </script>
+
 
 {% endblock %}

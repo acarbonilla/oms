@@ -1,13 +1,36 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 {% block content %}
+
 <style>
     .zoom-img {
-            transition: transform 0.3s ease-in-out;
-        }
+        transition: transform 0.3s ease-in-out;
+        max-width: 100%;
+        height: auto;
+    }
+
     #shadow {
-  box-shadow: 10px 10px 5px lightblue;
-}
+        box-shadow: 10px 10px 5px lightblue;
+    }
+
+    .topName {
+        min-width: 100px;
+    }
+
+    @media (max-width: 376px) {
+        img {
+            width: 100% !important;
+            height: auto !important;
+        }
+
+        .input-group-text {
+            font-size: 0.8rem;
+        }
+
+        .formSubmitButton {
+            width: 100%;
+        }
+    }
 </style>
 
 <script>
@@ -20,13 +43,14 @@
     });
 </script>
 
-<div class="container border" id="shadow">
-    <div class="row">
-        <div class="col-3 text-center">
+<div class="container border mt-3 mb-5" id="shadow">
+    <div class="row g-3">
+        <!-- Form Column -->
+        <div class="col-12 col-md-4 text-center">
             <form enctype="multipart/form-data" method="POST">
                 {% csrf_token %}
                 {{form.media}}
-                <!-- Adding Snippets to check the error in form -->
+
                 {% if form.errors %}
                 <div class="alert alert-danger mb-3">
                     <strong>Error!</strong> Please correct the following:
@@ -39,89 +63,74 @@
                     </ul>
                 </div>
                 {% endif %}
-                <!-- End here the snippet -->
+
                 <div class="input-group mb-3 mt-2">
-                    <span class="input-group-text topName mb-2">Remarks:</span>
-                    {% render_field form.remarks id='id_remarks'%}
+                    <span class="input-group-text">Remarks:</span>
+                    {% render_field form.remarks id='id_remarks' class='form-control' %}
                 </div>
+
                 <div class="input-group mb-3">
-                    <span class="input-group-text topName">Status:</span>
-                    {% render_field form.status class="form-select"%}
+                    <span class="input-group-text">Status:</span>
+                    {% render_field form.status class="form-select" %}
                 </div>
+
                 <div class="input-group mb-3">
-                    <span class="input-group-text topName">Re-Schedule:</span>
-                    {% render_field form.re_schedule class="form-control" type="date"%}
+                    <span class="input-group-text">Re-Schedule:</span>
+                    {% render_field form.re_schedule class="form-control" type="date" %}
                 </div>
 
                 <div class="input-group mb-3" style="display: none;">
-                    <span class="input-group-text topName">Remark By:</span>
-                    {% render_field form.remark_by class="form-select"%}
+                    <span class="input-group-text">Remark By:</span>
+                    {% render_field form.remark_by class="form-select" %}
                 </div>
-                <a
-                        class="btn btn-primary formSubmitButton mb-2"
-                        href="
-                                {%url 'assessment' %}"
-                        role="button"
-                >Cancel
-                </a>
-                <input
-                        aria-controls="offcanvasTop"
-                        class="btn btn-primary formSubmitButton mb-2"
-                        data-bs-target="#offcanvasTop"
-                        data-bs-toggle="offcanvas"
-                        type="submit"
-                        value="Submit"
-                />
 
-
+                <a class="btn btn-secondary formSubmitButton mb-2 w-100" href="{% url 'assessment' %}">Cancel</a>
+                <input type="submit" value="Submit" class="btn btn-primary formSubmitButton mb-2 w-100" />
         </div>
 
-        <div class="col-5 border text-center">
+        <!-- Recent Image -->
+        <div class="col-12 col-md-4 border text-center">
             <div class="input-group mb-3 mt-2">
-                <span class="input-group-text topName mb-2">Recent Image</span>
-                {% if form.instance.recent_image %}
-                <img alt="Recent Image" class="img-fluid rounded zoom-img" data-zoom-image="{{ form.instance.recent_image.url }}"
+                <span class="input-group-text">Recent Image</span>
+            </div>
+            {% if form.instance.recent_image %}
+                <img alt="Recent" class="img-fluid rounded zoom-img"
                      id="zoomImage"
-                     src="{{ form.instance.recent_image.url }}"
-                     style="height: 500px; width: 700px;">
-                {% else %}
+                     src="{{ form.instance.recent_image.url }}">
+            {% else %}
                 <p class="form-control">No Image Available</p>
-                {% endif %}
-            </div>
+            {% endif %}
         </div>
 
-        <!-- jQuery & ElevateZoom -->
-        <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js"></script>
-
-        <script>
-            $(document).ready(function(){
-                $("#zoomImage").elevateZoom({
-                    zoomType: "lens", // "inner", "lens", "window"
-                   lensShape: "round",
-                    lensSize: 200,
-                    scrollZoom: true, // Allows zooming in/out with the scroll wheel
-                    zoomLevel: 1
-                });
-            });
-        </script>
-
-        <div class="col-4 border text-center">
+        <!-- Standard Image -->
+        <div class="col-12 col-md-4 border text-center">
             <div class="input-group mb-3 mt-2">
-                <span class="input-group-text topName mb-2">Standard Image</span>
-                {% if form.instance.s_image and form.instance.s_image.standard_image %}
-                <img alt="Standard" class="img-fluid rounded" src="{{ form.instance.s_image.standard_image.url }}"
-                     style="height: 500px; width: 700px">
-                {% else %}
-                <p class="form-control">No Image Available</p>
-                {% endif %}
+                <span class="input-group-text">Standard Image</span>
             </div>
-
+            {% if form.instance.s_image and form.instance.s_image.standard_image %}
+                <img alt="Standard" class="img-fluid rounded"
+                     src="{{ form.instance.s_image.standard_image.url }}">
+            {% else %}
+                <p class="form-control">No Image Available</p>
+            {% endif %}
         </div>
-        </form>
+            </form>
     </div>
-
 </div>
 
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $("#zoomImage").elevateZoom({
+            zoomType: "lens",
+            lensShape: "round",
+            lensSize: 200,
+            scrollZoom: true,
+            zoomLevel: 1
+        });
+    });
+</script>
 
 {% endblock %}

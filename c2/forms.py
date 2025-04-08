@@ -5,6 +5,11 @@ from .models import C2RecentImage, C2User, C2TechActivities, C2Facility, C2TechA
 
 
 class C2RecentImageForm(forms.ModelForm):
+    title = forms.CharField(
+        required=True,
+        error_messages={'required': 'Title is missing.'}
+    )
+
     class Meta:
         model = C2RecentImage
         fields = ['title', 'recent_image']
