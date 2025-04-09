@@ -17,12 +17,12 @@ from django.core.files.base import ContentFile
 from django.utils.text import slugify
 
 
-class C2User(models.Model):
+class DanaoUser(models.Model):
     position = (
-        ("AM", "AM"), ("EMP", "EMP"), ("EV", "EV")
+        ("AM_D", "AM_D"), ("EMP_D", "EMP_D"), ("EV_D", "EV_D")
     )
     sbu = models.ForeignKey(SBU, on_delete=models.CASCADE)
-    name = models.OneToOneField(User, on_delete=models.CASCADE, related_name="users")
+    name = models.OneToOneField(User, on_delete=models.CASCADE, related_name="usersDanao")
     position = models.CharField(
         max_length=20,
         choices=position,
@@ -30,7 +30,7 @@ class C2User(models.Model):
         default='EMP'
 
     )
-    facility = models.ForeignKey('C2Facility', on_delete=models.SET_NULL, null=True, blank=True)  # ✅ NEW
+    facility = models.ForeignKey('DanaoFacility', on_delete=models.SET_NULL, null=True, blank=True)  # ✅ NEW
 
     created = models.DateField(auto_now_add=True)
     updated = models.DateField(auto_now=True)
@@ -41,10 +41,10 @@ class C2User(models.Model):
 
 # It is used only 1 output per facility on Standard app here in models.py. No repeated of location even if uploaded
 # many times
-class C2StandardManager(models.Manager):
+class DanaoStandardManager(models.Manager):
     def latest_per_facility(self):
         """Returns only the latest C2Standard per facility."""
-        latest_standard = C2Standard.objects.filter(
+        latest_standard = DanaoStandard.objects.filter(
             facility=OuterRef('facility')
         ).order_by('-updated', '-id').values('id')[:1]
 
@@ -52,13 +52,13 @@ class C2StandardManager(models.Manager):
 
 
 # This is path function for C2Standard
-def standard_image_upload_path(instance, filename):
+def danao_standard_image_upload_path(instance, filename):
     """Generates a unique filename based on facility name and an incrementing number."""
     facility_name = slugify(instance.facility.name)  # Convert facility name to a safe format
 
     # Define base directory for images
-    # base_dir = os.path.join(settings.MEDIA_ROOT, "img/development/standard_images")  # Change path dynamically
-    base_dir = os.path.join(settings.MEDIA_ROOT, "img/production/standard_images")
+    # base_dir = os.path.join(settings.MEDIA_ROOT, "danao/development/standard_images")  # Change path dynamically
+    base_dir = os.path.join(settings.MEDIA_ROOT, "danao/production/standard_images")
     # Ensure the directory exists
     os.makedirs(base_dir, exist_ok=True)
 
@@ -72,28 +72,28 @@ def standard_image_upload_path(instance, filename):
     next_number = len(existing_files) + 1
     new_filename = f"{facility_name}_{next_number}.png"
 
-    return os.path.join("img/production/standard_images", new_filename)
+    return os.path.join("danao/production/standard_images", new_filename)
 
 
-class C2Standard(StandardImage):
-    facility = models.ForeignKey('C2Facility', on_delete=models.SET_NULL, null=True, related_name="standards")
-    standard_image = models.ImageField(upload_to=standard_image_upload_path)
-    objects = C2StandardManager()  # Attach custom manager
+class DanaoStandard(StandardImage):
+    facility = models.ForeignKey('DanaoFacility', on_delete=models.SET_NULL, null=True, related_name="standardsDanao")
+    standard_image = models.ImageField(upload_to=danao_standard_image_upload_path)
+    objects = DanaoStandardManager()  # Attach custom manager
 
     def __str__(self):
         return f"{self.facility}"
 
 
 # This is naming every upload image
-def recent_image_upload_path(instance, filename):
+def danao_recent_image_upload_path(instance, filename):
     """Generates a unique filename based on facility name and an incrementing number."""
 
     facility_name = slugify(instance.s_image.facility.name)
     facility_name = re.sub(r'[^a-zA-Z0-9_-]', '', facility_name)  # Remove unsafe characters
 
     # Correct base directory setup
-    base_dir = os.path.join(settings.MEDIA_ROOT, "img/production/recent_images")
-    # base_dir = os.path.join(settings.MEDIA_ROOT, "img/development/recent_images")
+    base_dir = os.path.join(settings.MEDIA_ROOT, "danao/production/recent_images")
+    # base_dir = os.path.join(settings.MEDIA_ROOT, "danao/development/recent_images")
 
     # Ensure the directory exists
     os.makedirs(base_dir, exist_ok=True)
@@ -110,48 +110,30 @@ def recent_image_upload_path(instance, filename):
     ext = filename.split(".")[-1]
     new_filename = f"{facility_name}_{next_number}.{ext}"
 
-    # return os.path.join("img/development/recent_images", new_filename)
-    return os.path.join("img/production/recent_images", new_filename)
+    # return os.path.join("danao/development/recent_images", new_filename)
+    return os.path.join("danao/production/recent_images", new_filename)
 
 
 # This is for Development Only
-def recent_image_upload_path_development(instance, filename):
-    """Generates a unique filename based on facility name and an incrementing number."""
-    facility_name = slugify(instance.s_image.facility.name)  # Convert facility name to a safe format
-
-    # This is for Development setup
-    base_dir = "img/development/recent_images"  # This setup is for development
-
-    # Find existing files for this facility
-    existing_files = [
-        f for f in os.listdir(os.path.join("media", base_dir))
-        if f.startswith(facility_name)
-    ]
-
-    # Get next number (increment by 1)
-    next_number = len(existing_files) + 1
-    new_filename = f"{facility_name}_{next_number}.png"
-
-    return os.path.join(base_dir, new_filename)
 
 
-class C2RecentImage(RecentImage):
+class DanaoRecentImage(RecentImage):
     STATUS_CHOICES = [
         ("Pass", "Pass"),
         ("Failed", "Failed"),
         ("Pending", "Pending")
     ]
-    s_image = models.ForeignKey(C2Standard, on_delete=models.SET_NULL, null=True, )
-    recent_image = models.ImageField(upload_to=recent_image_upload_path)
+    s_image = models.ForeignKey(DanaoStandard, on_delete=models.SET_NULL, null=True, )
+    recent_image = models.ImageField(upload_to=danao_recent_image_upload_path)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Pending")
-    uploaded_by = models.ForeignKey(C2User, on_delete=models.CASCADE, related_name="uploaded_images")
-    remark_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="remarked_images")
+    uploaded_by = models.ForeignKey(DanaoUser, on_delete=models.CASCADE, related_name="uploaded_imagesDanao")
+    remark_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="remarked_imagesDanao")
 
 
-class C2Facility(models.Model):
+class DanaoFacility(models.Model):
     name = models.CharField(max_length=50, verbose_name="Facility")
-    # qr_code = models.ImageField(upload_to="img/development/qrcodes/", blank=True, null=True)  # Ready for Development
-    qr_code = models.ImageField(upload_to="img/production/qrcodes/", blank=True, null=True)  # Ready for Production
+    # qr_code = models.ImageField(upload_to="danao/development/qrcodes/", blank=True, null=True)  # Ready for Development
+    qr_code = models.ImageField(upload_to="danao/production/qrcodes/", blank=True, null=True)  # Ready for Production
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
@@ -163,10 +145,10 @@ class C2Facility(models.Model):
         filename = f"qr_{sanitized_name}.png"
 
         # ✅ Generate the QR code with the facility URL
-        qr_url = f"https://143.198.217.58/c2/c2/facility/{self.id}/upload/" # online
-        # qr_url = f"https://192.168.1.20/c2/c2/facility/{self.id}/upload/" # mine
-        # qr_url = f"https://192.11.200.14/c2/c2/facility/{self.id}/upload/" # JFC Server
-        # qr_url = f"http://127.0.0.1:8000/c2/c2/facility/{self.id}/upload/" # Development
+        qr_url = f"https://143.198.217.58/danao/danao/facility/{self.id}/upload/" # online
+        # qr_url = f"https://192.168.1.20/danao/danao/facility/{self.id}/upload/" # mine
+        # qr_url = f"https://192.11.200.14/danao/danao/facility/{self.id}/upload/" # JFC Server
+        # qr_url = f"http://127.0.0.1:8000/danao/danao/facility/{self.id}/upload/"  # Development
         qr = qrcode.make(qr_url)
 
         buffer = BytesIO()
@@ -190,10 +172,10 @@ class C2Facility(models.Model):
         return self.name
 
 
-class C2TechActivities(models.Model):
+class DanaoTechActivities(models.Model):
     name = models.CharField(max_length=100, verbose_name="Activity")
     location = models.CharField(max_length=100)
-    uploaded_by = models.ForeignKey(C2User, on_delete=models.CASCADE, related_name="uploaded_images_by")
+    uploaded_by = models.ForeignKey(DanaoUser, on_delete=models.CASCADE, related_name="uploaded_images_byDanao")
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -204,10 +186,10 @@ class C2TechActivities(models.Model):
         return f"{self.name}"
 
 
-class C2TechActivityImage(models.Model):
-    activity = models.ForeignKey(C2TechActivities, on_delete=models.CASCADE, related_name="images")
-    # image = models.ImageField(upload_to="img/development/technical_images")
-    image = models.ImageField(upload_to="img/production/technical_images")
+class DanaoTechActivityImage(models.Model):
+    activity = models.ForeignKey(DanaoTechActivities, on_delete=models.CASCADE, related_name="imagesDanao")
+    # image = models.ImageField(upload_to="danao/development/technical_images")
+    image = models.ImageField(upload_to="danao/production/technical_images")
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

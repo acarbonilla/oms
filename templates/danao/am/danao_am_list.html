@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out;
+    }
+    .card:hover {
+        transform: scale(1.05);
+    }
+    .container {
+        margin-top: 10px;
+    }
+    .title {
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .bckgc{
+         color: #5f0b2c;
+         background: linear-gradient(to right, #93A5CF, #E4EfE9); /* Gradient from peach to light orange */
+        }
+</style>
+
+
+
+<div class="container">
+    <h3 class="text-center text-primary mb-2">Managers' Dashboard</h3>
+    <!-- Technical Activities Section -->
+    <div class="row">
+        <h4 class="text-success">🛠 Technical Activities</h4>
+        <div class="col-md-4">
+            <div class="card text-center mb-3 bckgc">
+                <div class="card-body">
+                    <h5 class="title">Weekly Activity Report</h5>
+                    <p class="card-text fs-3">{{ weekly_tech_activities }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bckgc text-center mb-3">
+                <div class="card-body">
+                    <h5 class="title">Monthly Activity Report</h5>
+                    <p class="card-text fs-3">{{ monthly_tech_activities }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bckgc text-center mb-3">
+                <div class="card-body">
+                    <h5 class="title">Yearly Activity Report</h5>
+                    <p class="card-text fs-3">{{ yearly_tech_activities }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- General Activities Section -->
+    <div class="row">
+        <h4 class="text-success">📌 General Activities</h4>
+        <div class="col-md-4 mb-4">
+            <div class="card bg-light mb-3">
+                <div class="card-body text-center">
+                    <h5 class="title">Weekly Activities</h5>
+                    <p class="card-text fs-3">{{ weekly_general_activities }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4 text-center">
+            <div class="card bg-light mb-3">
+                <div class="card-body">
+                    <h5 class="title">Monthly Activities</h5>
+                    <p class="card-text fs-3">{{ monthly_general_activities }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4 text-center">
+            <div class="card bg-light mb-3">
+                <div class="card-body">
+                    <h5 class="title">Yearly Activities</h5>
+                    <p class="card-text fs-3">{{ yearly_general_activities }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graph -->
+    <div class="row mb-5">
+        <!-- Status Breakdown -->
+        <div class="col-md-4" id="grapPie">
+            <h4 style="text-align: center">📊 Status Breakdown</h4>
+            <div>
+                <canvas id="myChart"></canvas>
+            </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+            <script>
+                const ctx = document.getElementById('myChart');
+                new Chart(ctx, {
+                  type: 'pie',
+                  data: {
+                    labels: ['Passed', 'Failed', 'Pending'],
+                    datasets: [{
+                      label: 'Total',
+                      data: [{{ passed_count }}, {{ failed_count }}, {{ pending_count }}],
+                      borderWidth: 1
+                    }]
+                  },
+
+                });
+            </script>
+        </div>
+
+        <!-- Facility Statistics -->
+        <div class="col-md-8" id="linePie">
+            <h4 style="text-align: center">🏢 Facility Statistics</h4>
+
+
+            <div>
+                <canvas id="lineChart"></canvas>
+            </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+            <script>
+                const ctx2 = document.getElementById('lineChart');
+
+                new Chart(ctx2, {
+                  type: 'bar',
+                  data: {
+                    labels: ['Visited This Week', 'Not Visited This Week'],
+                    datasets: [{
+                      label: 'Total: {{facility_reg_count}}',
+                      fill: false,
+                      data: [{{facility_visited_week}}, {{ facility_not_visited_week }}],
+                      borderWidth: 1,
+                      tension: 1,
+                      borderColor: 'rgb(75, 192, 192)',
+                      HoverBackgroundColor: 'rgb(255, 0, 0)'
+                    }]
+                  },
+
+                });
+            </script>
+        </div>
+
+
+    </div> <!-- End of Row -->
+
+    <!-- Testing for Technical Line chart -->
+
+</div>
+
+    <!-- End here -->
+
+
+{% endblock %}

@@ -10,7 +10,7 @@
   text-shadow: 2px 2px 4px blue;
   font-size: 20px;
   font-weight: bolder;
-  color: red;
+  color: #00ff00;
   text-align: center;
   animation: glow 1s ease-in-out infinite alternate;
 }
@@ -37,8 +37,9 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a aria-current="page" class="nav-link active text-white" href="{% url 'empMember' %}">Home</a>
+                    <a aria-current="page" class="nav-link active text-white" href="{% url 'evMemberDanao' %}">Home</a>
                 </li>
+
 
                 <li class="nav-item dropdown">
                     <a aria-expanded="false" class="nav-link dropdown-toggle text-white" data-bs-toggle="dropdown" href="#"
@@ -46,13 +47,18 @@
                         Gen_Activities
                     </a>
                     <ul class="dropdown-menu">
-                         <li><a class="dropdown-item" href="{% url 'standard_image_ev' %}">Standard Image</a></li>
+                         <li><a class="dropdown-item" href="{% url 'standard_image_evDanao' %}">Standard Image</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="{%url 'failed_list' %}">Failed</a></li>
-                        <li><a class="dropdown-item" href="{%url 'pass_list' %}">Passed</a></li>
 
+                        <li><a class="dropdown-item" href="{% url 'assessmentDanao'%}">Pending</a></li>
+                        <li><a class="dropdown-item" href="{%url 'failed_listDanao' %}">Failed</a></li>
+                        <li><a class="dropdown-item" href="{%url 'pass_listDanao' %}">Passed</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="{% url 'not_visited_facilities_listDanao' %}">Not Visited</a></li>
                     </ul>
 
                 </li>
@@ -63,19 +69,21 @@
                         Tech_Activities
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'tech_act_upload' %}">Tech-Activities Form</a></li>
-                        <li><a class="dropdown-item" href="{% url 'activity_list' %}">Activity List</a></li>
+                        <li><a class="dropdown-item" href="{% url 'tech_act_uploadDanao' %}">Tech-Activities Form</a></li>
+                        <li><a class="dropdown-item" href="{% url 'activity_listDanao' %}">Activity List</a></li>
                     </ul>
 
                 </li>
 
-                 <li class="nav-item dropdown">
+                <li class="nav-item dropdown">
                     <a aria-expanded="false" class="nav-link dropdown-toggle text-white" data-bs-toggle="dropdown" href="#"
                        role="button">
                         File
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'facility_list'%}">QR code</a></li>
+                        <li><a class="dropdown-item" href="{% url 'download_pdfDanao' %}">ALL-PDF Download</a></li>
+                        <li><a class="dropdown-item" href="{% url 'download_selected_pdfDanao'%}">Selected PDF</a></li>
+                        <li><a class="dropdown-item" href="{% url 'facility_listDanao'%}">QR code</a></li>
 
                     </ul>
 

@@ -12,6 +12,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('members.urls')),
     path('c2/', include('c2.urls')),
+    path('danao/', include('danao.urls')),
     path('core/', include('core.urls')),
 ]
 if settings.DEBUG:

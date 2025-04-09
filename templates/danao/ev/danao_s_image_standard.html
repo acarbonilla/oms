@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    #shadow {
+  box-shadow: 10px 10px 5px lightblue;
+}
+
+</style>
+
+<div class="container mt-4">
+    <h2 class="mb-3">Standard Images</h2>
+
+    <!-- ✅ Search & Sort Form -->
+    <form method="GET" class="mb-3">
+        <div class="row">
+            <div class="col-md-6">
+                <input type="text" name="search" value="{{ search_query }}" class="form-control"
+                       placeholder="Search by Facility Name" id="shadow">
+            </div>
+            <div class="col-md-3">
+                <select name="sort" class="form-select" id="shadow">
+                    <option value="asc" {% if sort_order == "asc" %}selected{% endif %}>Sort A-Z</option>
+                    <option value="desc" {% if sort_order == "desc" %}selected{% endif %}>Sort Z-A</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary" id="shadow">Apply</button>
+                <button type="submit" class="btn btn-primary" id="shadow">
+                    <a class="text-white" href="{% url 'standard_image_evDanao'%}" style="text-decoration:none;">
+                         Refresh
+                    </a>
+
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- ✅ Standard Image List -->
+    <div class="row">
+        {% for image in s_standard %}
+            <div class="col-md-4 mb-4" >
+                <div class="card" id="shadow">
+                    <img src="{{ image.standard_image.url }}" width="200" height="300" class="card-img-top" alt="Standard Image">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ image.facility }}</h5>
+                         <a href="{% url 'standard_image_ev_detailsDanao' image.id %}" class="btn btn-info">📄 Details</a>
+
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>No standard images found.</p>
+        {% endfor %}
+    </div>
+
+    <!-- ✅ Pagination Controls -->
+    <nav>
+        <ul class="pagination justify-content-center">
+            {% if s_standard.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1&search={{ search_query }}&sort={{ sort_order }}">First</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ s_standard.previous_page_number }}&search={{ search_query }}&sort={{ sort_order }}">Previous</a></li>
+            {% endif %}
+
+            <li class="page-item active"><span class="page-link">Page {{ s_standard.number }} of {{ s_standard.paginator.num_pages }}</span></li>
+
+            {% if s_standard.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ s_standard.next_page_number }}&search={{ search_query }}&sort={{ sort_order }}">Next</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ s_standard.paginator.num_pages }}&search={{ search_query }}&sort={{ sort_order }}">Last</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+{% endblock %}

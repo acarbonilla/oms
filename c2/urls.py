@@ -1,4 +1,4 @@
-# from django.conf.urls import handler403, handler404, handler500
+
 from django.urls import path
 from .views import (empMember, amMember, amAssessment, upload_recent_image_qr, update_recent_image,
                     recent_image_detail, evMember, standard_image_ev, failed_list, generate_pdf,
@@ -6,6 +6,8 @@ from .views import (empMember, amMember, amAssessment, upload_recent_image_qr, u
                     access_denied, trigger_500, tech_act_upload, activity_list, activity_detail, facility_list,
                     generate_qr_code
                     )
+
+# app_name = 'c2'
 
 urlpatterns = [
     path('', evMember, name='evMember'),
@@ -49,4 +51,5 @@ urlpatterns = [
     path('facility/<int:facility_id>/download_qr/', generate_qr_code, name='download_qr_code'),
 
     path("test-500/", trigger_500),  # Go to /test-500/ to see the 500 error page
+
 ]

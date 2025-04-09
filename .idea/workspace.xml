@@ -5,8 +5,46 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="66939e78-aa53-4976-9238-052a50849d6b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/core/middleware.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/danao/danao_context.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/danao/forms.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/danao/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/am/danao_am_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/am/navbar.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/emp/danao_emp_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/emp/emp_qr_upload.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/emp/form/upload_recent_image.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/emp/navbar.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/ev/danao_ev_dashboard.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/ev/danao_not_visited_facilities_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/ev/danao_s_image_standard.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/ev/danao_standard_image_details.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/ev/danao_upload_recent_image_qr.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/ev/navbar.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/general/danao_activity_detail.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/general/danao_activity_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/general/danao_assessment.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/general/danao_ev_update_recent_image.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/general/danao_facility_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/general/danao_failed_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/general/danao_pass_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/general/danao_recent_image_detail.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/general/danao_report_selection.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/general/danao_tech_act_upload.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/general/navbar.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/danao/general/report.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oms/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/oms/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oms/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/oms/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/c2/emp/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/emp/navbar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/c2/ev/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev/navbar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/forbidden/access_denied.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/forbidden/access_denied.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/am/navbar.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,23 +86,23 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/dc/PycharmProjects/oms/media/img/production&quot;
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/dc/PycharmProjects/oms/media/danao&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\dc\PycharmProjects\oms\media\danao" />
+      <recent name="C:\Users\dc\PycharmProjects\oms\templates\danao\am" />
+      <recent name="C:\Users\dc\PycharmProjects\oms\templates\danao" />
       <recent name="C:\Users\dc\PycharmProjects\oms\media\img\production" />
       <recent name="C:\Users\dc\PycharmProjects\oms\media\img\development" />
-      <recent name="C:\Users\dc\PycharmProjects\oms\static\report_logo" />
-      <recent name="C:\Users\dc\PycharmProjects\oms\static\img" />
-      <recent name="C:\Users\dc\PycharmProjects\oms\templates\c2\ev\form" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\dc\PycharmProjects\oms\templates\danao\general" />
+      <recent name="C:\Users\dc\PycharmProjects\oms\templates\c2\am" />
       <recent name="C:\Users\dc\PycharmProjects\oms\media\img\production" />
       <recent name="C:\Users\dc\PycharmProjects\oms\templates\c2" />
       <recent name="C:\Users\dc\PycharmProjects\oms\templates\forbidden" />
-      <recent name="C:\Users\dc\PycharmProjects\oms\templates" />
-      <recent name="C:\Users\dc\PycharmProjects\oms\templates\c2\emp\form" />
     </key>
   </component>
   <component name="RunManager">
@@ -116,6 +154,81 @@
           <url>file://$PROJECT_DIR$/main.py</url>
           <line>8</line>
           <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/danao/views.py</url>
+          <line>73</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/danao/views.py</url>
+          <line>128</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/danao/views.py</url>
+          <line>136</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/danao/views.py</url>
+          <line>207</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/danao/views.py</url>
+          <line>262</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/danao/views.py</url>
+          <line>337</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/danao/views.py</url>
+          <line>310</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/danao/views.py</url>
+          <line>355</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/danao/views.py</url>
+          <line>392</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/danao/views.py</url>
+          <line>457</line>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/danao/views.py</url>
+          <line>509</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/danao/views.py</url>
+          <line>700</line>
+          <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/danao/views.py</url>
+          <line>800</line>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/danao/views.py</url>
+          <line>851</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/danao/views.py</url>
+          <line>862</line>
+          <option name="timeStamp" value="20" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

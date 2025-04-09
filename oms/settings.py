@@ -18,15 +18,14 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # SECURITY WARNING: don't run with debug turned on in production!
 
 # Usage
+
 DEBUG = env('DEBUG')
 SECRET_KEY = env('SECRET_KEY')
 
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "192.168.1.20",
-    "192.168.1.14",
-    "192.11.200.14",
+    "143.198.217.58",
     "*",
 ]
 
@@ -51,6 +50,7 @@ INSTALLED_APPS = [
     # My Apps
     'core',
     'c2',
+    'danao',
 
     # Editor
     'ckeditor',
@@ -85,6 +85,11 @@ TEMPLATES = [
                 'c2.c2_context.am_group',
                 'c2.c2_context.emp_group',
                 'c2.c2_context.ev_group',
+                # Danao Group
+                'danao.danao_context.am_group_danao',
+                'danao.danao_context.emp_group_danao',
+                'danao.danao_context.ev_group_danao',
+
             ],
         },
     },
@@ -105,7 +110,7 @@ DATABASES = {
         'PORT': env('DATABASE_PORT'),
     }
 }
-print("DB Password:", env('DATABASE_PASSWORD'))
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

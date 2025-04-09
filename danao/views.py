@@ -16,7 +16,7 @@ from django.core.paginator import Paginator  # ✅ Import Paginator
 from django.db.models import Count
 from django.db.models import OuterRef, Subquery
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.shortcuts import render
 # This is for QR
@@ -33,42 +33,15 @@ from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 
-from c2.forms import C2RecentImageForm, C2RecentImageFormUpdate, TechnicalActivitiesForm
-# from c2.filters import FacilityFilter
-from c2.models import C2Standard, C2User, C2Facility, C2TechActivities, C2TechActivityImage
-from .models import C2RecentImage  # Ensure correct model import
+from danao.forms import DanaoRecentImageForm, DanaoRecentImageFormUpdate, DanaoTechnicalActivitiesForm
+# from danao.filters import FacilityFilter
+from danao.models import DanaoStandard, DanaoUser, DanaoFacility, DanaoTechActivities, DanaoTechActivityImage
+from danao.models import DanaoRecentImage  # Ensure correct model import
 
 # This is for Technical Activities
 import base64
 from django.core.files.base import ContentFile
 import json
-
-
-# Decorators to prohibits the other app access
-def restrict_for_c2group_only(allowed_groups=None, redirect_url="access_denied/"):
-    """
-    This decorator restricts access to views to only users in the specified list of allowed groups.
-    If the user is not in one of the allowed groups, they will be redirected to the access_denied page.
-
-    :param allowed_groups: List of group names (strings) that are allowed to access the view.
-    :param redirect_url: URL to redirect to if the user is not in the allowed groups (default is 'access_denied/').
-    """
-    if allowed_groups is None:
-        allowed_groups = []
-
-    def decorator(view_func):
-        @wraps(view_func)
-        def _wrapped_view(request, *args, **kwargs):
-            # Check if the user is in one of the allowed groups
-            if not any(request.user.groups.filter(name=group).exists() for group in allowed_groups):
-                # If user is not in allowed groups, show a message and redirect
-                messages.warning(request, "🚫 You are not authorized to access this page.")
-                return redirect(access_denied)
-            return view_func(request, *args, **kwargs)
-
-        return _wrapped_view
-
-    return decorator
 
 
 # This decorator prohibits the EMP group to access the page
@@ -77,7 +50,7 @@ def restrict_emp_group(redirect_url="access_denied/"):  # Redirect to "access_de
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
-            if request.user.groups.filter(name="EMP").exists():
+            if request.user.groups.filter(name="EMP_D").exists():
                 messages.warning(request, "🚫 You are not authorized to access this page.")
                 return redirect(redirect_url)
             return view_func(request, *args, **kwargs)
@@ -93,13 +66,12 @@ def access_denied(request):
 
 # This is for only user belong to EV group can access the upload_recent_image_qr
 def ev_group_required(user):
-    return user.groups.filter(name="EV").exists()
+    return user.groups.filter(name="EV_D").exists()
 
 
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
-def evMember(request):
+def evMemberDanao(request):
     # Get current time in Philippine Time
     ph_time_now = localtime(now())
 
@@ -113,14 +85,14 @@ def evMember(request):
     start_of_year = ph_time_now.replace(month=1, day=1)
 
     # ✅ Count form entries for this week, month, and year
-    weekly_count = C2RecentImage.objects.filter(created__gte=start_of_week).count()
-    monthly_count = C2RecentImage.objects.filter(created__gte=start_of_month).count()
-    yearly_count = C2RecentImage.objects.filter(created__gte=start_of_year).count()
+    weekly_count = DanaoRecentImage.objects.filter(created__gte=start_of_week).count()
+    monthly_count = DanaoRecentImage.objects.filter(created__gte=start_of_month).count()
+    yearly_count = DanaoRecentImage.objects.filter(created__gte=start_of_year).count()
 
     # ✅ Get Passed Facilities within this month
     search_query = request.GET.get("search", "")
 
-    passed_facilities = C2RecentImage.objects.filter(
+    passed_facilities = DanaoRecentImage.objects.filter(
         status="Pass",
         created__gte=start_of_month
     ).values("id", "s_image__facility__name", "created").distinct()
@@ -135,11 +107,11 @@ def evMember(request):
     page_obj = paginator.get_page(page_number)
 
     context = {
-        "failed_sites_count": C2RecentImage.objects.filter(
+        "failed_sites_count": DanaoRecentImage.objects.filter(
             status="Failed",
             created__gte=ph_time_now - timedelta(days=30)
         ).count(),
-        "total_facilities": C2Facility.objects.count(),
+        "total_facilities": DanaoFacility.objects.count(),
         "passed_facilities_count": passed_facilities.count(),
         "page_obj": page_obj,
         "search_query": search_query,
@@ -150,21 +122,19 @@ def evMember(request):
         "yearly_count": yearly_count,
         "title": "Evaluator Dashboard",
     }
-    return render(request, 'c2/ev/ev_dashboard.html', context)
+    return render(request, 'danao/ev/danao_ev_dashboard.html', context)
 
 
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @login_required(login_url='omsLogin')
-def empMember(request):
-    facilities = C2Facility.objects.all()  # ✅ Fetch all facilities
+def empMemberDanao(request):
+    facilities = DanaoFacility.objects.all()  # ✅ Fetch all facilities
     name = User.objects.all()
     context = {'name': name, 'facilities': facilities, 'title': 'Employee'}
-    return render(request, 'c2/emp/emp_list.html', context)
+    return render(request, 'danao/emp/danao_emp_list.html', context)
 
 
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @login_required(login_url='omsLogin')
-def amMember(request):
+def amMemberDanao(request):
     # Get all users
     name = User.objects.all()
 
@@ -191,27 +161,27 @@ def amMember(request):
         year_start = make_aware(year_start)
 
     # Now you can use them in queries
-    weekly_general_activities = C2RecentImage.objects.filter(created__gte=week_start).count()
-    monthly_general_activities = C2RecentImage.objects.filter(created__gte=month_start).count()
-    yearly_general_activities = C2RecentImage.objects.filter(created__gte=year_start).count()
+    weekly_general_activities = DanaoRecentImage.objects.filter(created__gte=week_start).count()
+    monthly_general_activities = DanaoRecentImage.objects.filter(created__gte=month_start).count()
+    yearly_general_activities = DanaoRecentImage.objects.filter(created__gte=year_start).count()
 
     # Facility Statistics
-    facility_reg_count = C2Facility.objects.count()
+    facility_reg_count = DanaoFacility.objects.count()
     # ✅ Get all facilities that WERE visited within the last month
-    facility_visited_week = C2RecentImage.objects.filter(
+    facility_visited_week = DanaoRecentImage.objects.filter(
         created__gte=week_start).values_list("s_image__facility__id", flat=True).distinct().count()
     facility_not_visited_week = facility_reg_count - facility_visited_week
 
     # Status Breakdown
-    passed_count = C2RecentImage.objects.filter(status="Pass").count()
-    failed_count = C2RecentImage.objects.filter(status="Failed").count()
-    pending_count = C2RecentImage.objects.filter(status="Pending").count()
+    passed_count = DanaoRecentImage.objects.filter(status="Pass").count()
+    failed_count = DanaoRecentImage.objects.filter(status="Failed").count()
+    pending_count = DanaoRecentImage.objects.filter(status="Pending").count()
 
     # Technical Activities (C2TechActivities) Counts
-    weekly_tech_activities = C2TechActivities.objects.filter(created__gte=week_start).count()
+    weekly_tech_activities = DanaoTechActivities.objects.filter(created__gte=week_start).count()
     print(f"Weekly: {weekly_tech_activities}")
-    monthly_tech_activities = C2TechActivities.objects.filter(created__gte=month_start).count()
-    yearly_tech_activities = C2TechActivities.objects.filter(created__gte=year_start).count()
+    monthly_tech_activities = DanaoTechActivities.objects.filter(created__gte=month_start).count()
+    yearly_tech_activities = DanaoTechActivities.objects.filter(created__gte=year_start).count()
 
     context = {
         'name': name,
@@ -230,22 +200,21 @@ def amMember(request):
         'title': "Managers' Dashboard",
 
     }
-    return render(request, 'c2/am/am_list.html', context)
+    return render(request, 'danao/am/danao_am_list.html', context)
 
 
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
-def amAssessment(request):
+def amAssessmentDanao(request):
     """Show the latest failed recent images per facility with search and pagination."""
 
     search_query = request.GET.get("search", "")
 
-    latest_recent = C2RecentImage.objects.filter(
+    latest_recent = DanaoRecentImage.objects.filter(
         s_image__facility=OuterRef("s_image__facility")
     ).order_by("-updated", "-id").values("id")[:1]
 
-    latest_recent_images = C2RecentImage.objects.filter(
+    latest_recent_images = DanaoRecentImage.objects.filter(
         id=Subquery(latest_recent)
     ).exclude(status="Pass")
 
@@ -256,7 +225,7 @@ def amAssessment(request):
         )
 
     # ✅ Ensure we correctly count failures per facility
-    failed_counts = C2RecentImage.objects.filter(status="Failed").values("s_image__facility").annotate(
+    failed_counts = DanaoRecentImage.objects.filter(status="Failed").values("s_image__facility").annotate(
         failed_count=Count("id")
     )
     failed_dict = {item["s_image__facility"]: item["failed_count"] for item in failed_counts}
@@ -287,28 +256,27 @@ def amAssessment(request):
         "search_query": search_query,
         "title": "Assessment List",
     }
-    return render(request, "c2/assessment.html", context)
+    return render(request, "danao/general/danao_assessment.html", context)
 
 
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @user_passes_test(ev_group_required, login_url='omsLogin')  # ✅ Redirect if not in "EV" group
-def upload_recent_image_qr(request, facility_id):
+def upload_recent_image_qrDanao(request, facility_id):
     """Handles QR code scanning and redirects users to the upload form."""
 
     request.session['last_facility_id'] = facility_id
     request.session.modified = True
 
-    facility = get_object_or_404(C2Facility, id=facility_id)
+    facility = get_object_or_404(DanaoFacility, id=facility_id)
 
     if request.method == "POST":
-        form = C2RecentImageForm(request.user, request.POST, request.FILES)
+        form = DanaoRecentImageForm(request.user, request.POST, request.FILES)
         if form.is_valid():
             recent_image = form.save(commit=False)
 
             # ✅ Debugging: Print facility ID and check standard image
             print(f"Facility ID: {facility.id}, Facility Name: {facility.name}")
 
-            standard_image = C2Standard.objects.filter(facility=facility).first()  # ✅ Prevents multiple query failures
+            standard_image = DanaoStandard.objects.filter(facility=facility).first()  # ✅ Prevents multiple query failures
 
             if not standard_image:
                 print("Debug: No standard image found for this facility!")  # ✅ Debugging print
@@ -321,7 +289,7 @@ def upload_recent_image_qr(request, facility_id):
             recent_image.save()
             messages.success(request, "Recent image uploaded successfully!")
 
-            return redirect(reverse('update_recent_image', kwargs={'pk': recent_image.id}))
+            return redirect(reverse('update_recent_imageDanao', kwargs={'pk': recent_image.id}))
 
         else:
             error_messages = []
@@ -331,52 +299,51 @@ def upload_recent_image_qr(request, facility_id):
             messages.error(request, " | ".join(error_messages))
 
     else:
-        form = C2RecentImageForm(request.user)
+        form = DanaoRecentImageForm(request.user)
 
-    return render(request, 'c2/ev/upload_recent_image_qr.html',
+    return render(request, 'danao/ev/danao_upload_recent_image_qr.html',
                   {'form': form, 'facility': facility, 'title': "Upload Form"})
 
 
 # This section is for uploading or updating the recent image.
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
+
 @user_passes_test(ev_group_required, login_url='omsLogin')  # ✅ Redirect if not in "EV" group
-def update_recent_image(request, pk):
+def update_recent_imageDanao(request, pk):
     """Update an existing C2RecentImage and automatically assign remark_by."""
 
-    recent_image = get_object_or_404(C2RecentImage, pk=pk)
+    recent_image = get_object_or_404(DanaoRecentImage, pk=pk)
 
     if request.method == "POST":
-        form = C2RecentImageFormUpdate(request.POST, request.FILES, instance=recent_image,
+        form = DanaoRecentImageFormUpdate(request.POST, request.FILES, instance=recent_image,
                                        user=request.user)  # ✅ Pass request.user
         if form.is_valid():
             form.save()
             messages.success(request, "Recent image updated successfully!")
 
-            return redirect('assessment')
+            return redirect('assessmentDanao')
 
         else:
             messages.error(request, ", ".join([str(error) for error in form.errors.values()]))
 
     else:
-        form = C2RecentImageFormUpdate(instance=recent_image, user=request.user)  # ✅ Pass request.user
+        form = DanaoRecentImageFormUpdate(instance=recent_image, user=request.user)  # ✅ Pass request.user
 
-    return render(request, 'c2/ev_update_recent_image.html', {'form': form, 'recent_image': recent_image,
+    return render(request, 'danao/general/danao_ev_update_recent_image.html', {'form': form, 'recent_image': recent_image,
                                                               'title': "Update Form"})
 
 
 # Details Section
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
-def recent_image_detail(request, pk):
+def recent_image_detailDanao(request, pk):
     """Displays details of a recent image and shows assigned users of the facility."""
 
-    image = get_object_or_404(C2RecentImage, pk=pk)
+    image = get_object_or_404(DanaoRecentImage, pk=pk)
 
     # ✅ Query the assigned user(s) for the facility via `C2Standard`
-    assigned_users = C2User.objects.filter(facility=image.s_image.facility)
+    assigned_users = DanaoUser.objects.filter(facility=image.s_image.facility)
 
-    return render(request, 'c2/recent_image_detail.html', {
+    return render(request, 'danao/general/danao_recent_image_detail.html', {
         'image': image,
         'assigned_users': assigned_users,  # ✅ Pass assigned users to template
         "title": "Present Image Details"
@@ -385,15 +352,14 @@ def recent_image_detail(request, pk):
 
 # This is for EV Standard Image
 # @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @login_required(login_url='omsLogin')
-def standard_image_ev(request):
+def standard_image_evDanao(request):
     """Displays standard images with search, sorting, and pagination."""
 
     search_query = request.GET.get('search', '')  # Get search input
     sort_order = request.GET.get('sort', 'asc')  # Get sorting order (default: ascending)
 
-    s_image_standard = C2Standard.objects.all()
+    s_image_standard = DanaoStandard.objects.all()
 
     # ✅ Search filter
     if search_query:
@@ -419,38 +385,36 @@ def standard_image_ev(request):
         'title': "Standard Image"
     }
 
-    return render(request, 'c2/ev/s_image_standard.html', context)
+    return render(request, 'danao/ev/danao_s_image_standard.html', context)
 
 
 # @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @login_required(login_url='omsLogin')
-def standard_image_ev_details(request, pk):
+def standard_image_ev_detailsDanao(request, pk):
     """View details of a specific standard image and show the assigned user."""
 
-    s_image = get_object_or_404(C2Standard, pk=pk)  # Get the standard image
-    assigned_users = C2User.objects.filter(facility=s_image.facility)  # ✅ Query assigned users
+    s_image = get_object_or_404(DanaoStandard, pk=pk)  # Get the standard image
+    assigned_users = DanaoUser.objects.filter(facility=s_image.facility)  # ✅ Query assigned users
 
     context = {
         "s_image": s_image,
         "assigned_users": assigned_users,  # ✅ Pass users to template
         "title": f"Standard Image - {s_image.facility.name}"
     }
-    return render(request, "c2/ev/standard_image_details.html", context)
+    return render(request, "danao/ev/danao_standard_image_details.html", context)
 
 
 # This is for everyone
 # @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @login_required(login_url='omsLogin')
-def failed_list(request):
+def failed_listDanao(request):
     """Show up to 3 'Failed' images within 30 days & keep a yearly history, with search and pagination."""
 
     thirty_days_ago = now() - timedelta(days=30)  # ✅ 30 days filter
     one_year_ago = now() - timedelta(days=365)  # ✅ 1 year filter
 
     search_query = request.GET.get('search', '')  # ✅ Get search input
-    facilities = C2Facility.objects.all()
+    facilities = DanaoFacility.objects.all()
 
     if search_query:
         facilities = facilities.filter(name__icontains=search_query)  # ✅ Filter by facility name
@@ -458,13 +422,13 @@ def failed_list(request):
     failed_facilities = []  # ✅ Stores facilities with failed images
 
     for facility in facilities:
-        recent_failed_images = C2RecentImage.objects.filter(
+        recent_failed_images = DanaoRecentImage.objects.filter(
             s_image__facility=facility,
             status="Failed",
             created__gte=thirty_days_ago
         ).order_by('-created')[:3]
 
-        yearly_failed_images = C2RecentImage.objects.filter(
+        yearly_failed_images = DanaoRecentImage.objects.filter(
             s_image__facility=facility,
             status="Failed",
             created__gte=one_year_ago,
@@ -486,13 +450,12 @@ def failed_list(request):
 
     context = {'page_obj': page_obj, 'search_query': search_query,
                'title': f"Failed List "}
-    return render(request, 'c2/failed_list.html', context)
+    return render(request, 'danao/general/danao_failed_list.html', context)
 
 
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
-def generate_pdf(request):
+def generate_pdfDanao(request):
     """Generate and download a PDF report of C2RecentImage entries within the current year."""
 
     # ✅ Get search query (if provided)
@@ -500,7 +463,7 @@ def generate_pdf(request):
     current_year = now().year
 
     # ✅ Filter images within the current year
-    images = C2RecentImage.objects.filter(created__year=current_year)
+    images = DanaoRecentImage.objects.filter(created__year=current_year)
 
     # ✅ Apply search filter (by facility name or title)
     if search_query:
@@ -518,7 +481,7 @@ def generate_pdf(request):
     y_position = height - 50  # Start position
 
     pdf.setFont("Helvetica-Bold", 16)
-    pdf.drawString(200, y_position, "C2 Recent Image Report - " + str(current_year))
+    pdf.drawString(200, y_position, "Danao Recent Image Report - " + str(current_year))
     y_position -= 40
 
     pdf.setFont("Helvetica", 12)
@@ -538,20 +501,18 @@ def generate_pdf(request):
     pdf.save()
     buffer.seek(0)
     response = HttpResponse(buffer, content_type="application/pdf")
-    response["Content-Disposition"] = 'attachment; filename="C2RecentImage_Report.pdf"'
+    response["Content-Disposition"] = 'attachment; filename="DanaoRecentImage_Report.pdf"'
     return response
 
 
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
-def generate_selected_pdf(request):
+def generate_selected_pdfDanao(request):
     """Generate a landscape PDF report with watermark, images, and details."""
     selected_ids = request.GET.getlist("selected_ids", [])
     search_query = request.GET.get("search", "")
     current_year = now().year
-    images = C2RecentImage.objects.filter(created__year=current_year).exclude(status="Pending")
-
+    images = DanaoRecentImage.objects.filter(created__year=current_year).exclude(status="Pending")
     if search_query:
         images = images.filter(Q(title__icontains=search_query) | Q(s_image__facility__name__icontains=search_query)
                                | Q(status__icontains=search_query)
@@ -560,14 +521,14 @@ def generate_selected_pdf(request):
                                )
 
     if not images.exists():
-        return render(request, "c2/report_selection.html", {
-            "error_message": "❌ No available records to download (Pending records are excluded).",
+        return render(request, "danao/ganeral/danao_report_selection.html", {
+            "error_message": "? No available records to download (Pending records are excluded).",
             "search_query": search_query
         })
 
     if not selected_ids:
-        return render(request, "c2/report_selection.html", {
-            "error_message": "❌ Please select at least one item before downloading.",
+        return render(request, "danao/general/danao_report_selection.html", {
+            "error_message": "? Please select at least one item before downloading.",
             "search_query": search_query,
             "page_obj": images
         })
@@ -590,7 +551,7 @@ def generate_selected_pdf(request):
 
     for index, img in enumerate(images):  # Added index to track the first page
         if index > 0:  # Only add a new page after the first iteration
-            pdf.showPage()  # ✅ Now it correctly starts a new page for each report
+            pdf.showPage()  # ? Now it correctly starts a new page for each report
 
         # add_watermark(pdf, width, height)  # Add watermark
         add_watermark(pdf, width, height)  # Add watermark
@@ -681,10 +642,8 @@ def generate_selected_pdf(request):
 
 
 # This is for Pass List
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @login_required(login_url='omsLogin')
-def pass_list(request):
+def pass_listDanao(request):
     """View to list all 'Pass' statuses within 30 days and 1 year, sorted by date, with search & pagination."""
 
     # ✅ Get current time
@@ -698,12 +657,12 @@ def pass_list(request):
     search_query = request.GET.get("search", "")
 
     # ✅ Query for records marked as "Pass"
-    recent_passes = C2RecentImage.objects.filter(
+    recent_passes = DanaoRecentImage.objects.filter(
         status="Pass",
         created__gte=thirty_days_ago  # ✅ Passed within the last 30 days
     ).order_by("-created")
 
-    old_passes = C2RecentImage.objects.filter(
+    old_passes = DanaoRecentImage.objects.filter(
         status="Pass",
         created__gte=one_year_ago,
         created__lt=thirty_days_ago  # ✅ Passed after 30 days but within a year
@@ -734,13 +693,12 @@ def pass_list(request):
         "search_query": search_query,  # ✅ Preserve search input
         "title": "Passed List",
     }
-    return render(request, 'c2/pass_list.html', context)
+    return render(request, 'danao/general/danao_pass_list.html', context)
 
 
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
-def not_visited_facilities_list(request):
+def not_visited_facilities_listDanao(request):
     """View to list facilities that have NOT been visited within the last month."""
 
     # ✅ Get current time in Philippine Time
@@ -753,12 +711,12 @@ def not_visited_facilities_list(request):
     search_query = request.GET.get("search", "")
 
     # ✅ Get all facilities that WERE visited within the last month
-    visited_facilities = C2RecentImage.objects.filter(
+    visited_facilities = DanaoRecentImage.objects.filter(
         created__gte=one_month_ago
     ).values_list("s_image__facility__id", flat=True).distinct()
 
     # ✅ Get facilities that were NOT visited within the last month
-    not_visited_facilities = C2Facility.objects.exclude(id__in=visited_facilities).order_by("name")
+    not_visited_facilities = DanaoFacility.objects.exclude(id__in=visited_facilities).order_by("name")
 
     # ✅ Apply search filter
     if search_query:
@@ -776,49 +734,71 @@ def not_visited_facilities_list(request):
         "search_query": search_query,  # ✅ Preserve search input
         "title": "Not Visited List",
     }
-    return render(request, 'c2/ev/not_visited_facilities_list.html', context)
+    return render(request, 'danao/ev/danao_not_visited_facilities_list.html', context)
 
 
 # This is for Technical Activities
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @login_required(login_url='omsLogin')
-def tech_act_upload(request, pk=None):
-    tech = get_object_or_404(C2TechActivities, id=pk) if pk else None
+def tech_act_uploadDanao(request, pk=None):
+    tech = get_object_or_404(DanaoTechActivities, id=pk) if pk else None
 
     if request.method == "POST":
-        form = TechnicalActivitiesForm(request.POST, instance=tech)
+        form = DanaoTechnicalActivitiesForm(request.POST, instance=tech)
 
         if form.is_valid():
-            tech_activity = form.save(commit=False)
-            tech_activity.uploaded_by = C2User.objects.get(name__id=request.user.id)
-            tech_activity.save()
+            try:
+                tech_activity = form.save(commit=False)
+                tech_activity.uploaded_by = DanaoUser.objects.get(name__id=request.user.id)
+                print(tech_activity.uploaded_by)
+                tech_activity.save()
+                print("Activity saved:", tech_activity.id)
+            except DanaoUser.DoesNotExist:
+                print("No DanaoUser found for:", request.user.id)
+                return redirect('activity_listDanao')
 
             # Handle uploaded image files
             files = request.FILES.getlist('image')
-            for file in files:
-                C2TechActivityImage.objects.create(activity=tech_activity, image=file)
+            print("FILES:", files)
+            print("Uploaded file count:", len(files))  # Debug to check file count
 
+            for file in files:
+                DanaoTechActivityImage.objects.create(activity=tech_activity, image=file)
+
+            if not files:
+                print("No files uploaded.")
+            else:
+                for file in files:
+                    print(f"Processing file: {file.name}")
+                    DanaoTechActivityImage.objects.create(activity=tech_activity, image=file)
+                    print(f"Saved image: {file.name}")
             # Handle captured images (Base64 format)
             captured_images = request.POST.get('captured_images')
             if captured_images:
                 images = json.loads(captured_images)
+                print(f"Captured base64 images: {len(images)}")  # Debug for number of captured images
                 for idx, img_data in enumerate(images):
+                    print(f"Processing captured image {idx}")
                     format, imgstr = img_data.split(';base64,')
                     ext = format.split('/')[-1]
                     file_data = ContentFile(base64.b64decode(imgstr), name=f"captured_{tech_activity.id}_{idx}.{ext}")
-                    C2TechActivityImage.objects.create(activity=tech_activity, image=file_data)
+                    DanaoTechActivityImage.objects.create(activity=tech_activity, image=file_data)
+                    print(f"Saved captured image {idx}")
+            else:
+                print("No base64 images received.")
 
-            return redirect('activity_list')
+            return redirect('activity_listDanao')
+
     else:
-        form = TechnicalActivitiesForm(instance=tech)
+        form = DanaoTechnicalActivitiesForm(instance=tech)
+    print("Current user ID:", request.user.id)
 
-    return render(request, "c2/tech_act_upload.html", {"activity_form": form, "title": "Tech-Activity Form"})
+    return render(request, "danao/general/danao_tech_act_upload.html",
+                  {"activity_form": form, "title": "Tech-Activity Form"})
 
 
 # This is for tech view list
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @login_required(login_url='omsLogin')
-def activity_list(request):
+def activity_listDanao(request):
     """View for listing activities with search, filter, and pagination."""
 
     search_query = request.GET.get("search", "")
@@ -838,7 +818,7 @@ def activity_list(request):
         start_date = None  # Show all records
 
     # Apply filters
-    activities = C2TechActivities.objects.all().prefetch_related("images")
+    activities = DanaoTechActivities.objects.all().prefetch_related("imagesDanao")
     if start_date:
         activities = activities.filter(created__gte=start_date)
     if search_query:
@@ -850,7 +830,7 @@ def activity_list(request):
 
     return render(
         request,
-        "c2/activity_list.html",
+        "danao/general/danao_activity_list.html",
         {
             "activities": activities_page,
             "filter_option": filter_option,
@@ -860,20 +840,18 @@ def activity_list(request):
     )
 
 
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @login_required(login_url='omsLogin')
-def activity_detail(request, activity_id):
+def activity_detailDanao(request, activity_id):
     """View to show details of a specific activity with images."""
-    activity = get_object_or_404(C2TechActivities, id=activity_id)
-    return render(request, "c2/activity_detail.html",
+    activity = get_object_or_404(DanaoTechActivities, id=activity_id)
+    return render(request, "danao/general/danao_activity_detail.html",
                   {"activity": activity, "title": f" Activity-Details: {activity.name}"})
 
 
 # This is for downloading the QR code from facility
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
-def generate_qr_code(request, facility_id):
+def generate_qr_codeDanao(request, facility_id):
     # Get the facility by ID
-    facility = get_object_or_404(C2Facility, id=facility_id)
+    facility = get_object_or_404(DanaoFacility, id=facility_id)
 
     # Return the QR code image as a downloadable response
     with open(facility.qr_code.path, 'rb') as qr_file:
@@ -882,20 +860,19 @@ def generate_qr_code(request, facility_id):
         return response
 
 
-@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
-def facility_list(request):
+def facility_listDanao(request):
     # Get the search query from the request
     query = request.GET.get('search', '')
 
     # Filter facilities by name if a search query is provided
-    facilities = C2Facility.objects.filter(name__icontains=query)
+    facilities = DanaoFacility.objects.filter(name__icontains=query)
 
     # Pagination
     paginator = Paginator(facilities, 5)  # Show 5 facilities per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'c2/facility_list.html', {
+    return render(request, 'danao/general/danao_facility_list.html', {
         'page_obj': page_obj,
         'query': query
     })

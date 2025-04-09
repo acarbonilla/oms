@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<div class="container mt-4">
+    <h2 class="mb-3">{{ s_image.facility.name }} - Standard Image</h2>
+
+    <div class="row">
+        <!-- ✅ Left Side: Information -->
+        <div class="col-md-6">
+            <ul class="list-group">
+                <li class="list-group-item"><strong>Facility Name:</strong> {{ s_image.facility.name }}</li>
+                <li class="list-group-item"><strong>Last Updated:</strong> {{ s_image.updated|date:"F j, Y, g:i a" }}
+                </li>
+                <li class="list-group-item"><strong>Created:</strong> {{ s_image.created|date:"F j, Y, g:i a" }}</li>
+                <li class="list-group-item"><strong>In-charge:</strong>
+                    {% for user in assigned_users %}
+                    <span class="badge bg-primary">{{ user.name.first_name }} {{user.name.last_name}}</span>
+                    {% empty %}
+                    <span class="text-muted">No In-charge</span>
+                    {% endfor %}
+                </li>
+            </ul>
+        </div>
+
+        <!-- ✅ Right Side: Image -->
+        <div class="col-md-6 text-center">
+            <img alt="Standard Image" class="img-fluid rounded shadow" src="{{ s_image.standard_image.url }}"
+                 style="max-width: 90%; height: auto;"
+                 width="500">
+        </div>
+    </div>
+
+    <a class="btn btn-secondary mt-3" href="{% url 'standard_image_evDanao' %}">Back to List</a>
+</div>
+
+{% endblock %}

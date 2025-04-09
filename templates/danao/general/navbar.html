@@ -37,7 +37,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a aria-current="page" class="nav-link active text-white" href="{% url 'empMember' %}">Home</a>
+                    <a aria-current="page" class="nav-link active text-white" href="{% url 'amMember' %}">Home</a>
                 </li>
 
                 <li class="nav-item dropdown">
@@ -50,9 +50,14 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
+
+                        <li><a class="dropdown-item" href="{% url 'assessment'%}">Pending</a></li>
                         <li><a class="dropdown-item" href="{%url 'failed_list' %}">Failed</a></li>
                         <li><a class="dropdown-item" href="{%url 'pass_list' %}">Passed</a></li>
-
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="{% url 'not_visited_facilities_list' %}">Not Visited</a></li>
                     </ul>
 
                 </li>
@@ -69,13 +74,14 @@
 
                 </li>
 
-                 <li class="nav-item dropdown">
+                <li class="nav-item dropdown">
                     <a aria-expanded="false" class="nav-link dropdown-toggle text-white" data-bs-toggle="dropdown" href="#"
                        role="button">
                         File
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'facility_list'%}">QR code</a></li>
+                        <li><a class="dropdown-item" href="{% url 'download_pdf' %}">ALL-PDF Download</a></li>
+                        <li><a class="dropdown-item" href="{% url 'download_selected_pdf'%}">Selected PDF</a></li>
 
                     </ul>
 
