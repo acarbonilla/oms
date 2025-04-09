@@ -521,7 +521,7 @@ def generate_selected_pdfDanao(request):
                                )
 
     if not images.exists():
-        return render(request, "danao/ganeral/danao_report_selection.html", {
+        return render(request, "danao/general/danao_report_selection.html", {
             "error_message": "? No available records to download (Pending records are excluded).",
             "search_query": search_query
         })
