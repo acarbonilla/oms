@@ -28,7 +28,7 @@ class C2RecentImageForm(forms.ModelForm):
 
         if self.user:  # ✅ Ensure user exists before assignment
             try:
-                c2_user = C2User.objects.get(name=self.user)
+                c2_user = C2User.objects.get(name__username=self.user.username)
                 instance.uploaded_by = c2_user
             except C2User.DoesNotExist:
                 instance.uploaded_by = None  # ✅ Prevent errors if user is missing
