@@ -301,7 +301,9 @@ def upload_recent_image_qr(request, facility_id):
     facility = get_object_or_404(C2Facility, id=facility_id)
 
     if request.method == "POST":
+        print(f"User in request: {request.user}")  # Check user in production
         form = C2RecentImageForm(request.user, request.POST, request.FILES)
+        print(f"User in form: {form.user}")  # Check user passed to form
         if form.is_valid():
             recent_image = form.save(commit=False)
 
