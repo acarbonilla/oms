@@ -44,6 +44,32 @@ from django.core.files.base import ContentFile
 import json
 
 
+def restrict_for_danaogroup_only(allowed_groups=None, redirect_url="access_denied/"):
+    """
+    This decorator restricts access to views to only users in the specified list of allowed groups.
+    If the user is not in one of the allowed groups, they will be redirected to the access_denied page.
+
+    :param allowed_groups: List of group names (strings) that are allowed to access the view.
+    :param redirect_url: URL to redirect to if the user is not in the allowed groups (default is 'access_denied/').
+    """
+    if allowed_groups is None:
+        allowed_groups = []
+
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped_view(request, *args, **kwargs):
+            # Check if the user is in one of the allowed groups
+            if not any(request.user.groups.filter(name=group).exists() for group in allowed_groups):
+                # If user is not in allowed groups, show a message and redirect
+                messages.warning(request, "🚫 You are not authorized to access this page.")
+                return redirect(access_denied)
+            return view_func(request, *args, **kwargs)
+
+        return _wrapped_view
+
+    return decorator
+
+
 # This decorator prohibits the EMP group to access the page
 
 def restrict_emp_group(redirect_url="access_denied/"):  # Redirect to "access_denied"
@@ -69,6 +95,7 @@ def ev_group_required(user):
     return user.groups.filter(name="EV_D").exists()
 
 
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
 def evMemberDanao(request):
@@ -125,6 +152,7 @@ def evMemberDanao(request):
     return render(request, 'danao/ev/danao_ev_dashboard.html', context)
 
 
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @login_required(login_url='omsLogin')
 def empMemberDanao(request):
     facilities = DanaoFacility.objects.all()  # ✅ Fetch all facilities
@@ -133,6 +161,7 @@ def empMemberDanao(request):
     return render(request, 'danao/emp/danao_emp_list.html', context)
 
 
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @login_required(login_url='omsLogin')
 def amMemberDanao(request):
     # Get all users
@@ -203,6 +232,7 @@ def amMemberDanao(request):
     return render(request, 'danao/am/danao_am_list.html', context)
 
 
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
 def amAssessmentDanao(request):
@@ -259,6 +289,7 @@ def amAssessmentDanao(request):
     return render(request, "danao/general/danao_assessment.html", context)
 
 
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @user_passes_test(ev_group_required, login_url='omsLogin')  # ✅ Redirect if not in "EV" group
 def upload_recent_image_qrDanao(request, facility_id):
     """Handles QR code scanning and redirects users to the upload form."""
@@ -276,7 +307,8 @@ def upload_recent_image_qrDanao(request, facility_id):
             # ✅ Debugging: Print facility ID and check standard image
             print(f"Facility ID: {facility.id}, Facility Name: {facility.name}")
 
-            standard_image = DanaoStandard.objects.filter(facility=facility).first()  # ✅ Prevents multiple query failures
+            standard_image = DanaoStandard.objects.filter(
+                facility=facility).first()  # ✅ Prevents multiple query failures
 
             if not standard_image:
                 print("Debug: No standard image found for this facility!")  # ✅ Debugging print
@@ -306,7 +338,7 @@ def upload_recent_image_qrDanao(request, facility_id):
 
 
 # This section is for uploading or updating the recent image.
-
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @user_passes_test(ev_group_required, login_url='omsLogin')  # ✅ Redirect if not in "EV" group
 def update_recent_imageDanao(request, pk):
     """Update an existing C2RecentImage and automatically assign remark_by."""
@@ -315,7 +347,7 @@ def update_recent_imageDanao(request, pk):
 
     if request.method == "POST":
         form = DanaoRecentImageFormUpdate(request.POST, request.FILES, instance=recent_image,
-                                       user=request.user)  # ✅ Pass request.user
+                                          user=request.user)  # ✅ Pass request.user
         if form.is_valid():
             form.save()
             messages.success(request, "Recent image updated successfully!")
@@ -328,11 +360,13 @@ def update_recent_imageDanao(request, pk):
     else:
         form = DanaoRecentImageFormUpdate(instance=recent_image, user=request.user)  # ✅ Pass request.user
 
-    return render(request, 'danao/general/danao_ev_update_recent_image.html', {'form': form, 'recent_image': recent_image,
-                                                              'title': "Update Form"})
+    return render(request, 'danao/general/danao_ev_update_recent_image.html',
+                  {'form': form, 'recent_image': recent_image,
+                   'title': "Update Form"})
 
 
 # Details Section
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
 def recent_image_detailDanao(request, pk):
@@ -352,6 +386,7 @@ def recent_image_detailDanao(request, pk):
 
 # This is for EV Standard Image
 # @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @login_required(login_url='omsLogin')
 def standard_image_evDanao(request):
     """Displays standard images with search, sorting, and pagination."""
@@ -389,6 +424,7 @@ def standard_image_evDanao(request):
 
 
 # @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @login_required(login_url='omsLogin')
 def standard_image_ev_detailsDanao(request, pk):
     """View details of a specific standard image and show the assigned user."""
@@ -406,6 +442,7 @@ def standard_image_ev_detailsDanao(request, pk):
 
 # This is for everyone
 # @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @login_required(login_url='omsLogin')
 def failed_listDanao(request):
     """Show up to 3 'Failed' images within 30 days & keep a yearly history, with search and pagination."""
@@ -453,6 +490,7 @@ def failed_listDanao(request):
     return render(request, 'danao/general/danao_failed_list.html', context)
 
 
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
 def generate_pdfDanao(request):
@@ -505,6 +543,7 @@ def generate_pdfDanao(request):
     return response
 
 
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
 def generate_selected_pdfDanao(request):
@@ -642,6 +681,7 @@ def generate_selected_pdfDanao(request):
 
 
 # This is for Pass List
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @login_required(login_url='omsLogin')
 def pass_listDanao(request):
     """View to list all 'Pass' statuses within 30 days and 1 year, sorted by date, with search & pagination."""
@@ -696,6 +736,7 @@ def pass_listDanao(request):
     return render(request, 'danao/general/danao_pass_list.html', context)
 
 
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @restrict_emp_group(redirect_url="access_denied")  # Redirect EMP users to home page
 @login_required(login_url='omsLogin')
 def not_visited_facilities_listDanao(request):
@@ -738,6 +779,7 @@ def not_visited_facilities_listDanao(request):
 
 
 # This is for Technical Activities
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @login_required(login_url='omsLogin')
 def tech_act_uploadDanao(request, pk=None):
     tech = get_object_or_404(DanaoTechActivities, id=pk) if pk else None
@@ -797,6 +839,7 @@ def tech_act_uploadDanao(request, pk=None):
 
 
 # This is for tech view list
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @login_required(login_url='omsLogin')
 def activity_listDanao(request):
     """View for listing activities with search, filter, and pagination."""
@@ -840,6 +883,7 @@ def activity_listDanao(request):
     )
 
 
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 @login_required(login_url='omsLogin')
 def activity_detailDanao(request, activity_id):
     """View to show details of a specific activity with images."""
@@ -849,6 +893,7 @@ def activity_detailDanao(request, activity_id):
 
 
 # This is for downloading the QR code from facility
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 def generate_qr_codeDanao(request, facility_id):
     # Get the facility by ID
     facility = get_object_or_404(DanaoFacility, id=facility_id)
@@ -860,6 +905,7 @@ def generate_qr_codeDanao(request, facility_id):
         return response
 
 
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
 def facility_listDanao(request):
     # Get the search query from the request
     query = request.GET.get('search', '')
@@ -876,20 +922,3 @@ def facility_listDanao(request):
         'page_obj': page_obj,
         'query': query
     })
-
-
-# This is for Errors
-def custom_403(request, exception=None):
-    return render(request, "forbidden/403.html", status=403)
-
-
-def custom_404(request, exception):
-    return render(request, "forbidden/404.html", status=404)
-
-
-def custom_500(request):
-    return render(request, "forbidden/500.html", status=500)
-
-
-def trigger_500(request):
-    raise ValueError("Intentional Server Error")

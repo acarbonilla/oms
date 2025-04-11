@@ -5,7 +5,7 @@ from danao.views import (empMemberDanao, amMemberDanao, amAssessmentDanao, uploa
                          generate_pdfDanao,
                          generate_selected_pdfDanao, standard_image_ev_detailsDanao, pass_listDanao,
                          not_visited_facilities_listDanao,
-                         access_denied, trigger_500, tech_act_uploadDanao, activity_listDanao, activity_detailDanao,
+                         access_denied, tech_act_uploadDanao, activity_listDanao, activity_detailDanao,
                          facility_listDanao,
                          generate_qr_codeDanao
                          )
@@ -58,5 +58,4 @@ urlpatterns = [
     path('facilities/', facility_listDanao, name='facility_listDanao'),
     path('facility/<int:facility_id>/download_qr/', generate_qr_codeDanao, name='download_qr_codeDanao'),
 
-    path("test-500/", trigger_500),  # Go to /test-500/ to see the 500 error page
 ]
