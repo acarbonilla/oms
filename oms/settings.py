@@ -26,6 +26,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "143.198.217.58",
+    "https://nabworkplaceintelligence.com/",
     "*",
 ]
 
