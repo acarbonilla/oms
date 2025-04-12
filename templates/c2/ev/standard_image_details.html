@@ -13,13 +13,7 @@
                 <li class="list-group-item"><strong>Last Updated:</strong> {{ s_image.updated|date:"F j, Y, g:i a" }}
                 </li>
                 <li class="list-group-item"><strong>Created:</strong> {{ s_image.created|date:"F j, Y, g:i a" }}</li>
-                <li class="list-group-item"><strong>In-charge:</strong>
-                    {% for user in assigned_users %}
-                    <span class="badge bg-primary">{{ user.name.first_name }} {{user.name.last_name}}</span>
-                    {% empty %}
-                    <span class="text-muted">No In-charge</span>
-                    {% endfor %}
-                </li>
+
             </ul>
         </div>
 

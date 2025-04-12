@@ -1,19 +1,56 @@
 {% extends "base.html" %}
-
+{% load highlight %}
 {% block content %}
+<style>
+    .search-highlight {
+        background-color: #007bff; /* Bootstrap primary blue */
+        color: white;
+        padding: 2px 4px;
+        border-radius: 4px;
+        font-weight: bold;         /* Make text bold */
+        text-decoration: underline; /* Add underline */
+        animation: highlight-animation 1s ease-out forwards; /* Animation effect */
+    }
+
+    /* Animation to fade out the background gradually */
+    @keyframes highlight-animation {
+        0% {
+            background-color: #007bff;
+        }
+        100% {
+            background-color: #3399ff; /* Slightly lighter blue */
+        }
+    }
+</style>
+
+
 <div class="container mt-4">
     <h2 class="mb-4">📋 Facilities Not Visited in the Last Month</h2>
 
-    <!-- Search Bar -->
-    <form method="GET" class="mb-3">
-        <input type="text" name="search" class="form-control" placeholder="Search facility..." value="{{ search_query }}">
-        <button type="submit" class="btn btn-primary mt-2">Search</button>
+    <!-- Search Bar with Button beside -->
+    <form method="GET" class="mb-3 d-flex">
+        <div class="input-group me-2">
+            <input type="text" name="search" class="form-control" placeholder="Search facility..." value="{{ search_query }}" autofocus>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+        {% if search_query %}
+        <a href="{% url 'not_visited_facilities_list' %}" class="btn btn-secondary">Clear</a>
+        {% endif %}
     </form>
 
     <!-- List of Not Visited Facilities -->
     <div class="card mt-4">
         <div class="card-header bg-warning text-white">🚨 Facilities Not Visited in the Last 30 Days</div>
         <div class="card-body">
+
+            <!-- Total and Range Info -->
+            <p class="fw-bold text-muted">
+                Total Not Visited: {{ page_obj.paginator.count }}
+            </p>
+            <p class="text-muted">
+                Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }} results
+            </p>
+
             <table class="table table-bordered">
                 <thead class="table-light">
                     <tr>
@@ -25,7 +62,13 @@
                     {% for facility in page_obj %}
                     <tr>
                         <td>{{ facility.id }}</td>
-                        <td>{{ facility.name }}</td>
+                        <td>
+                            {% if search_query %}
+                                {{ facility.name|safe|highlight:search_query }}
+                            {% else %}
+                                {{ facility.name }}
+                            {% endif %}
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
@@ -61,6 +104,5 @@
             </nav>
         </div>
     </div>
-
 </div>
 {% endblock %}

@@ -3,6 +3,7 @@
 {% block content %}
 
 <style>
+
     .zoom-img {
         transition: transform 0.3s ease-in-out;
         max-width: 100%;
@@ -15,6 +16,21 @@
 
     .topName {
         min-width: 100px;
+    }
+
+    .image-wrapper {
+        width: 100%;
+        aspect-ratio: 1 / 1; /* Keep all images square */
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
     @media (max-width: 376px) {
@@ -31,6 +47,11 @@
             width: 100%;
         }
     }
+
+.custom-textarea {
+    min-height: 100px; /* Change this to whatever height you want */
+    resize: vertical;  /* Allows the user to resize up/down */
+}
 </style>
 
 <script>
@@ -50,7 +71,6 @@
             <form enctype="multipart/form-data" method="POST">
                 {% csrf_token %}
                 {{form.media}}
-
                 {% if form.errors %}
                 <div class="alert alert-danger mb-3">
                     <strong>Error!</strong> Please correct the following:
@@ -65,8 +85,8 @@
                 {% endif %}
 
                 <div class="input-group mb-3 mt-2">
-                    <span class="input-group-text">Remarks:</span>
-                    {% render_field form.remarks id='id_remarks' class='form-control' %}
+                    <span class="input-group-text mb-3">Remarks:</span>
+                    {% render_field form.remarks id='id_remarks' class='form-control' rows="5" %}
                 </div>
 
                 <div class="input-group mb-3">
@@ -85,20 +105,22 @@
                 </div>
 
                 <a class="btn btn-secondary formSubmitButton mb-2 w-100" href="{% url 'assessment' %}">Cancel</a>
-                <input type="submit" value="Submit" class="btn btn-primary formSubmitButton mb-2 w-100" />
+                <input class="btn btn-primary formSubmitButton mb-2 w-100" type="submit" value="Submit"/>
         </div>
 
         <!-- Recent Image -->
         <div class="col-12 col-md-4 border text-center">
             <div class="input-group mb-3 mt-2">
-                <span class="input-group-text">Recent Image</span>
+                <span class="input-group-text">Latest Image</span>
             </div>
             {% if form.instance.recent_image %}
+            <div class="image-wrapper">
                 <img alt="Recent" class="img-fluid rounded zoom-img"
                      id="zoomImage"
                      src="{{ form.instance.recent_image.url }}">
+            </div>
             {% else %}
-                <p class="form-control">No Image Available</p>
+            <p class="form-control">No Image Available</p>
             {% endif %}
         </div>
 
@@ -108,13 +130,15 @@
                 <span class="input-group-text">Standard Image</span>
             </div>
             {% if form.instance.s_image and form.instance.s_image.standard_image %}
+            <div class="image-wrapper">
                 <img alt="Standard" class="img-fluid rounded"
                      src="{{ form.instance.s_image.standard_image.url }}">
+            </div>
             {% else %}
-                <p class="form-control">No Image Available</p>
+            <p class="form-control">No Image Available</p>
             {% endif %}
         </div>
-            </form>
+        </form>
     </div>
 </div>
 
@@ -126,7 +150,7 @@
         $("#zoomImage").elevateZoom({
             zoomType: "lens",
             lensShape: "round",
-            lensSize: 200,
+            lensSize: 100,
             scrollZoom: true,
             zoomLevel: 1
         });
