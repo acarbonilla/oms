@@ -20,6 +20,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # Usage
 
 DEBUG = env('DEBUG')
+
 SECRET_KEY = env('SECRET_KEY')
 
 ALLOWED_HOSTS = [
@@ -112,7 +113,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -149,7 +149,6 @@ USE_TZ = True
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
-# MEDIA_URL = '/var/www/media'
 
 # This for Server Setup Production
 # Media files (user uploads)
@@ -172,3 +171,10 @@ SESSION_COOKIE_AGE = 86400  # 24 hours
 SESSION_SAVE_EVERY_REQUEST = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# This setup is for not changing if I'm in development or production
+# From .evn > settings > model (any model)
+IMAGE_ENV = env("IMAGE_ENV", default="production")
+
+# This is for qr code path
+BASE_URL = env("BASE_URL")

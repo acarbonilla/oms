@@ -17,6 +17,16 @@ from django.core.files.base import ContentFile
 from django.utils.text import slugify
 
 
+def upload_to_technical(instance, filename):
+    folder = settings.IMAGE_ENV
+    return os.path.join(f"danao/{folder}/technical_images", filename)
+
+
+def upload_to_qrcodes(instance, filename):
+    sanitized_name = instance.name.replace(" ", "_").lower()
+    return f"danao/{os.getenv('IMAGE_ENV', 'production')}/qrcodes/qr_{sanitized_name}.png"
+
+
 class DanaoUser(models.Model):
     position = (
         ("AM_D", "AM_D"), ("EMP_D", "EMP_D"), ("EV_D", "EV_D")
@@ -57,8 +67,8 @@ def danao_standard_image_upload_path(instance, filename):
     facility_name = slugify(instance.facility.name)  # Convert facility name to a safe format
 
     # Define base directory for images
-    # base_dir = os.path.join(settings.MEDIA_ROOT, "danao/development/standard_images")  # Change path dynamically
-    base_dir = os.path.join(settings.MEDIA_ROOT, "danao/production/standard_images")
+    folder = settings.IMAGE_ENV
+    base_dir = os.path.join(settings.MEDIA_ROOT, f"danao/{folder}/standard_images")
     # Ensure the directory exists
     os.makedirs(base_dir, exist_ok=True)
 
@@ -92,8 +102,8 @@ def danao_recent_image_upload_path(instance, filename):
     facility_name = re.sub(r'[^a-zA-Z0-9_-]', '', facility_name)  # Remove unsafe characters
 
     # Correct base directory setup
-    base_dir = os.path.join(settings.MEDIA_ROOT, "danao/production/recent_images")
-    # base_dir = os.path.join(settings.MEDIA_ROOT, "danao/development/recent_images")
+    folder = settings.IMAGE_ENV
+    base_dir = os.path.join(settings.MEDIA_ROOT, f"danao/{folder}/recent_images")
 
     # Ensure the directory exists
     os.makedirs(base_dir, exist_ok=True)
@@ -111,7 +121,7 @@ def danao_recent_image_upload_path(instance, filename):
     new_filename = f"{facility_name}_{next_number}.{ext}"
 
     # return os.path.join("danao/development/recent_images", new_filename)
-    return os.path.join("danao/production/recent_images", new_filename)
+    return os.path.join(f"danao/{folder}/recent_images", new_filename)
 
 
 # This is for Development Only
@@ -132,24 +142,21 @@ class DanaoRecentImage(RecentImage):
 
 class DanaoFacility(models.Model):
     name = models.CharField(max_length=50, verbose_name="Facility")
-    # qr_code = models.ImageField(upload_to="danao/development/qrcodes/", blank=True, null=True)  # Ready for Development
     qr_code = models.ImageField(upload_to="danao/production/qrcodes/", blank=True, null=True)  # Ready for Production
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
+    def get_qr_url(self):
+        """Builds a dynamic URL for this facility based on BASE_URL."""
+        return f"{settings.BASE_URL}/danao/danao/facility/{self.id}/upload/"
+
     def generate_qr_code(self):
         """Generate and save QR code for this facility."""
-
-        # ✅ Convert facility name to a safe filename
         sanitized_name = self.name.replace(" ", "_").lower()
         filename = f"qr_{sanitized_name}.png"
 
-        # ✅ Generate the QR code with the facility URL
-        qr_url = f"https://nabworkplaceintelligence.com/danao/danao/facility/{self.id}/upload/" # online
-        # qr_url = f"https://143.198.217.58/danao/danao/facility/{self.id}/upload/" # online
-        # qr_url = f"https://192.168.1.20/danao/danao/facility/{self.id}/upload/" # mine
-        # qr_url = f"https://192.11.200.14/danao/danao/facility/{self.id}/upload/" # JFC Server
-        # qr_url = f"http://127.0.0.1:8000/danao/danao/facility/{self.id}/upload/"  # Development
+        # ✅ Use dynamic BASE_URL
+        qr_url = self.get_qr_url()
         qr = qrcode.make(qr_url)
 
         buffer = BytesIO()
@@ -189,8 +196,7 @@ class DanaoTechActivities(models.Model):
 
 class DanaoTechActivityImage(models.Model):
     activity = models.ForeignKey(DanaoTechActivities, on_delete=models.CASCADE, related_name="imagesDanao")
-    # image = models.ImageField(upload_to="danao/development/technical_images")
-    image = models.ImageField(upload_to="danao/production/technical_images")
+    image = models.ImageField(upload_to=upload_to_technical)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
