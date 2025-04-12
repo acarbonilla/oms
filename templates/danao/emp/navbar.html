@@ -37,7 +37,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a aria-current="page" class="nav-link active text-white" href="{% url 'empMember' %}">Home</a>
+                    <a aria-current="page" class="nav-link active text-white" href="{% url 'empMemberDanao' %}">Home</a>
                 </li>
 
                 <li class="nav-item dropdown">
@@ -46,12 +46,12 @@
                         Gen_Activities
                     </a>
                     <ul class="dropdown-menu">
-                         <li><a class="dropdown-item" href="{% url 'standard_image_ev' %}">Standard Image</a></li>
+                         <li><a class="dropdown-item" href="{% url 'standard_image_evDanao' %}">Standard Image</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="{%url 'failed_list' %}">Failed</a></li>
-                        <li><a class="dropdown-item" href="{%url 'pass_list' %}">Passed</a></li>
+                        <li><a class="dropdown-item" href="{%url 'failed_listDanao' %}">Failed</a></li>
+                        <li><a class="dropdown-item" href="{%url 'pass_listDanao' %}">Passed</a></li>
 
                     </ul>
 
@@ -63,8 +63,8 @@
                         Tech_Activities
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'tech_act_upload' %}">Tech-Activities Form</a></li>
-                        <li><a class="dropdown-item" href="{% url 'activity_list' %}">Activity List</a></li>
+                        <li><a class="dropdown-item" href="{% url 'tech_act_uploadDanao' %}">Tech-Activities Form</a></li>
+                        <li><a class="dropdown-item" href="{% url 'activity_listDanao' %}">Activity List</a></li>
                     </ul>
 
                 </li>
@@ -75,7 +75,7 @@
                         File
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'facility_list'%}">QR code</a></li>
+                        <li><a class="dropdown-item" href="{% url 'facility_listDanao'%}">QR code</a></li>
 
                     </ul>
 

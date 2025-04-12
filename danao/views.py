@@ -157,7 +157,9 @@ def evMemberDanao(request):
 def empMemberDanao(request):
     facilities = DanaoFacility.objects.all()  # ✅ Fetch all facilities
     name = User.objects.all()
-    context = {'name': name, 'facilities': facilities, 'title': 'Employee'}
+    context = {'name': name, 'facilities': facilities, 'title': 'Employee',
+               'user_name': request.user.first_name or request.user.username
+               }
     return render(request, 'danao/emp/danao_emp_list.html', context)
 
 

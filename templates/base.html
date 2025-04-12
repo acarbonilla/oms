@@ -39,54 +39,61 @@
 
 <body>
 <div class="container">
-
     {% if user in all_am %}
-        <div class="row">{% include 'c2/am/navbar.html' %}</div>
-        <br/><br/><br/>
+    <div class="row">{% include 'c2/am/navbar.html' %}</div>
+    <br/><br/><br/>
 
     {% elif user in all_ev %}
-        <div class="row">{% include 'c2/ev/navbar.html' %}</div>
-        <br/><br/><br/>
+    <div class="row">{% include 'c2/ev/navbar.html' %}</div>
+    <br/><br/><br/>
 
     {% elif user in all_emp %}
-        <div class="row">{% include 'c2/emp/navbar.html' %}</div>
-        <br/><br/><br/>
+    <div class="row">{% include 'c2/emp/navbar.html' %}</div>
+    <br/><br/><br/>
 
     <!-- This is for Danao -->
-     {% elif user in all_ev_d %}
-        <div class="row">{% include 'danao/ev/navbar.html' %}</div>
-        <br/><br/><br/>
+    {% elif user in all_ev_d %}
+    <div class="row">{% include 'danao/ev/navbar.html' %}</div>
+    <br/><br/><br/>
 
     {% elif user in all_emp_d %}
-        <div class="row">{% include 'danao/emp/navbar.html' %}</div>
-        <br/><br/><br/>
+    <div class="row">{% include 'danao/emp/navbar.html' %}</div>
+    <br/><br/><br/>
     {% elif user in all_am_d %}
-        <div class="row">{% include 'danao/am/navbar.html' %}</div>
-        <br/><br/><br/>
+    <div class="row">{% include 'danao/am/navbar.html' %}</div>
+    <br/><br/><br/>
 
     {% else %}
 
     {% endif %}
 
+    <!-- End here -->
     <div class="row">
+        <div class="page-wrapper">
+              {% block content %}
+        {% endblock %}<br/>
+        {% include 'footer.html' %}
 
-        {% block content %}
-
-        {% endblock %}
+        </div>
 
     </div>
     <div class="position-fixed bottom-0 end-0 p-3">
         {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-warning alert-dismissible fade show" role="alert" style="background-color: red;">
-                <h5 style="text-align:center; color: white;"> {{message}}</h5>
-                <button aria-label="Close" class="btn-close bg-light" data-bs-dismiss="alert" type="button"></button>
-            </div>
-            {% endfor %}
+        {% for message in messages %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert" style="background-color: red;">
+            <h5 style="text-align:center; color: white;"> {{message}}</h5>
+            <button aria-label="Close" class="btn-close bg-light" data-bs-dismiss="alert" type="button"></button>
+        </div>
+        {% endfor %}
         {% endif %}
     </div>
 
 </div>
+
+
+  <script>
+    document.getElementById("footer-year").textContent = new Date().getFullYear();
+  </script>
 
 <script
         crossorigin="anonymous"

@@ -5,10 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="66939e78-aa53-4976-9238-052a50849d6b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/templates/footer.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/c2/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/danao/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/danao/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oms/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/oms/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/c2/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/c2/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/danao/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/danao/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/c2/emp/emp_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/emp/emp_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/danao/emp/danao_emp_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/danao/emp/danao_emp_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/danao/emp/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/danao/emp/navbar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/members/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/members/login.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -131,62 +136,62 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/danao/views.py</url>
-          <line>165</line>
+          <line>167</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/danao/views.py</url>
-          <line>237</line>
+          <line>239</line>
           <option name="timeStamp" value="8" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/danao/views.py</url>
-          <line>293</line>
+          <line>295</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/danao/views.py</url>
-          <line>371</line>
+          <line>373</line>
           <option name="timeStamp" value="10" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/danao/views.py</url>
-          <line>342</line>
+          <line>344</line>
           <option name="timeStamp" value="11" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/danao/views.py</url>
-          <line>390</line>
+          <line>392</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/danao/views.py</url>
-          <line>428</line>
+          <line>430</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/danao/views.py</url>
-          <line>495</line>
+          <line>497</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/danao/views.py</url>
-          <line>548</line>
+          <line>550</line>
           <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/danao/views.py</url>
-          <line>741</line>
+          <line>743</line>
           <option name="timeStamp" value="16" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/danao/views.py</url>
-          <line>843</line>
+          <line>845</line>
           <option name="timeStamp" value="18" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/danao/views.py</url>
-          <line>896</line>
+          <line>898</line>
           <option name="timeStamp" value="19" />
         </line-breakpoint>
       </breakpoints>

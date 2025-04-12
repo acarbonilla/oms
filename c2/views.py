@@ -158,7 +158,8 @@ def evMember(request):
 def empMember(request):
     facilities = C2Facility.objects.all()  # ✅ Fetch all facilities
     name = User.objects.all()
-    context = {'name': name, 'facilities': facilities, 'title': 'Employee'}
+    context = {'name': name, 'facilities': facilities, 'title': 'Employee',
+               'user_name': request.user.first_name or request.user.username}
     return render(request, 'c2/emp/emp_list.html', context)
 
 

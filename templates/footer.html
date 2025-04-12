@@ -1,0 +1,93 @@
+<style>
+  /* Layout */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.site-footer {
+  margin-top: auto;
+
+  color: #333;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  border-top: 1px solid #ccc;
+  font-size: 0.95rem;
+  animation: fadeIn 1.2s ease-in;
+}
+
+/* Dark mode support (if using data-theme or prefers-color-scheme) */
+[data-theme="dark"] .site-footer {
+  background: #121212;
+  color: #ddd;
+  border-top: 1px solid #333;
+}
+
+.site-footer a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.site-footer .tagline {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-top: 0.5rem;
+}
+
+.site-footer .social-icons {
+  margin-top: 0.8rem;
+}
+
+.site-footer .social-icons a {
+  margin: 0 0.5rem;
+  font-size: 1.3rem;
+  transition: transform 0.2s ease;
+  text-decoration: none;
+}
+
+.site-footer .social-icons a:hover {
+  transform: scale(1.2);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+</style>
+
+<footer class="site-footer fade-in">
+  <p>
+    <span class="icon">📧</span>
+    Need help? <a href="mailto:support@nabworkplaceintelligence.com">support@nabworkplaceintelligence.com</a>
+  </p>
+
+  <p>
+    &copy; <span id="footer-year"></span> NAB Workplace Intelligence. All rights reserved.
+  </p>
+
+  <p class="tagline">
+    🚀 Built with passion for better workplace experiences.
+  </p>
+
+</footer>
+
+<script>
+  document.getElementById("footer-year").textContent = new Date().getFullYear();
+</script>
+
