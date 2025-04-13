@@ -19,14 +19,8 @@
                 <li class="list-group-item"><strong>Status:</strong> {{ image.status }}</li>
                 <li class="list-group-item"><strong>Updated:</strong> {{ image.updated|date:"F j, Y, g:i a" }}</li>
                 <li class="list-group-item"><strong>Created:</strong> {{ image.created|date:"F j, Y, g:i a" }}</li>
-                <li class="list-group-item"><strong>In-charge:</strong>
-                    {% for user in assigned_users %}
-                        <span class="badge bg-primary">{{ user.name.first_name }} {{ user.name.last_name }}</span>
-                    {% empty %}
-                        <span class="text-muted">No assigned users</span>
-                    {% endfor %}
-                </li>
-                <li class="list-group-item"><strong>Evaluated By:</strong> {{ image.remark_by.first_name }} {{ image.remark_by.last_name }}</li>
+                <li class="list-group-item"><strong>Evaluated By:</strong>
+                    {{ image.remark_by.first_name }} {{ image.remark_by.last_name }}</li>
             </ul>
         </div>
 

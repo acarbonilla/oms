@@ -43,12 +43,13 @@
                     <button class="btn btn-success" id="captureBtn" type="button"><i class="fas fa-camera"></i> Capture Photo</button>
                 </div>
                 <canvas id="canvas" style="display:none;"></canvas>
-                <!-- This hidden file input is updated with the camera capture -->
+                <img id="cameraImagePreview" class="img-fluid border rounded shadow mt-3" style="max-width: 400px; display: none;" alt="Camera Preview" />
+                <!-- Hidden file input updated with the camera capture -->
                 <input accept="image/*" capture="environment" id="cameraImageInput" name="recent_image" style="display:none;" type="file">
             </div>
 
             <!-- Buttons -->
-            <div class="text-center">
+            <div class="text-center mt-4">
                 <button class="btn btn-primary px-4" type="submit"><i class="fas fa-upload"></i> Upload</button>
                 <a class="btn btn-secondary px-4" href="{% url 'facility_qr_upload' facility.id %}"><i class="fas fa-times"></i> Cancel</a>
             </div>
@@ -67,10 +68,10 @@
     const captureBtn = document.getElementById("captureBtn");
     const canvas = document.getElementById("canvas");
     const imageUploadFromCamera = document.getElementById("cameraImageInput");
+    const cameraImagePreview = document.getElementById("cameraImagePreview");
 
     let cameraStarted = false;
 
-    // Toggle view between Upload and Camera
     function toggleSections() {
         if (uploadOption.checked) {
             uploadSection.style.display = "block";
@@ -84,11 +85,8 @@
         }
     }
 
-    // Add event listeners
     uploadOption.addEventListener("change", toggleSections);
     cameraOption.addEventListener("change", toggleSections);
-
-    // Initialize with default view
     toggleSections();
 
     function startCamera() {
@@ -110,13 +108,18 @@
             });
     }
 
-    // Capture image and load into hidden input
     captureBtn.addEventListener("click", function () {
         let context = canvas.getContext("2d");
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
+        // Show camera preview
+        const dataUrl = canvas.toDataURL("image/png");
+        cameraImagePreview.src = dataUrl;
+        cameraImagePreview.style.display = "block";
+
+        // Create file for form submission
         canvas.toBlob(function (blob) {
             let file = new File([blob], "captured-image.png", { type: "image/png" });
             let dataTransfer = new DataTransfer();
@@ -125,7 +128,7 @@
         }, "image/png");
     });
 
-    // File preview for upload
+    // File upload preview
     document.getElementById('imageUpload').addEventListener('change', function (event) {
         const preview = document.getElementById('imagePreview');
         const file = event.target.files[0];
@@ -142,6 +145,4 @@
         }
     });
 </script>
-
-
 {% endblock %}
