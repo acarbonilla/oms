@@ -14,7 +14,7 @@
                 {% render_field form.title|add_class:"form-control" required="true" %}
             </div>
 
-            <!-- Input Method -->
+            <!-- Option: Upload or Camera -->
             <div class="mb-3">
                 <label class="form-label fw-bold">Choose Input Method</label>
                 <div>
@@ -27,27 +27,31 @@
                 </div>
             </div>
 
-            <!-- File Upload Section -->
+            <!-- Upload Section -->
             <div id="uploadSection" class="mb-3 text-center">
                 <label for="imageUpload" class="form-label fw-bold">Select an image</label>
                 <input type="file" accept="image/*" id="imageUpload" name="recent_image" class="form-control" required>
                 <img id="imagePreview" class="img-fluid border rounded shadow mt-3" style="max-width: 100%; display: none;" alt="Preview" />
             </div>
 
-            <!-- Camera Section -->
+            <!-- Camera Capture Section -->
             <div id="cameraSection" style="display:none;">
                 <div class="text-center mb-3">
-                    <video autoplay class="border rounded shadow" id="cameraPreview" style="width:100%; max-width: 400px;"></video>
+                    <video autoplay playsinline class="border rounded shadow w-100" id="cameraPreview" style="max-width: 500px; height: auto;"></video>
                 </div>
-                <div class="text-center mb-3">
-                    <button class="btn btn-success me-2" id="captureBtn" type="button"><i class="fas fa-camera"></i> Capture Photo</button>
-                    <button class="btn btn-warning" id="retakeBtn" type="button" style="display: none;"><i class="fas fa-sync"></i> Retake Photo</button>
+
+                <div class="text-center mb-3 d-flex justify-content-center gap-2 flex-wrap">
+                    <button class="btn btn-success" id="captureBtn" type="button"><i class="fas fa-camera"></i> Capture Photo</button>
+                    <button class="btn btn-warning" id="retakeBtn" type="button" style="display: none;"><i class="fas fa-redo"></i> Retake</button>
                 </div>
-                <div class="text-center">
-                    <img id="capturedImagePreview" class="img-fluid border rounded shadow" style="max-width: 100%; display: none;" alt="Captured Preview" />
-                </div>
+
                 <canvas id="canvas" style="display:none;"></canvas>
-                <input type="file" accept="image/*" id="cameraImageInput" name="recent_image" style="display:none;">
+                <div class="text-center">
+                    <img id="cameraImagePreview" class="img-fluid border rounded shadow mt-3" style="max-width: 100%; display: none;" alt="Camera Preview" />
+                </div>
+
+                <!-- Hidden input for captured image -->
+                <input accept="image/*" id="cameraImageInput" name="recent_image" style="display:none;" type="file">
             </div>
 
             <!-- Buttons -->
@@ -72,122 +76,106 @@
     const retakeBtn = document.getElementById("retakeBtn");
     const canvas = document.getElementById("canvas");
     const imageUploadFromCamera = document.getElementById("cameraImageInput");
-    const capturedPreview = document.getElementById("capturedImagePreview");
-    const fileUploadInput = document.getElementById("imageUpload");
-    const filePreview = document.getElementById("imagePreview");
+    const cameraImagePreview = document.getElementById("cameraImagePreview");
 
+    let stream = null;
     let cameraStarted = false;
-    let streamRef = null;
 
     function toggleSections() {
         if (uploadOption.checked) {
             uploadSection.style.display = "block";
             cameraSection.style.display = "none";
-            fileUploadInput.required = true;
-            stopCamera();
-            resetCameraCapture();
-            clearPreview(capturedPreview);
         } else {
             uploadSection.style.display = "none";
             cameraSection.style.display = "block";
-            fileUploadInput.required = false;
             if (!cameraStarted) {
                 startCamera();
             }
-            clearPreview(filePreview);
-            fileUploadInput.value = "";
         }
     }
 
     uploadOption.addEventListener("change", toggleSections);
     cameraOption.addEventListener("change", toggleSections);
-    toggleSections();  // Initial setup
+    toggleSections();
 
     function startCamera() {
+        cameraStarted = true;
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-            .then((stream) => {
-                video.srcObject = stream;
-                streamRef = stream;
-                cameraStarted = true;
-            })
-            .catch((error) => {
-                console.warn("Back camera not available. Using default camera...");
-                return navigator.mediaDevices.getUserMedia({ video: true });
-            })
-            .then((fallbackStream) => {
-                if (fallbackStream && !streamRef) {
-                    video.srcObject = fallbackStream;
-                    streamRef = fallbackStream;
-                    cameraStarted = true;
-                }
+            .then((mediaStream) => {
+                stream = mediaStream;
+                video.srcObject = mediaStream;
             })
             .catch((err) => {
-                console.error("Camera error:", err);
-                alert("Camera not available or permission denied.");
+                alert("Unable to access camera: " + err.message);
             });
     }
 
     function stopCamera() {
-        if (streamRef) {
-            streamRef.getTracks().forEach(track => track.stop());
-            streamRef = null;
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
         }
-        cameraStarted = false;
-    }
-
-    function clearPreview(element) {
-        element.src = '';
-        element.style.display = 'none';
-    }
-
-    function resetCameraCapture() {
-        capturedPreview.src = '';
-        capturedPreview.style.display = 'none';
-        retakeBtn.style.display = 'none';
-        captureBtn.style.display = 'inline-block';
     }
 
     captureBtn.addEventListener("click", function () {
+        const context = canvas.getContext("2d");
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-        const context = canvas.getContext("2d");
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
+        // Create a data URL and show it
+        const dataUrl = canvas.toDataURL("image/png");
+        cameraImagePreview.src = dataUrl;
+        cameraImagePreview.style.display = "block";
+
+        // Convert to file for input
         canvas.toBlob(function (blob) {
             const file = new File([blob], "captured-image.png", { type: "image/png" });
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            imageUploadFromCamera.files = dataTransfer.files;
-
-            // Show captured preview
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                capturedPreview.src = e.target.result;
-                capturedPreview.style.display = 'block';
-                captureBtn.style.display = 'none';
-                retakeBtn.style.display = 'inline-block';
-            };
-            reader.readAsDataURL(file);
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            imageUploadFromCamera.files = dt.files;
         }, "image/png");
+
+        video.style.display = "none";
+        captureBtn.style.display = "none";
+        retakeBtn.style.display = "inline-block";
     });
 
     retakeBtn.addEventListener("click", function () {
-        resetCameraCapture();
-        imageUploadFromCamera.value = "";
+        video.style.display = "block";
+        cameraImagePreview.style.display = "none";
+        captureBtn.style.display = "inline-block";
+        retakeBtn.style.display = "none";
+
+        // Clear the file input
+        const newInput = document.createElement("input");
+        newInput.type = "file";
+        newInput.name = "recent_image";
+        newInput.accept = "image/*";
+        newInput.style.display = "none";
+        newInput.id = "cameraImageInput";
+        imageUploadFromCamera.replaceWith(newInput);
+        imageUploadFromCamera = newInput;
     });
 
-    fileUploadInput.addEventListener('change', function (event) {
+    // File upload preview
+    document.getElementById('imageUpload').addEventListener('change', function (event) {
+        const preview = document.getElementById('imagePreview');
         const file = event.target.files[0];
         if (file && file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = function (e) {
-                filePreview.src = e.target.result;
-                filePreview.style.display = 'block';
+                preview.src = e.target.result;
+                preview.style.display = 'block';
             };
             reader.readAsDataURL(file);
         } else {
-            clearPreview(filePreview);
+            preview.src = '';
+            preview.style.display = 'none';
         }
     });
+
+    // Stop camera on page unload
+    window.addEventListener("beforeunload", stopCamera);
 </script>
 {% endblock %}
