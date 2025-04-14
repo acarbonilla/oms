@@ -99,14 +99,20 @@
     toggleSections();
 
     function startCamera() {
-        cameraStarted = true;
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-            .then((mediaStream) => {
+        const constraints = {
+            video: {
+                facingMode: { ideal: "environment" }
+            }
+        };
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(mediaStream => {
                 stream = mediaStream;
+                const video = document.getElementById('cameraPreview');
                 video.srcObject = mediaStream;
             })
-            .catch((err) => {
-                alert("Unable to access camera: " + err.message);
+            .catch(error => {
+                console.error("Camera access error:", error);
+                alert("Unable to access camera.");
             });
     }
 

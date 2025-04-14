@@ -37,6 +37,7 @@ from c2.forms import C2RecentImageForm, C2RecentImageFormUpdate, TechnicalActivi
 # from c2.filters import FacilityFilter
 from c2.models import C2Standard, C2User, C2Facility, C2TechActivities, C2TechActivityImage
 from .models import C2RecentImage  # Ensure correct model import
+from django.http import JsonResponse  # Adding this for main form concern
 
 # This is for Technical Activities
 import base64
@@ -279,7 +280,7 @@ def amAssessment(request):
         })
 
     # ✅ PAGINATION - Show 5 items per page
-    paginator = Paginator(combined_data, 2)
+    paginator = Paginator(combined_data, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 

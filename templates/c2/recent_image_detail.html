@@ -20,7 +20,12 @@
                 <li class="list-group-item"><strong>Updated:</strong> {{ image.updated|date:"F j, Y, g:i a" }}</li>
                 <li class="list-group-item"><strong>Created:</strong> {{ image.created|date:"F j, Y, g:i a" }}</li>
                 <li class="list-group-item"><strong>Evaluated By:</strong>
-                    {{ image.remark_by.first_name }} {{ image.remark_by.last_name }}</li>
+                    {% if image.remark_by %}
+                         {{ image.remark_by.first_name }} {{ image.remark_by.last_name }}
+                    {% else %}
+                        Not Evaluated!
+                    {% endif %}
+                   </li>
             </ul>
         </div>
 
