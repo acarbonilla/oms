@@ -75,7 +75,7 @@
     const captureBtn = document.getElementById("captureBtn");
     const retakeBtn = document.getElementById("retakeBtn");
     const canvas = document.getElementById("canvas");
-    const imageUploadFromCamera = document.getElementById("cameraImageInput");
+    let imageUploadFromCamera = document.getElementById("cameraImageInput");
     const cameraImagePreview = document.getElementById("cameraImagePreview");
 
     let stream = null;
@@ -99,20 +99,14 @@
     toggleSections();
 
     function startCamera() {
-        const constraints = {
-            video: {
-                facingMode: { ideal: "environment" }
-            }
-        };
-        navigator.mediaDevices.getUserMedia(constraints)
-            .then(mediaStream => {
+        cameraStarted = true;
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then((mediaStream) => {
                 stream = mediaStream;
-                const video = document.getElementById('cameraPreview');
                 video.srcObject = mediaStream;
             })
-            .catch(error => {
-                console.error("Camera access error:", error);
-                alert("Unable to access camera.");
+            .catch((err) => {
+                alert("Unable to access camera: " + err.message);
             });
     }
 
@@ -129,17 +123,27 @@
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Create a data URL and show it
         const dataUrl = canvas.toDataURL("image/png");
         cameraImagePreview.src = dataUrl;
         cameraImagePreview.style.display = "block";
 
-        // Convert to file for input
         canvas.toBlob(function (blob) {
             const file = new File([blob], "captured-image.png", { type: "image/png" });
+
+            // Create a new hidden file input with the image
+            const newInput = document.createElement("input");
+            newInput.type = "file";
+            newInput.name = "recent_image";
+            newInput.accept = "image/*";
+            newInput.style.display = "none";
+
             const dt = new DataTransfer();
             dt.items.add(file);
-            imageUploadFromCamera.files = dt.files;
+            newInput.files = dt.files;
+
+            // Replace old hidden input with the new one
+            imageUploadFromCamera.parentNode.replaceChild(newInput, imageUploadFromCamera);
+            imageUploadFromCamera = newInput;
         }, "image/png");
 
         video.style.display = "none";
@@ -153,18 +157,17 @@
         captureBtn.style.display = "inline-block";
         retakeBtn.style.display = "none";
 
-        // Clear the file input
+        // Remove and recreate the file input
         const newInput = document.createElement("input");
         newInput.type = "file";
         newInput.name = "recent_image";
         newInput.accept = "image/*";
         newInput.style.display = "none";
         newInput.id = "cameraImageInput";
-        imageUploadFromCamera.replaceWith(newInput);
+        imageUploadFromCamera.parentNode.replaceChild(newInput, imageUploadFromCamera);
         imageUploadFromCamera = newInput;
     });
 
-    // File upload preview
     document.getElementById('imageUpload').addEventListener('change', function (event) {
         const preview = document.getElementById('imagePreview');
         const file = event.target.files[0];
@@ -181,7 +184,7 @@
         }
     });
 
-    // Stop camera on page unload
     window.addEventListener("beforeunload", stopCamera);
 </script>
+
 {% endblock %}
