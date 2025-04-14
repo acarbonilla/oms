@@ -117,6 +117,56 @@
         }
     }
 
+    captureBtn.addEventListener("click", function () {
+        const context = canvas.getContext("2d");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const dataUrl = canvas.toDataURL("image/png");
+        cameraImagePreview.src = dataUrl;
+        cameraImagePreview.style.display = "block";
+
+        canvas.toBlob(function (blob) {
+            const file = new File([blob], "captured-image.png", { type: "image/png" });
+
+            // Create a new hidden file input with the image
+            const newInput = document.createElement("input");
+            newInput.type = "file";
+            newInput.name = "recent_image";
+            newInput.accept = "image/*";
+            newInput.style.display = "none";
+
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            newInput.files = dt.files;
+
+            // Replace old hidden input with the new one
+            imageUploadFromCamera.parentNode.replaceChild(newInput, imageUploadFromCamera);
+            imageUploadFromCamera = newInput;
+        }, "image/png");
+
+        video.style.display = "none";
+        captureBtn.style.display = "none";
+        retakeBtn.style.display = "inline-block";
+    });
+
+    retakeBtn.addEventListener("click", function () {
+        video.style.display = "block";
+        cameraImagePreview.style.display = "none";
+        captureBtn.style.display = "inline-block";
+        retakeBtn.style.display = "none";
+
+        // Remove and recreate the file input
+        const newInput = document.createElement("input");
+        newInput.type = "file";
+        newInput.name = "recent_image";
+        newInput.accept = "image/*";
+        newInput.style.display = "none";
+        newInput.id = "cameraImageInput";
+        imageUploadFromCamera.parentNode.replaceChild(newInput, imageUploadFromCamera);
+        imageUploadFromCamera = newInput;
+    });
 
     document.getElementById('imageUpload').addEventListener('change', function (event) {
         const preview = document.getElementById('imagePreview');
