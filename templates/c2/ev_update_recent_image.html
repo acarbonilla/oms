@@ -19,19 +19,22 @@
     }
 
     .image-wrapper {
-        width: 100%;
-        aspect-ratio: 1 / 1; /* Keep all images square */
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-    .image-wrapper img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
+.image-wrapper img {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    display: block;
+    object-fit: contain; /* Ensures the image doesn't get cropped */
+    border-radius: 0.5rem; /* Equivalent to 'rounded' */
+}
 
     @media (max-width: 376px) {
         img {
@@ -52,6 +55,15 @@
     min-height: 100px; /* Change this to whatever height you want */
     resize: vertical;  /* Allows the user to resize up/down */
 }
+
+    .auto-expand {
+    overflow: hidden;
+    min-height: 0;
+    height: auto;
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+    line-height: 1.2;
+    resize: none;
 </style>
 
 <script>
@@ -62,6 +74,21 @@
             $(this).css("transform", "scale(1)");
         });
     });
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const textareas = document.querySelectorAll('.auto-expand');
+
+    textareas.forEach(textarea => {
+        const resize = () => {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        };
+
+        textarea.addEventListener('input', resize);
+        resize(); // Initial sizing if there's already content
+    });
+});
 </script>
 
 <div class="container border mt-3 mb-5" id="shadow">
@@ -85,9 +112,10 @@
                 {% endif %}
 
                 <div class="input-group mb-3 mt-2">
-                    <span class="input-group-text mb-3">Remarks:</span>
-                    {% render_field form.remarks id='id_remarks' class='form-control' rows="5" %}
-                </div>
+    <span class="input-group-text mb-3">Remarks:</span>
+    {% render_field form.remarks id="id_remarks" class="form-control resize-none auto-expand" rows="1" %}
+</div>
+
 
                 <div class="input-group mb-3">
                     <span class="input-group-text">Status:</span>
@@ -115,7 +143,7 @@
             </div>
             {% if form.instance.recent_image %}
             <div class="image-wrapper">
-                <img alt="Recent" class="img-fluid rounded zoom-img"
+                <img alt="Recent" class="img-fluid rounded zoom-img border"
                      id="zoomImage"
                      src="{{ form.instance.recent_image.url }}">
             </div>
