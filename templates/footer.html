@@ -71,6 +71,8 @@ html, body {
 
 </style>
 
+{% if request.user.is_authenticated %}
+
 <footer class="site-footer fade-in">
   <p>
     <span class="icon">📧</span>
@@ -86,7 +88,24 @@ html, body {
   </p>
 
 </footer>
+{% else %}
+<footer class="site-footer fade-in text-white">
+  <p>
+    <span class="icon">📧</span>
+    Need help? <a href="mailto:support@nabworkplaceintelligence.com">support@nabworkplaceintelligence.com</a>
+  </p>
 
+  <p>
+    &copy; <span id="footer-year"></span> NAB Workplace Intelligence. All rights reserved.
+  </p>
+
+  <p class="tagline">
+    🚀 Built with passion for better workplace experiences.
+  </p>
+
+</footer>
+
+{% endif %}
 <script>
   document.getElementById("footer-year").textContent = new Date().getFullYear();
 </script>

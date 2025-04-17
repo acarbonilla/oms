@@ -70,30 +70,23 @@
     <!-- End here -->
     <div class="row">
         <div class="page-wrapper">
-              {% block content %}
-        {% endblock %}<br/>
-        {% include 'footer.html' %}
+            {% block content %}
+            {% endblock %}<br/>
+
+                {% include 'footer.html' %}
 
         </div>
 
     </div>
-    <div class="position-fixed bottom-0 end-0 p-3">
-        {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert" style="background-color: red;">
-            <h5 style="text-align:center; color: white;"> {{message}}</h5>
-            <button aria-label="Close" class="btn-close bg-light" data-bs-dismiss="alert" type="button"></button>
-        </div>
-        {% endfor %}
-        {% endif %}
-    </div>
-
+    <!-- This is for error message -->
+   {% include 'message_alert.html' %}
+    <!-- End here -->
 </div>
 
 
-  <script>
+<script>
     document.getElementById("footer-year").textContent = new Date().getFullYear();
-  </script>
+</script>
 
 <script
         crossorigin="anonymous"

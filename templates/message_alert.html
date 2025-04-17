@@ -1,0 +1,43 @@
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1000;">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-warning alert-dismissible fade show mb-3"
+         role="alert"
+         style="background-color: #ff4444; border: none; animation: slideIn 0.5s ease-out forwards, fadeOut 0.5s ease 4.5s forwards;">
+        <h5 style="text-align:center; color: white; margin: 0;">{{message}}</h5>
+
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
+<style>
+    /* Slide in from right + fade in */
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    /* Fade out after delay */
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+    }
+
+    /* Hover pause animation */
+    .alert:hover {
+        animation-play-state: paused !important;
+    }
+</style>

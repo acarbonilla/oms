@@ -3,7 +3,6 @@
 {% block content %}
 
 <style>
-
     .zoom-img {
         transition: transform 0.3s ease-in-out;
         max-width: 100%;
@@ -64,6 +63,7 @@
     padding-bottom: 0.3rem;
     line-height: 1.2;
     resize: none;
+
 </style>
 
 <script>
@@ -110,12 +110,10 @@
                     </ul>
                 </div>
                 {% endif %}
-
                 <div class="input-group mb-3 mt-2">
-    <span class="input-group-text mb-3">Remarks:</span>
-    {% render_field form.remarks id="id_remarks" class="form-control resize-none auto-expand" rows="1" %}
-</div>
-
+                    <span class="input-group-text mb-3">Remarks:</span>
+                    {% render_field form.remarks id="id_remarks" class="form-control resize-none auto-expand" rows="1"%}
+                </div>
 
                 <div class="input-group mb-3">
                     <span class="input-group-text">Status:</span>
@@ -143,7 +141,7 @@
             </div>
             {% if form.instance.recent_image %}
             <div class="image-wrapper">
-                <img alt="Recent" class="img-fluid rounded zoom-img border"
+                <img alt="Recent" class="img-fluid rounded zoom-img"
                      id="zoomImage"
                      src="{{ form.instance.recent_image.url }}">
             </div>
