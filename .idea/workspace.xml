@@ -6,10 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="66939e78-aa53-4976-9238-052a50849d6b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/ev/ev_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev/ev_dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/ev/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev/navbar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/ev/s_image_standard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/ev/s_image_standard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/c2/am/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/am/navbar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/c2/emp/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/emp/navbar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/c2/recent_image_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/recent_image_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/danao/am/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/danao/am/navbar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/danao/emp/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/danao/emp/navbar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/danao/ev/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/danao/ev/navbar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/danao/general/danao_recent_image_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/danao/general/danao_recent_image_detail.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
