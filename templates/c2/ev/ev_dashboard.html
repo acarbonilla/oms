@@ -1,113 +1,300 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-4">Evaluator Dashboard</h2>
 
+<style>
+    /* Modern Color Palette */
+    :root {
+        --primary: #4361ee;
+        --secondary: #3f37c9;
+        --success: #4cc9f0;
+        --danger: #f72585;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --info: #4895ef;
+    }
+
+    /* Base Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-5px); }
+        100% { transform: translateY(0px); }
+    }
+
+    /* Dashboard Structure */
+    .dashboard-container {
+        animation: fadeIn 0.6s ease-out;
+        padding-bottom: 2rem;
+    }
+
+    /* Card Enhancements */
+    .metric-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+    }
+
+    .metric-card.bg-danger { background: linear-gradient(135deg, #f72585, #b5179e); }
+    .metric-card.bg-primary { background: linear-gradient(135deg, #4361ee, #3a0ca3); }
+    .metric-card.bg-success { background: linear-gradient(135deg, #4cc9f0, #4895ef); }
+
+    .metric-card .card-header {
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .metric-card .card-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-top: 0.5rem;
+    }
+
+    /* Form Entry Cards */
+    .entry-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border-left: 4px solid var(--info);
+    }
+
+    .entry-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+    }
+
+    .entry-card .card-title {
+        color: var(--dark);
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .entry-card .card-text {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    /* Search Bar */
+    .search-container {
+        position: relative;
+        margin: 2rem 0;
+    }
+
+    .search-container .form-control {
+        border-radius: 50px;
+        padding: 12px 20px;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .search-container .btn {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        border-radius: 50px;
+        padding: 8px 20px;
+        background: linear-gradient(to right, var(--primary), var(--secondary));
+        border: none;
+        transition: all 0.3s;
+    }
+
+    .search-container .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+    }
+
+    /* Facilities Table */
+    .facilities-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .facilities-card .card-header {
+        background: linear-gradient(135deg, #4cc9f0, #4895ef);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        font-size: 1.1rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(72, 149, 239, 0.05);
+        transform: translateX(3px);
+    }
+
+    /* Pagination */
+    .pagination .page-item .page-link {
+        border: none;
+        color: var(--primary);
+        margin: 0 3px;
+        border-radius: 8px !important;
+    }
+
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(to right, var(--primary), var(--secondary));
+        color: white;
+        box-shadow: 0 4px 8px rgba(67, 97, 238, 0.2);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .metric-card .card-title {
+            font-size: 1.8rem;
+        }
+        .entry-card .card-text {
+            font-size: 1.5rem;
+        }
+    }
+
+</style>
+
+<div class="container dashboard-container">
+    <h2 class="mb-4" style="color: var(--dark); font-weight: 700;">Evaluator Dashboard</h2>
+
+    <!-- Metrics Row with Animated Counters -->
     <div class="row">
-        <!-- Failed Sites in Last 30 Days -->
         <div class="col-md-4">
-            <div class="card text-white bg-danger mb-3">
+            <div class="card text-white  text-center bg-danger mb-3 metric-card" id="failed-sites-card">
                 <div class="card-header">Failed Sites (Last 30 Days)</div>
                 <div class="card-body">
-                    <h4 class="card-title">{{ failed_sites_count }}</h4>
+                    <h4 class="card-title counter" data-target="{{ failed_sites_count }}">0</h4>
                 </div>
             </div>
         </div>
 
-        <!-- Total Facilities -->
         <div class="col-md-4">
-            <div class="card text-white bg-primary mb-3">
+            <div class="card text-white text-center bg-primary mb-3 metric-card" id="total-facilities-card">
                 <div class="card-header">Total Facilities</div>
                 <div class="card-body">
-                    <h4 class="card-title">{{ total_facilities }}</h4>
+                    <h4 class="card-title counter" data-target="{{ total_facilities }}">0</h4>
                 </div>
             </div>
         </div>
 
-        <!-- Facilities Passed This Month -->
         <div class="col-md-4">
-            <div class="card text-white bg-success mb-3">
+            <div class="card text-white text-center bg-success mb-3 metric-card" id="passed-facilities-card">
                 <div class="card-header">Facilities Passed This Month</div>
                 <div class="card-body">
-                    <h4 class="card-title">{{ passed_facilities_count }}</h4>
+                    <h4 class="card-title counter" data-target="{{ passed_facilities_count }}">0</h4>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Weekly, Monthly, Yearly Form Entry Counts -->
-    <div class="row text-center mt-4">
+    <!-- Form Entry Counts -->
+    <div class="row mt-4">
         <div class="col-md-4">
-            <div class="card bg-light">
-                <div class="card-body">
+            <div class="card entry-card h-100" style="animation-delay: 0.1s;">
+                <div class="card-body text-center">
                     <h5 class="card-title">🗓 Form Entries This Week</h5>
-                    <h4 class="card-text">{{ weekly_count }}</h4>
+                    <h4 class="card-text counter" data-target="{{ weekly_count }}">0</h4>
                 </div>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="card bg-light">
-                <div class="card-body">
+            <div class="card entry-card h-100" style="animation-delay: 0.2s;">
+                <div class="card-body text-center">
                     <h5 class="card-title">📆 Form Entries This Month</h5>
-                    <h4 class="card-text">{{ monthly_count }}</h4>
+                    <h4 class="card-text counter" data-target="{{ monthly_count }}">0</h4>
                 </div>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="card bg-light">
-                <div class="card-body">
+            <div class="card entry-card h-100" style="animation-delay: 0.3s;">
+                <div class="card-body text-center">
                     <h5 class="card-title">📅 Form Entries This Year</h5>
-                    <h4 class="card-text">{{ yearly_count }}</h4>
+                    <h4 class="card-text counter" data-target="{{ yearly_count }}">0</h4>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Search Bar -->
-    <form method="GET" class="mb-3 mt-4">
+    <form method="GET" class="search-container">
         <input type="text" name="search" class="form-control" placeholder="Search facility..." value="{{ search_query }}">
-        <button type="submit" class="btn btn-primary mt-2">Search</button>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
     </form>
 
-    <!-- List of Facilities Passed -->
-    <div class="card mt-4">
-        <div class="card-header bg-success text-white">🏆 Congratulations! Facilities Passed This Month</div>
-        <div class="card-body">
-            <table class="table table-bordered">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Facility Name</th>
-                        <th>Date Created</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for facility in page_obj %}
-                    <tr>
-                        <td>{{ facility.id }}</td>
-                        <td>{{ facility.s_image__facility__name }}</td>
-                        <td>{{ facility.created|date:"F d, Y" }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3" class="text-center">No passed facilities found.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- Facilities Table -->
+    <div class="card facilities-card mt-4">
+        <div class="card-header d-flex align-items-center">
+
+            <span>🏆 Congratulations! Facilities Passed This Month</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Facility Name</th>
+                            <th>Date Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for facility in page_obj %}
+                        <tr>
+                            <td>{{ facility.id }}</td>
+                            <td>{{ facility.s_image__facility__name }}</td>
+                            <td>{{ facility.created|date:"F d, Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center py-4">No passed facilities found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Pagination -->
-            <nav aria-label="Page navigation">
+            <nav aria-label="Page navigation" class="px-3 pb-3">
                 <ul class="pagination justify-content-center mt-3">
                     {% if page_obj.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?search={{ search_query }}&page=1">&laquo; First</a>
+                            <a class="page-link" href="?search={{ search_query }}&page=1"><i class="fas fa-angle-double-left"></i></a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link" href="?search={{ search_query }}&page={{ page_obj.previous_page_number }}">Previous</a>
+                            <a class="page-link" href="?search={{ search_query }}&page={{ page_obj.previous_page_number }}"><i class="fas fa-angle-left"></i></a>
                         </li>
                     {% endif %}
 
@@ -115,10 +302,10 @@
 
                     {% if page_obj.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="?search={{ search_query }}&page={{ page_obj.next_page_number }}">Next</a>
+                            <a class="page-link" href="?search={{ search_query }}&page={{ page_obj.next_page_number }}"><i class="fas fa-angle-right"></i></a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link" href="?search={{ search_query }}&page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                            <a class="page-link" href="?search={{ search_query }}&page={{ page_obj.paginator.num_pages }}"><i class="fas fa-angle-double-right"></i></a>
                         </li>
                     {% endif %}
                 </ul>
@@ -126,4 +313,44 @@
         </div>
     </div>
 </div>
+
+<!-- Animation Scripts -->
+<script>
+    // Counter Animation
+    document.addEventListener('DOMContentLoaded', function() {
+        const counters = document.querySelectorAll('.counter');
+        const speed = 200; // Animation duration in ms
+
+        counters.forEach(counter => {
+            const target = +counter.getAttribute('data-target');
+            const count = +counter.innerText;
+            const increment = target / speed;
+
+            if (count < target) {
+                const updateCount = () => {
+                    const currentCount = +counter.innerText;
+                    if (currentCount < target) {
+                        counter.innerText = Math.ceil(currentCount + increment);
+                        setTimeout(updateCount, 1);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                updateCount();
+            }
+        });
+
+        // Card hover effects
+        const cards = document.querySelectorAll('.metric-card, .entry-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-5px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+            });
+        });
+    });
+</script>
+
 {% endblock %}

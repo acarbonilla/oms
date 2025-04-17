@@ -1,10 +1,50 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-    #shadow {
-  box-shadow: 10px 10px 5px lightblue;
-}
+    /* General Styles */
+    body {
+        background-color: #f8f9fa; /* Light background for contrast */
+    }
 
+    #shadow {
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+        transition: box-shadow 0.3s ease;
+    }
+
+    #shadow:hover {
+        box-shadow: 0 8px 16px rgba(0, 123, 255, 0.4);
+    }
+
+    .card {
+        transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+    }
+
+    .btn-primary {
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3; /* Darker shade on hover */
+        transform: translateY(-2px);
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .pagination .page-link {
+        transition: background-color 0.3s ease;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #0056b3;
+        color: white;
+    }
 </style>
 
 <div class="container mt-4">
@@ -25,11 +65,8 @@
             </div>
             <div class="col-md-3">
                 <button type="submit" class="btn btn-primary" id="shadow">Apply</button>
-                <button type="submit" class="btn btn-primary" id="shadow">
-                    <a class="text-white" href="{% url 'standard_image_ev'%}" style="text-decoration:none;">
-                         Refresh
-                    </a>
-
+                <button type="button" class="btn btn-primary" id="shadow" onclick="window.location.href='{% url 'standard_image_ev' %}'">
+                    Refresh
                 </button>
             </div>
         </div>
@@ -38,13 +75,12 @@
     <!-- ✅ Standard Image List -->
     <div class="row">
         {% for image in s_standard %}
-            <div class="col-md-4 mb-4" >
+            <div class="col-md-4 mb-4">
                 <div class="card" id="shadow">
                     <img src="{{ image.standard_image.url }}" width="200" height="300" class="card-img-top" alt="Standard Image">
                     <div class="card-body">
                         <h5 class="card-title">{{ image.facility }}</h5>
-                         <a href="{% url 'standard_image_ev_details' image.id %}" class="btn btn-info">📄 Details</a>
-
+                        <a href="{% url 'standard_image_ev_details' image.id %}" class="btn btn-info">📄 Details</a>
                     </div>
                 </div>
             </div>
@@ -70,5 +106,4 @@
         </ul>
     </nav>
 </div>
-
 {% endblock %}
