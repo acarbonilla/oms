@@ -6,13 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="66939e78-aa53-4976-9238-052a50849d6b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/am/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/am/navbar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/emp/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/emp/navbar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/c2/recent_image_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/recent_image_detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/danao/am/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/danao/am/navbar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/danao/emp/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/danao/emp/navbar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/danao/ev/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/danao/ev/navbar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/danao/general/danao_recent_image_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/danao/general/danao_recent_image_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/c2/am/am_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/am/am_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/c2/assessment.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/c2/assessment.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

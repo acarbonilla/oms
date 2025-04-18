@@ -2,56 +2,152 @@
 {% block content %}
 
 <style>
-    .card {
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease-in-out;
-    }
-    .card:hover {
-        transform: scale(1.05);
-    }
-    .container {
-        margin-top: 10px;
-    }
-    .title {
-        font-weight: bold;
-        text-transform: uppercase;
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f8f9fa;
     }
 
-    .bckgc{
-         color: #5f0b2c;
-         background: linear-gradient(to right, #93A5CF, #E4EfE9); /* Gradient from peach to light orange */
-        }
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: none;
+        overflow: hidden;
+    }
+
+    .card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .container {
+        margin-top: 30px;
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    .dashboard-title {
+        font-weight: 600;
+        letter-spacing: 1px;
+        margin-bottom: 30px;
+        position: relative;
+        display: inline-block;
+        color: #2c3e50;
+    }
+
+    .dashboard-title:after {
+        content: '';
+        position: absolute;
+        width: 50%;
+        height: 4px;
+        bottom: -10px;
+        left: 0;
+        background: linear-gradient(90deg, #3498db, #9b59b6);
+        border-radius: 2px;
+    }
+
+    .section-title {
+        font-weight: 500;
+        margin: 25px 0 15px;
+        color: #34495e;
+        position: relative;
+        padding-left: 15px;
+    }
+
+    .section-title:before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 70%;
+        width: 4px;
+        background: linear-gradient(to bottom, #2ecc71, #3498db);
+        border-radius: 2px;
+    }
+
+    .bckgc {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+    }
+
+    .bg-light {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+
+    .title {
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        margin-bottom: 15px;
+    }
+
+    .card-text {
+        font-weight: 300;
+        font-size: 2.2rem !important;
+    }
+
+    .graph-container {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .graph-container:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+        100% { transform: scale(1); }
+    }
+
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+
+    .count-up {
+        font-weight: 300;
+    }
 </style>
 
-
-
 <div class="container">
-    <h3 class="text-center text-primary mb-2">Managers' Dashboard</h3>
+    <h2 class="text-center dashboard-title">MANAGERS' DASHBOARD</h2>
+
     <!-- Technical Activities Section -->
-    <div class="row">
-        <h4 class="text-success">🛠 Technical Activities</h4>
+    <div class="row animate__animated animate__fadeIn">
+        <h4 class="section-title">🛠 TECHNICAL ACTIVITIES</h4>
         <div class="col-md-4">
-            <div class="card text-center mb-3 bckgc">
+            <div class="card text-center mb-4 bckgc pulse-animation">
                 <div class="card-body">
                     <h5 class="title">Weekly Activity Report</h5>
-                    <p class="card-text fs-3">{{ weekly_tech_activities }}</p>
+                    <p class="card-text count-up">{{ weekly_tech_activities }}</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card bckgc text-center mb-3">
+            <div class="card bckgc text-center mb-4">
                 <div class="card-body">
                     <h5 class="title">Monthly Activity Report</h5>
-                    <p class="card-text fs-3">{{ monthly_tech_activities }}</p>
+                    <p class="card-text count-up">{{ monthly_tech_activities }}</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card bckgc text-center mb-3">
+            <div class="card bckgc text-center mb-4">
                 <div class="card-body">
                     <h5 class="title">Yearly Activity Report</h5>
-                    <p class="card-text fs-3">{{ yearly_tech_activities }}</p>
+                    <p class="card-text count-up">{{ yearly_tech_activities }}</p>
                 </div>
             </div>
         </div>
@@ -59,102 +155,195 @@
 
     <!-- General Activities Section -->
     <div class="row">
-        <h4 class="text-success">📌 General Activities</h4>
-        <div class="col-md-4 mb-4">
-            <div class="card bg-light mb-3">
+        <h4 class="section-title">📌 GENERAL ACTIVITIES</h4>
+        <div class="col-md-4">
+            <div class="card bg-light mb-4">
                 <div class="card-body text-center">
                     <h5 class="title">Weekly Activities</h5>
-                    <p class="card-text fs-3">{{ weekly_general_activities }}</p>
+                    <p class="card-text count-up">{{ weekly_general_activities }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-4 text-center">
-            <div class="card bg-light mb-3">
-                <div class="card-body">
+        <div class="col-md-4">
+            <div class="card bg-light mb-4">
+                <div class="card-body text-center">
                     <h5 class="title">Monthly Activities</h5>
-                    <p class="card-text fs-3">{{ monthly_general_activities }}</p>
+                    <p class="card-text count-up">{{ monthly_general_activities }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-4 text-center">
-            <div class="card bg-light mb-3">
-                <div class="card-body">
+        <div class="col-md-4">
+            <div class="card bg-light mb-4">
+                <div class="card-body text-center">
                     <h5 class="title">Yearly Activities</h5>
-                    <p class="card-text fs-3">{{ yearly_general_activities }}</p>
+                    <p class="card-text count-up">{{ yearly_general_activities }}</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Graph -->
+    <!-- Graph Section -->
     <div class="row mb-5">
         <!-- Status Breakdown -->
-        <div class="col-md-4" id="grapPie">
-            <h4 style="text-align: center">📊 Status Breakdown</h4>
-            <div>
-                <canvas id="myChart"></canvas>
+        <div class="col-md-4">
+            <div class="graph-container">
+                <h4 class="text-center mb-4">📊 STATUS BREAKDOWN</h4>
+                <div>
+                    <canvas id="myChart"></canvas>
+                </div>
             </div>
-
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-            <script>
-                const ctx = document.getElementById('myChart');
-                new Chart(ctx, {
-                  type: 'pie',
-                  data: {
-                    labels: ['Passed', 'Failed', 'Pending'],
-                    datasets: [{
-                      label: 'Total',
-                      data: [{{ passed_count }}, {{ failed_count }}, {{ pending_count }}],
-                      borderWidth: 1
-                    }]
-                  },
-
-                });
-            </script>
         </div>
 
         <!-- Facility Statistics -->
-        <div class="col-md-8" id="linePie">
-            <h4 style="text-align: center">🏢 Facility Statistics</h4>
-
-
-            <div>
-                <canvas id="lineChart"></canvas>
+        <div class="col-md-8">
+            <div class="graph-container">
+                <h4 class="text-center mb-4">🏢 FACILITY STATISTICS</h4>
+                <div>
+                    <canvas id="lineChart"></canvas>
+                </div>
             </div>
-
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-            <script>
-                const ctx2 = document.getElementById('lineChart');
-
-                new Chart(ctx2, {
-                  type: 'bar',
-                  data: {
-                    labels: ['Visited This Week', 'Not Visited This Week'],
-                    datasets: [{
-                      label: 'Total: {{facility_reg_count}}',
-                      fill: false,
-                      data: [{{facility_visited_week}}, {{ facility_not_visited_week }}],
-                      borderWidth: 1,
-                      tension: 1,
-                      borderColor: 'rgb(75, 192, 192)',
-                      HoverBackgroundColor: 'rgb(255, 0, 0)'
-                    }]
-                  },
-
-                });
-            </script>
         </div>
-
-
-    </div> <!-- End of Row -->
-
-    <!-- Testing for Technical Line chart -->
-
+    </div>
 </div>
 
-    <!-- End here -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
 
+<script>
+    // Count-up animation
+    document.querySelectorAll('.count-up').forEach(element => {
+        const target = parseInt(element.textContent);
+        let current = 0;
+        const increment = target / 30;
+
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                element.textContent = target;
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(current);
+            }
+        }, 30);
+    });
+
+    // Pie Chart
+    const ctx = document.getElementById('myChart');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Passed', 'Failed', 'Pending'],
+            datasets: [{
+                data: [{{ passed_count }}, {{ failed_count }}, {{ pending_count }}],
+                backgroundColor: [
+                    'rgba(46, 204, 113, 0.8)',
+                    'rgba(231, 76, 60, 0.8)',
+                    'rgba(241, 196, 15, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(46, 204, 113, 1)',
+                    'rgba(231, 76, 60, 1)',
+                    'rgba(241, 196, 15, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        font: {
+                            family: 'Poppins',
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    bodyFont: {
+                        family: 'Poppins',
+                        size: 12
+                    }
+                }
+            }
+        }
+    });
+
+    // Bar Chart
+    const ctx2 = document.getElementById('lineChart');
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: ['Visited This Week', 'Not Visited This Week'],
+            datasets: [{
+                label: 'Total: {{facility_reg_count}}',
+                data: [{{facility_visited_week}}, {{ facility_not_visited_week }}],
+                backgroundColor: [
+                    'rgba(52, 152, 219, 0.8)',
+                    'rgba(155, 89, 182, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(52, 152, 219, 1)',
+                    'rgba(155, 89, 182, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        font: {
+                            family: 'Poppins'
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            family: 'Poppins'
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        font: {
+                            family: 'Poppins',
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    bodyFont: {
+                        family: 'Poppins',
+                        size: 12
+                    }
+                }
+            }
+        }
+    });
+
+    // Add animation to cards when they come into view
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = 1;
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.card, .graph-container').forEach(card => {
+        card.style.opacity = 0;
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'all 0.6s ease-out';
+        observer.observe(card);
+    });
+</script>
 
 {% endblock %}

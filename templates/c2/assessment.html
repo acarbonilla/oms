@@ -2,52 +2,257 @@
 {% load highlight %}
 {% block content %}
 <style>
-    img.assessment-image {
-    width: 350px; /* Set a fixed width */
-    height: 400px; /* Set a fixed height */
-    object-fit: cover; /* Crop image to fit */
-    border-radius: 8px; /* Optional: Rounded corners */
-}
-    #shadow {
-  box-shadow: 10px 10px 5px lightblue;
-}
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-    /* Testing to highlight search result */
-   .search-highlight {
-        background-color: #007bff; /* Bootstrap primary blue */
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f8fafc;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin-top: 2rem;
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    h2 {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+
+    h2:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(90deg, #4f46e5, #10b981);
+        border-radius: 2px;
+    }
+
+    .search-form {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(79, 70, 229, 0.1);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .search-form:hover {
+        box-shadow: 0 6px 25px rgba(79, 70, 229, 0.15);
+    }
+
+    .search-input {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+
+    .search-btn {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+
+    .assessment-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        margin-bottom: 2rem;
+        background: white;
+    }
+
+    .assessment-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: none;
+        font-weight: 500;
+    }
+
+    .bg-danger {
+        background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    }
+
+    .bg-warning {
+        background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+        color: white !important;
+    }
+
+    .bg-secondary {
+        background: linear-gradient(135deg, #64748b, #475569) !important;
+    }
+
+    .assessment-image {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .assessment-image:hover {
+        transform: scale(1.02);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .image-title {
+        font-weight: 500;
+        color: #334155;
+        margin-bottom: 1rem;
+        position: relative;
+        display: inline-block;
+    }
+
+    .image-title:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -5px;
+        width: 40px;
+        height: 3px;
+        background: #4f46e5;
+        border-radius: 2px;
+    }
+
+    .btn-action {
+        border-radius: 8px;
+        padding: 0.5rem 1.25rem;
+        font-weight: 500;
+        margin: 0 0.5rem;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .btn-evaluation {
+        background: linear-gradient(135deg, #10b981, #059669);
         color: white;
+    }
+
+    .btn-evaluation:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-details {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+    }
+
+    .btn-details:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .pagination {
+        margin-top: 2rem;
+    }
+
+    .page-link {
+        border: none;
+        color: #4f46e5;
+        margin: 0 5px;
+        border-radius: 8px !important;
+        transition: all 0.3s ease;
+    }
+
+    .page-link:hover {
+        background-color: #e0e7ff;
+        color: #4f46e5;
+    }
+
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: white;
+        border: none;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+    .search-highlight {
+        background-color: #fcd34d;
+        color: #92400e;
         padding: 2px 4px;
         border-radius: 4px;
-        font-weight: bold;         /* Make text bold */
-        text-decoration: underline; /* Add underline */
-        animation: highlight-animation 1s ease-out forwards; /* Animation effect */
+        font-weight: 600;
+        animation: highlight-animation 1.5s ease-out infinite alternate;
     }
 
-    /* Animation to fade out the background gradually */
     @keyframes highlight-animation {
         0% {
-            background-color: #007bff;
+            background-color: #fcd34d;
         }
         100% {
-            background-color: #3399ff; /* Slightly lighter blue */
+            background-color: #fde68a;
         }
     }
 
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .assessment-image {
+            height: 250px;
+        }
+
+        .btn-action {
+            margin-bottom: 0.5rem;
+            width: 100%;
+        }
+    }
 </style>
-<div class="container mt-4">
+
+<div class="container">
     <h2>📊 Assessment Report</h2>
 
     <!-- Search Bar -->
-    <form method="GET" action="{% url 'assessment' %}" class="mb-4" id="shadow">
+    <form method="GET" action="{% url 'assessment' %}" class="mb-4 search-form">
         <div class="input-group">
-            <input type="text" name="search" class="form-control" placeholder="Search by Facility Name..." value="{{ search_query }}">
-            <button type="submit" class="btn btn-primary">Search</button>
+            <input type="text" name="search" class="form-control search-input" placeholder="Search by Facility Name..." value="{{ search_query }}">
+            <button type="submit" class="btn search-btn">Search</button>
         </div>
     </form>
 
     {% if page_obj %}
         {% for item in page_obj %}
-        <div class="card mb-5 " id="shadow">
+        <div class="card assessment-card">
             <div class="card-header {% if item.failed_count > 1 %} bg-danger text-white
                 {% elif item.failed_count == 1 %} bg-warning
                 {% else %} bg-secondary text-white
@@ -55,7 +260,7 @@
                 {% if item.failed_count > 1%}
                 <h4>{{ item.s_image }} - {{ item.failed_count }} Failed Reports</h4>
                 {% elif item.failed_count == 1 %}
-                <h4>{{ item.s_image }} - {{ item.failed_count }} Failed Reports</h4>
+                <h4>{{ item.s_image }} - {{ item.failed_count }} Failed Report</h4>
                 {% else %}
                 <h4>{{ item.s_image }} - {{ item.failed_count }} Failed Report</h4>
                 {% endif %}
@@ -63,34 +268,34 @@
             <div class="card-body">
                 <div class="row">
                     <!-- Left: Standard Image -->
-                    <div class="col-md-6 text-center">
-                        <h5>Standard Image</h5>
+                    <div class="col-md-6 text-center mb-4 mb-md-0">
+                        <h5 class="image-title">Standard Image</h5>
                         {% if item.standard_image %}
                             <img src="{{ item.standard_image }}" alt="Standard Image"
-                                 class="img-fluid rounded shadow-lg assessment-image">
+                                 class="assessment-image">
                         {% else %}
-                            <p class="text-muted">No Image Available</p>
+                            <div class="text-muted p-4 bg-gray-50 rounded-lg">No Image Available</div>
                         {% endif %}
                     </div>
 
                     <!-- Right: Recent Failed Image -->
                     <div class="col-md-6 text-center">
-                        <h5>Latest Image</h5>
+                        <h5 class="image-title">Latest Image</h5>
                         {% if item.recent_image %}
                             <img src="{{ item.recent_image }}" alt="Recent Image"
-                                 class="img-fluid rounded shadow-lg assessment-image">
+                                 class="assessment-image">
                         {% else %}
-                            <p class="text-muted">No Image Available</p>
+                            <div class="text-muted p-4 bg-gray-50 rounded-lg">No Image Available</div>
                         {% endif %}
                     </div>
                 </div>
 
-                <!-- ✅ Restore "Details" and "Evaluation" Buttons -->
-                <div class="text-center mt-3">
+                <!-- Action Buttons -->
+                <div class="text-center mt-4">
                     {% if user in all_ev %}
-                    <a href="{% url 'update_recent_image' item.id %}" class="btn btn-success">📝 Evaluation</a>
+                    <a href="{% url 'update_recent_image' item.id %}" class="btn btn-action btn-evaluation">📝 Evaluation</a>
                     {% endif %}
-                    <a href="{% url 'recent_image_detail' item.id %}" class="btn btn-info">📄 Details</a>
+                    <a href="{% url 'recent_image_detail' item.id %}" class="btn btn-action btn-details">📄 Details</a>
                 </div>
             </div>
         </div>
@@ -98,7 +303,7 @@
 
         <!-- Pagination Controls -->
         <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
+            <ul class="pagination">
                 {% if page_obj.has_previous %}
                     <li class="page-item">
                         <a class="page-link" href="?search={{ search_query }}&page=1">First</a>
@@ -123,8 +328,29 @@
             </ul>
         </nav>
     {% else %}
-        <p class="alert alert-success">✅ No failed images found!</p>
+        <div class="alert alert-success">✅ No failed images found!</div>
     {% endif %}
-
 </div>
+
+<script>
+    // Add animation to cards when they come into view
+    document.addEventListener('DOMContentLoaded', function() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.assessment-card').forEach((card, index) => {
+            card.style.opacity = 0;
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = `all 0.6s ease-out ${index * 0.1}s`;
+            observer.observe(card);
+        });
+    });
+</script>
+
 {% endblock %}
