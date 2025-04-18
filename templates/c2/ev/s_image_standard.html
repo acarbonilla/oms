@@ -1,83 +1,249 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-    /* General Styles */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+    :root {
+        --primary-color: #4f46e5;
+        --primary-light: #6366f1;
+        --secondary-color: #10b981;
+        --accent-color: #f59e0b;
+        --dark-color: #1e293b;
+        --light-color: #f8fafc;
+    }
+
     body {
-        background-color: #f8f9fa; /* Light background for contrast */
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: 100vh;
     }
 
-    #shadow {
-        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
-        transition: box-shadow 0.3s ease;
+    .container {
+        max-width: 1200px;
+        margin-top: 2rem;
+        animation: fadeIn 0.8s ease-out;
     }
 
-    #shadow:hover {
-        box-shadow: 0 8px 16px rgba(0, 123, 255, 0.4);
+    h2 {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+        text-align: center;
     }
 
-    .card {
-        transition: transform 0.3s ease;
+    h2:after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 0;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        border-radius: 2px;
     }
 
-    .card:hover {
-        transform: scale(1.05);
+    .search-sort-container {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(79, 70, 229, 0.1);
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .search-sort-container:hover {
+        box-shadow: 0 8px 25px rgba(79, 70, 229, 0.15);
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: none;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
     }
 
     .btn-primary {
-        transition: background-color 0.3s ease, transform 0.3s ease;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(79, 70, 229, 0.1);
     }
 
     .btn-primary:hover {
-        background-color: #0056b3; /* Darker shade on hover */
         transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(79, 70, 229, 0.2);
+        background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
     }
 
-    .pagination .page-item.active .page-link {
-        background-color: #007bff;
-        border-color: #007bff;
-    }
-
-    .pagination .page-link {
-        transition: background-color 0.3s ease;
-    }
-
-    .pagination .page-link:hover {
-        background-color: #0056b3;
+    .btn-info {
+        background: linear-gradient(135deg, var(--secondary-color), #34d399));
+        border: none;
+        border-radius: 8px;
+        padding: 0.5rem 1.25rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
         color: white;
+        box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1);
+    }
+
+    .btn-info:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(16, 185, 129, 0.2);
+        color: white;
+        background: linear-gradient(135deg, #34d399, var(--secondary-color));
+    }
+
+    .image-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        margin-bottom: 2rem;
+        background: white;
+        height: 100%;
+    }
+
+    .image-card:hover {
+        transform: translateY(-8px) scale(1.03);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-img-top {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        transition: all 0.5s ease;
+    }
+
+    .image-card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .card-title {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    .empty-state p {
+        font-size: 1.2rem;
+        color: #64748b;
+    }
+
+    .pagination {
+        margin-top: 2rem;
+    }
+
+    .page-link {
+        border: none;
+        color: var(--primary-color);
+        margin: 0 5px;
+        border-radius: 8px !important;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .page-link:hover {
+        background-color: #e0e7ff;
+        color: var(--primary-color);
+    }
+
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        color: white;
+        border: none;
+        box-shadow: 0 4px 6px rgba(79, 70, 229, 0.1);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes cardEntry {
+        0% { opacity: 0; transform: translateY(30px) rotate(3deg); }
+        100% { opacity: 1; transform: translateY(0) rotate(0); }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .card-img-top {
+            height: 200px;
+        }
+
+        .search-sort-container .row > div {
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary, .btn-info {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
     }
 </style>
 
-<div class="container mt-4">
-    <h2 class="mb-3">Standard Images</h2>
+<div class="container">
+    <h2>📷 Standard Images Gallery</h2>
 
-    <!-- ✅ Search & Sort Form -->
-    <form method="GET" class="mb-3">
+    <!-- Search & Sort Form -->
+    <form method="GET" class="search-sort-container">
         <div class="row">
             <div class="col-md-6">
                 <input type="text" name="search" value="{{ search_query }}" class="form-control"
-                       placeholder="Search by Facility Name" id="shadow">
+                       placeholder="Search by Facility Name">
             </div>
             <div class="col-md-3">
-                <select name="sort" class="form-select" id="shadow">
+                <select name="sort" class="form-select">
                     <option value="asc" {% if sort_order == "asc" %}selected{% endif %}>Sort A-Z</option>
                     <option value="desc" {% if sort_order == "desc" %}selected{% endif %}>Sort Z-A</option>
                 </select>
             </div>
-            <div class="col-md-3">
-                <button type="submit" class="btn btn-primary" id="shadow">Apply</button>
-                <button type="button" class="btn btn-primary" id="shadow" onclick="window.location.href='{% url 'standard_image_ev' %}'">
+            <div class="col-md-3 d-flex align-items-center">
+                <button type="submit" class="btn btn-primary me-2">Apply</button>
+                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'standard_image_ev' %}'">
                     Refresh
                 </button>
             </div>
         </div>
     </form>
 
-    <!-- ✅ Standard Image List -->
+    <!-- Standard Image List -->
     <div class="row">
         {% for image in s_standard %}
             <div class="col-md-4 mb-4">
-                <div class="card" id="shadow">
-                    <img src="{{ image.standard_image.url }}" width="200" height="300" class="card-img-top" alt="Standard Image">
+                <div class="card image-card" style="animation: cardEntry 0.6s ease-out {{ forloop.counter|add:"-1"|divisibleby:"3"|yesno:"0.2s,0.4s,0.6s" }} forwards; opacity: 0;">
+                    <img src="{{ image.standard_image.url }}" class="card-img-top" alt="Standard Image">
                     <div class="card-body">
                         <h5 class="card-title">{{ image.facility }}</h5>
                         <a href="{% url 'standard_image_ev_details' image.id %}" class="btn btn-info">📄 Details</a>
@@ -85,13 +251,17 @@
                 </div>
             </div>
         {% empty %}
-            <p>No standard images found.</p>
+            <div class="col-12">
+                <div class="empty-state">
+                    <p>🌟 No standard images found. Try a different search or upload new images.</p>
+                </div>
+            </div>
         {% endfor %}
     </div>
 
-    <!-- ✅ Pagination Controls -->
+    <!-- Pagination Controls -->
     <nav>
-        <ul class="pagination justify-content-center">
+        <ul class="pagination">
             {% if s_standard.has_previous %}
                 <li class="page-item"><a class="page-link" href="?page=1&search={{ search_query }}&sort={{ sort_order }}">First</a></li>
                 <li class="page-item"><a class="page-link" href="?page={{ s_standard.previous_page_number }}&search={{ search_query }}&sort={{ sort_order }}">Previous</a></li>
@@ -106,4 +276,45 @@
         </ul>
     </nav>
 </div>
+
+<script>
+    // Add scroll animation to cards
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.image-card');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0) rotate(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        cards.forEach(card => {
+            observer.observe(card);
+        });
+
+        // Add ripple effect to buttons
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const x = e.clientX - e.target.getBoundingClientRect().left;
+                const y = e.clientY - e.target.getBoundingClientRect().top;
+
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple-effect');
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+
+                this.appendChild(ripple);
+
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+    });
+</script>
+
 {% endblock %}
