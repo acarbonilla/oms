@@ -1,31 +1,219 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-<div class="container mt-4">
-    <h2 class="mb-3">{{ s_image.facility.name }} - Standard Image</h2>
+    :root {
+        --primary-color: #4f46e5;
+        --primary-light: #6366f1;
+        --secondary-color: #10b981;
+        --accent-color: #f59e0b;
+        --dark-color: #1e293b;
+        --light-color: #f8fafc;
+    }
 
-    <div class="row">
-        <!-- ✅ Left Side: Information -->
-        <div class="col-md-6">
-            <ul class="list-group">
-                <li class="list-group-item"><strong>Facility Name:</strong> {{ s_image.facility.name }}</li>
-                <li class="list-group-item"><strong>Last Updated:</strong> {{ s_image.updated|date:"F j, Y, g:i a" }}
-                </li>
-                <li class="list-group-item"><strong>Created:</strong> {{ s_image.created|date:"F j, Y, g:i a" }}</li>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    }
 
-            </ul>
-        </div>
+    .container {
+        max-width: 1200px;
+        margin-top: 2rem;
+        animation: fadeIn 0.8s ease-out;
+    }
 
-        <!-- ✅ Right Side: Image -->
-        <div class="col-md-6 text-center">
-            <img alt="Standard Image" class="img-fluid rounded shadow" src="{{ s_image.standard_image.url }}"
-                 style="max-width: 90%; height: auto;"
-                 width="500">
+    h2 {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+        text-align: center;
+    }
+
+    h2:after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 0;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        border-radius: 2px;
+    }
+
+    .detail-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .detail-container:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .info-list {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .list-group-item {
+        border: none;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        padding: 1.25rem 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+
+    .list-group-item:hover {
+        background-color: #f8fafc;
+        transform: translateX(5px);
+    }
+
+    .list-group-item strong {
+        color: var(--primary-color);
+        min-width: 120px;
+        display: inline-block;
+    }
+
+    .standard-image-container {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .standard-image-container:hover {
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .standard-image {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+        border-radius: 12px;
+        transition: all 0.5s ease;
+    }
+
+    .standard-image-container:hover .standard-image {
+        transform: scale(1.02);
+    }
+
+    .back-btn {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(79, 70, 229, 0.1);
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .back-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(79, 70, 229, 0.2);
+        color: white;
+        text-decoration: none;
+    }
+
+    .back-btn i {
+        margin-right: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .back-btn:hover i {
+        transform: translateX(-3px);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .list-group-item {
+            padding: 1rem;
+        }
+
+        .list-group-item strong {
+            min-width: 100px;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .standard-image-container {
+            margin-top: 1.5rem;
+        }
+    }
+</style>
+
+<div class="container">
+    <h2>📸 {{ s_image.facility.name }} - Standard Image</h2>
+
+    <div class="detail-container">
+        <div class="row">
+            <!-- Left Side: Information -->
+            <div class="col-md-6">
+                <ul class="list-group info-list">
+                    <li class="list-group-item">
+                        <strong>Facility Name:</strong>
+                        <span>{{ s_image.facility.name }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Last Updated:</strong>
+                        <span>{{ s_image.updated|date:"F j, Y, g:i a" }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Created:</strong>
+                        <span>{{ s_image.created|date:"F j, Y, g:i a" }}</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Right Side: Image -->
+            <div class="col-md-6">
+                <div class="standard-image-container">
+                    <img src="{{ s_image.standard_image.url }}"
+                         alt="Standard Image for {{ s_image.facility.name }}"
+                         class="standard-image">
+                </div>
+            </div>
         </div>
     </div>
 
-    <a class="btn btn-secondary mt-3" href="{% url 'standard_image_ev' %}">Back to List</a>
+    <a href="{% url 'standard_image_ev' %}" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Back to List
+    </a>
 </div>
+
+<script>
+    // Add animation to image on load
+    document.addEventListener('DOMContentLoaded', function() {
+        const image = document.querySelector('.standard-image');
+        image.style.opacity = '0';
+        image.style.transform = 'scale(0.95)';
+
+        setTimeout(() => {
+            image.style.transition = 'all 0.6s ease-out';
+            image.style.opacity = '1';
+            image.style.transform = 'scale(1)';
+        }, 100);
+    });
+</script>
 
 {% endblock %}
