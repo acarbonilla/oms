@@ -239,12 +239,13 @@
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="topA" role="button" data-bs-toggle="dropdown">
                         <div class="avatar-circle-sm bg-gradient-primary me-2">
                             <!--{{ user.first_name|first|upper }} -->
+                             <i class="fas fa-user-circle" style="font-size: 1.2rem;"></i>
                         </div>
                         <span>{{ user.first_name }}</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" id="ulID">
                         <li><a class="dropdown-item" href="{% url 'omsLogout'%}">
-                           Sign Out</a></li>
+                           <i class="fas fa-sign-out-alt me-2"></i> Sign Out</a></li>
                         {% else %}
                         <li><a class="dropdown-item" href="{% url 'omsLogin'%}">Login</a></li>
                         {% endif %}
