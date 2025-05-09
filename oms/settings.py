@@ -1,28 +1,14 @@
 import os
 from pathlib import Path
-import environ
+from environ import Env
 
-env = environ.Env(
-    # set casting, default value
-    DEBUG=(bool, False)
-)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+env = Env()
+env.read_env(os.path.join(BASE_DIR, '.env'))  # Explicitly point to the .env file
 
-# Read .env file
-# environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
-# SECURITY WARNING: don't run with debug turned on in production!
-
-# Usage
-
-DEBUG = env('DEBUG')
-
-SECRET_KEY = env('SECRET_KEY')
-
+SECRET_KEY = env('DJANGO_SECRET_KEY')
+DEBUG = env.bool('DEBUG', default=False)
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
