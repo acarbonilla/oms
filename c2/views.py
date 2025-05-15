@@ -1069,6 +1069,7 @@ def tech_activity_download(request):
     search_query = request.GET.get("search", "")
     filter_option = request.GET.get("filter", "all")
     page_number = request.GET.get("page", 1)
+    page_size = int(request.GET.get("page_size", 10))  # Default to 10 items per page
 
     today = now()
 
@@ -1083,20 +1084,43 @@ def tech_activity_download(request):
         start_date = None
 
     # Apply filters
-    activities = C2TechActivities.objects.all().prefetch_related("images")
+    activities = C2TechActivities.objects.all().prefetch_related("images").order_by('-created')
     if start_date:
         activities = activities.filter(created__gte=start_date)
     if search_query:
         activities = activities.filter(name__icontains=search_query)
 
-    # Add pagination
-    paginator = Paginator(activities, 10)  # Show 10 activities per page
+    # Add pagination with dynamic page size
+    paginator = Paginator(activities, page_size)
     activities_page = paginator.get_page(page_number)
+
+    # Calculate visible page range (show 5 pages around current page)
+    page_range = []
+    current_page = activities_page.number
+    total_pages = paginator.num_pages
+
+    # Always show first page
+    if current_page > 3:
+        page_range.append(1)
+        if current_page > 4:
+            page_range.append(None)  # Represents ellipsis
+
+    # Show pages around current page
+    for i in range(max(1, current_page - 2), min(total_pages + 1, current_page + 3)):
+        page_range.append(i)
+
+    # Always show last page
+    if current_page < total_pages - 2:
+        if current_page < total_pages - 3:
+            page_range.append(None)  # Represents ellipsis
+        page_range.append(total_pages)
 
     context = {
         "activities": activities_page,
         "filter_option": filter_option,
         "search_query": search_query,
+        "page_size": page_size,
+        "page_range": page_range,
         "title": "Download Technical Activities"
     }
 
