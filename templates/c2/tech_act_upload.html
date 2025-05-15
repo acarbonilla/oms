@@ -1,66 +1,341 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-3">Upload Technical Activity</h2>
-    <form class="card p-4 shadow-sm" enctype="multipart/form-data" method="post">
-        {% csrf_token %}
+<style>
+    /* Enhanced Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
-        <div class="mb-3">
-            <label class="form-label" for="id_name">Activity Name:</label>
-            <input class="form-control" id="id_name" name="name" placeholder="Enter activity name"
-                   type="text" required>
-        </div>
+    @keyframes slideIn {
+        from { transform: translateX(-20px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
 
-        <div class="mb-3">
-            <label class="form-label" for="id_location">Location:</label>
-            <input class="form-control" id="id_location" name="location" placeholder="Enter location"
-                   required type="text">
-        </div>
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
 
-        <div class="mb-3">
-            <label class="form-label">Image Input Method:</label><br>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="input_method" id="uploadRadio" value="upload" checked>
-                <label class="form-check-label" for="uploadRadio">Upload</label>
+    /* Enhanced Card Styles */
+    .upload-card {
+        animation: fadeInUp 0.6s ease-out forwards;
+        border: none;
+        border-radius: 15px;
+        background: linear-gradient(145deg, #ffffff, #f5f7fa);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .upload-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+    }
+
+    /* Title Styles */
+    .page-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 10px;
+    }
+
+    .page-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(90deg, #007bff, #00d2ff);
+        border-radius: 2px;
+    }
+
+    /* Form Controls */
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 12px;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        transform: translateY(-2px);
+    }
+
+    /* Input Method Selection */
+    .input-method-container {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+
+    .method-option {
+        flex: 1;
+        max-width: 200px;
+        text-align: center;
+        padding: 20px;
+        border-radius: 12px;
+        background: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        animation: slideIn 0.5s ease-out forwards;
+    }
+
+    .method-option:hover {
+        background: #e9ecef;
+        transform: translateY(-3px);
+    }
+
+    .method-option input[type="radio"] {
+        display: none;
+    }
+
+    .method-option input[type="radio"]:checked + label {
+        color: #007bff;
+        font-weight: bold;
+    }
+
+    .method-option i {
+        font-size: 24px;
+        margin-bottom: 10px;
+        color: #6c757d;
+        transition: color 0.3s ease;
+    }
+
+    .method-option:hover i {
+        color: #007bff;
+    }
+
+    /* Preview Containers */
+    .preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .preview-item {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .preview-item:hover {
+        transform: translateY(-3px);
+    }
+
+    .preview-item img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 12px;
+    }
+
+    .delete-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .delete-btn:hover {
+        background: #dc3545;
+        color: white;
+    }
+
+    /* Camera Section */
+    .camera-section {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .camera-preview {
+        width: 100%;
+        max-width: 500px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin: 0 auto;
+    }
+
+    /* Action Buttons */
+    .action-btn {
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .btn-capture {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        border: none;
+        color: white;
+    }
+
+    .btn-submit {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        border: none;
+        color: white;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Helper Text */
+    .helper-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Error Messages */
+    .error-message {
+        animation: fadeInUp 0.4s ease-out;
+        border-radius: 10px;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="upload-card p-4">
+                <h2 class="text-center page-title">
+                    <i class="fas fa-tasks me-2"></i>Upload Technical Activity
+                </h2>
+
+                <form enctype="multipart/form-data" method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" for="id_name">
+                            <i class="fas fa-clipboard me-2"></i>Activity Name
+                        </label>
+                        <input class="form-control" id="id_name" name="name" 
+                               placeholder="Enter activity name" type="text" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" for="id_location">
+                            <i class="fas fa-map-marker-alt me-2"></i>Location
+                        </label>
+                        <input class="form-control" id="id_location" name="location" 
+                               placeholder="Enter location" required type="text">
+                    </div>
+
+                    <div class="input-method-container">
+                        <div class="method-option">
+                            <input type="radio" name="input_method" id="uploadRadio" value="upload" checked>
+                            <label for="uploadRadio">
+                                <i class="fas fa-file-upload d-block mb-2"></i>
+                                Upload Images
+                            </label>
+                        </div>
+                        <div class="method-option">
+                            <input type="radio" name="input_method" id="cameraRadio" value="camera">
+                            <label for="cameraRadio">
+                                <i class="fas fa-camera d-block mb-2"></i>
+                                Use Camera
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Upload Section -->
+                    <div class="mb-4" id="upload-section">
+                        <label class="form-label fw-bold" for="image-input">
+                            <i class="fas fa-images me-2"></i>Upload Images
+                        </label>
+                        <input type="file" class="form-control" name="image" id="image-input" 
+                               multiple accept="image/*">
+                        <div class="helper-text">
+                            <i class="fas fa-info-circle"></i>
+                            Maximum 10 images, each up to 5MB
+                        </div>
+                    </div>
+
+                    <!-- Camera Section -->
+                    <div class="camera-section d-none" id="camera-section">
+                        <div id="camera-error" class="error-message alert alert-danger d-none"></div>
+                        
+                        <div class="camera-controls mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-video me-2"></i>Camera Settings
+                            </label>
+                            <select class="form-select mb-2" id="camera-select">
+                                <option value="">Loading cameras...</option>
+                            </select>
+                            <select class="form-select" id="resolution-select">
+                                <option value="high">High Quality</option>
+                                <option value="medium" selected>Medium Quality</option>
+                                <option value="low">Low Quality</option>
+                            </select>
+                        </div>
+
+                        <div class="camera-preview mb-3">
+                            <video id="cameraPreview" autoplay playsinline style="width: 100%;"></video>
+                        </div>
+
+                        <div class="text-center mb-3">
+                            <button type="button" class="action-btn btn-capture" id="captureBtn">
+                                <i class="fas fa-camera me-2"></i>Capture Photo
+                            </button>
+                        </div>
+
+                        <input type="hidden" name="captured_images" id="captured-images">
+                        <div class="preview-container" id="captured-images-preview"></div>
+                        
+                        <div class="helper-text">
+                            <i class="fas fa-info-circle"></i>
+                            Maximum 10 photos allowed
+                        </div>
+                    </div>
+
+                    <!-- Image Previews -->
+                    <div class="preview-container" id="preview-container"></div>
+
+                    <div class="text-center mt-4">
+                        <button class="action-btn btn-submit" type="submit">
+                            <i class="fas fa-upload me-2"></i>Upload Activity
+                        </button>
+                    </div>
+                </form>
             </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="input_method" id="cameraRadio" value="camera">
-                <label class="form-check-label" for="cameraRadio">Camera</label>
-            </div>
         </div>
-
-        <!-- Upload Section -->
-        <div class="mb-3" id="upload-section">
-            <label class="form-label" for="image-input">Upload Images:</label>
-            <input type="file" name="image" id="image-input" multiple accept="image/*">
-            <small class="text-muted d-block">Maximum 10 images, each up to 5MB</small>
-        </div>
-
-        <!-- Camera Section -->
-        <div class="mb-3 d-none" id="camera-section">
-            <div id="camera-error" class="alert alert-danger d-none"></div>
-            <div class="camera-controls mb-2">
-                <select class="form-select mb-2" id="camera-select">
-                    <option value="">Loading cameras...</option>
-                </select>
-                <select class="form-select mb-2" id="resolution-select">
-                    <option value="high">High Quality</option>
-                    <option value="medium" selected>Medium Quality</option>
-                    <option value="low">Low Quality</option>
-                </select>
-            </div>
-            <video id="cameraPreview" autoplay playsinline style="width: 100%; max-width: 400px;"></video>
-            <button type="button" class="btn btn-secondary mt-2" id="captureBtn">Capture Photo</button>
-            <input type="hidden" name="captured_images" id="captured-images">
-            <div class="d-flex flex-wrap mt-2" id="captured-images-preview"></div>
-            <small class="text-muted d-block">Maximum 10 photos allowed</small>
-        </div>
-
-        <!-- Image Previews -->
-        <div class="d-flex flex-wrap" id="preview-container"></div>
-
-        <button class="btn btn-primary mt-3" type="submit">Upload Activity</button>
-    </form>
+    </div>
 </div>
 
 <script>
@@ -175,48 +450,50 @@
         const context = canvas.getContext('2d');
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Compress image if needed
         let quality = 0.8;
         let base64Image = canvas.toDataURL('image/jpeg', quality);
         
-        // Create preview container
         const container = document.createElement('div');
-        container.className = 'position-relative m-2';
+        container.className = 'preview-item';
         
         const img = document.createElement('img');
         img.src = base64Image;
-        img.style.width = '100px';
-        img.style.height = '100px';
-        img.style.objectFit = 'cover';
-        img.style.borderRadius = '8px';
-        img.style.boxShadow = '0 0 5px rgba(0,0,0,0.2)';
         
-        // Add delete button
         const deleteBtn = document.createElement('button');
-        deleteBtn.innerHTML = '×';
-        deleteBtn.className = 'btn btn-danger btn-sm position-absolute top-0 end-0';
-        deleteBtn.style.padding = '0 6px';
+        deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+        deleteBtn.className = 'delete-btn';
         deleteBtn.onclick = (e) => {
             e.preventDefault();
-            const index = capturedImages.indexOf(base64Image);
-            if (index > -1) {
-                capturedImages.splice(index, 1);
-                container.remove();
-                capturedImagesInput.value = JSON.stringify(capturedImages);
-            }
+            container.style.opacity = '0';
+            container.style.transform = 'scale(0.8)';
+            setTimeout(() => {
+                const index = capturedImages.indexOf(base64Image);
+                if (index > -1) {
+                    capturedImages.splice(index, 1);
+                    container.remove();
+                    capturedImagesInput.value = JSON.stringify(capturedImages);
+                }
+            }, 300);
         };
         
         container.appendChild(img);
         container.appendChild(deleteBtn);
         capturedImagesPreview.appendChild(container);
 
+        // Animation
+        container.style.opacity = '0';
+        container.style.transform = 'scale(0.8)';
+        setTimeout(() => {
+            container.style.opacity = '1';
+            container.style.transform = 'scale(1)';
+        }, 50);
+
         capturedImages.push(base64Image);
         capturedImagesInput.value = JSON.stringify(capturedImages);
         hideError();
     });
 
-    // Handle file upload preview
-    document.getElementById('image-input').addEventListener('change', function (event) {
+    document.getElementById('image-input').addEventListener('change', function(event) {
         const files = Array.from(event.target.files);
         
         if (files.length > MAX_IMAGES) {
@@ -225,7 +502,6 @@
             return;
         }
 
-        // Check file sizes
         const oversizedFiles = files.filter(file => file.size > MAX_IMAGE_SIZE);
         if (oversizedFiles.length > 0) {
             alert(`Some files exceed the ${MAX_IMAGE_SIZE / 1024 / 1024}MB limit:\n${oversizedFiles.map(f => f.name).join('\n')}`);
@@ -236,22 +512,25 @@
         const previewContainer = document.getElementById('preview-container');
         previewContainer.innerHTML = '';
 
-        files.forEach(file => {
+        files.forEach((file, index) => {
             const reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = function(e) {
                 const container = document.createElement('div');
-                container.className = 'position-relative m-2';
+                container.className = 'preview-item';
+                container.style.opacity = '0';
+                container.style.transform = 'scale(0.8)';
                 
                 const img = document.createElement('img');
                 img.src = e.target.result;
-                img.style.width = '100px';
-                img.style.height = '100px';
-                img.style.objectFit = 'cover';
-                img.style.borderRadius = '8px';
-                img.style.boxShadow = '0 0 5px rgba(0,0,0,0.2)';
                 
                 container.appendChild(img);
                 previewContainer.appendChild(container);
+
+                // Staggered animation
+                setTimeout(() => {
+                    container.style.opacity = '1';
+                    container.style.transform = 'scale(1)';
+                }, 50 * index);
             };
             reader.readAsDataURL(file);
         });
