@@ -785,59 +785,178 @@ def not_visited_facilities_listDanao(request):
 @login_required(login_url='omsLogin')
 def tech_act_uploadDanao(request, pk=None):
     tech = get_object_or_404(DanaoTechActivities, id=pk) if pk else None
+    MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
+    MAX_IMAGES = 10
+    ALLOWED_MIME_TYPES = {'image/jpeg', 'image/png', 'image/gif', 'image/webp'}
+    MIN_IMAGE_SIZE = 10 * 1024  # 10KB
 
     if request.method == "POST":
         form = DanaoTechnicalActivitiesForm(request.POST, instance=tech)
 
-        if form.is_valid():
-            try:
+        try:
+            if form.is_valid():
                 tech_activity = form.save(commit=False)
                 tech_activity.uploaded_by = DanaoUser.objects.get(name__id=request.user.id)
-                print(tech_activity.uploaded_by)
                 tech_activity.save()
-                print("Activity saved:", tech_activity.id)
-            except DanaoUser.DoesNotExist:
-                print("No DanaoUser found for:", request.user.id)
-                return redirect('activity_listDanao')
 
-            # Handle uploaded image files
-            files = request.FILES.getlist('image')
-            print("FILES:", files)
-            print("Uploaded file count:", len(files))  # Debug to check file count
+                uploaded_images = 0
+                errors = []
 
-            for file in files:
-                DanaoTechActivityImage.objects.create(activity=tech_activity, image=file)
+                # Handle uploaded image files
+                files = request.FILES.getlist('image')
+                if len(files) > MAX_IMAGES:
+                    messages.error(request, f'Maximum {MAX_IMAGES} images allowed')
+                    return redirect('tech_act_upload')
 
-            if not files:
-                print("No files uploaded.")
-            else:
                 for file in files:
-                    print(f"Processing file: {file.name}")
-                    DanaoTechActivityImage.objects.create(activity=tech_activity, image=file)
-                    print(f"Saved image: {file.name}")
-            # Handle captured images (Base64 format)
-            captured_images = request.POST.get('captured_images')
-            if captured_images:
-                images = json.loads(captured_images)
-                print(f"Captured base64 images: {len(images)}")  # Debug for number of captured images
-                for idx, img_data in enumerate(images):
-                    print(f"Processing captured image {idx}")
-                    format, imgstr = img_data.split(';base64,')
-                    ext = format.split('/')[-1]
-                    file_data = ContentFile(base64.b64decode(imgstr), name=f"captured_{tech_activity.id}_{idx}.{ext}")
-                    DanaoTechActivityImage.objects.create(activity=tech_activity, image=file_data)
-                    print(f"Saved captured image {idx}")
+                    try:
+                        # Validate file size
+                        if file.size > MAX_IMAGE_SIZE:
+                            errors.append(f'File {file.name} exceeds 5MB limit')
+                            continue
+
+                        if file.size < MIN_IMAGE_SIZE:
+                            errors.append(f'File {file.name} is too small (minimum 10KB)')
+                            continue
+
+                        # Validate file type
+                        if not file.content_type.startswith('image/'):
+                            errors.append(f'File {file.name} is not an image')
+                            continue
+
+                        # Additional MIME type validation
+                        if file.content_type not in ALLOWED_MIME_TYPES:
+                            errors.append(
+                                f'File {file.name} format not supported. Allowed formats: JPEG, PNG, GIF, WebP')
+                            continue
+
+                        # Validate image integrity
+                        try:
+                            from PIL import Image
+                            img = Image.open(file)
+                            img.verify()  # Verify image integrity
+
+                            # Check minimum dimensions
+                            if img.width < 100 or img.height < 100:
+                                errors.append(f'File {file.name} dimensions too small (minimum 100x100)')
+                                continue
+
+                            # Check maximum dimensions
+                            if img.width > 4096 or img.height > 4096:
+                                errors.append(f'File {file.name} dimensions too large (maximum 4096x4096)')
+                                continue
+
+                        except Exception as e:
+                            errors.append(f'File {file.name} appears to be corrupted')
+                            continue
+
+                        DanaoTechActivityImage.objects.create(activity=tech_activity, image=file)
+                        uploaded_images += 1
+                    except Exception as e:
+                        errors.append(f'Error uploading {file.name}: {str(e)}')
+
+                # Handle captured images (Base64 format)
+                captured_images = request.POST.get('captured_images')
+                if captured_images:
+                    try:
+                        images = json.loads(captured_images)
+                        if len(images) + uploaded_images > MAX_IMAGES:
+                            messages.error(request, f'Total images exceed maximum limit of {MAX_IMAGES}')
+                            tech_activity.delete()
+                            return redirect('tech_act_upload')
+
+                        for idx, img_data in enumerate(images):
+                            try:
+                                # Validate base64 image
+                                if not img_data.startswith('data:image/'):
+                                    errors.append(f'Invalid image format for captured image {idx + 1}')
+                                    continue
+
+                                format, imgstr = img_data.split(';base64,')
+                                ext = format.split('/')[-1]
+
+                                # Validate image format
+                                if not f'image/{ext}' in ALLOWED_MIME_TYPES:
+                                    errors.append(f'Captured image {idx + 1} format not supported')
+                                    continue
+
+                                # Decode and validate size
+                                decoded_image = base64.b64decode(imgstr)
+                                if len(decoded_image) > MAX_IMAGE_SIZE:
+                                    errors.append(f'Captured image {idx + 1} exceeds 5MB limit')
+                                    continue
+
+                                if len(decoded_image) < MIN_IMAGE_SIZE:
+                                    errors.append(f'Captured image {idx + 1} is too small (minimum 10KB)')
+                                    continue
+
+                                # Validate image integrity
+                                try:
+                                    from PIL import Image
+                                    import io
+                                    img = Image.open(io.BytesIO(decoded_image))
+                                    img.verify()  # Verify image integrity
+
+                                    # Check minimum dimensions
+                                    if img.width < 100 or img.height < 100:
+                                        errors.append(
+                                            f'Captured image {idx + 1} dimensions too small (minimum 100x100)')
+                                        continue
+
+                                    # Check maximum dimensions
+                                    if img.width > 4096 or img.height > 4096:
+                                        errors.append(
+                                            f'Captured image {idx + 1} dimensions too large (maximum 4096x4096)')
+                                        continue
+
+                                except Exception as e:
+                                    errors.append(f'Captured image {idx + 1} appears to be corrupted')
+                                    continue
+
+                                file_data = ContentFile(decoded_image, name=f"captured_{tech_activity.id}_{idx}.{ext}")
+                                DanaoTechActivityImage.objects.create(activity=tech_activity, image=file_data)
+                                uploaded_images += 1
+                            except Exception as e:
+                                errors.append(f'Error processing captured image {idx + 1}: {str(e)}')
+
+                    except json.JSONDecodeError:
+                        errors.append('Invalid captured images data')
+
+                if uploaded_images == 0:
+                    tech_activity.delete()
+                    messages.error(request, 'No valid images were uploaded')
+                    if errors:
+                        for error in errors:
+                            messages.warning(request, error)
+                    return redirect('tech_act_upload')
+
+                messages.success(request, f'Successfully uploaded {uploaded_images} images')
+                if errors:
+                    for error in errors:
+                        messages.warning(request, error)
+
+                return redirect('activity_list')
             else:
-                print("No base64 images received.")
+                for field, error_list in form.errors.items():
+                    for error in error_list:
+                        messages.error(request, f'{field}: {error}')
+                return redirect('tech_act_upload')
 
-            return redirect('activity_listDanao')
-
+        except DanaoUser.DoesNotExist:
+            messages.error(request, 'User not found')
+            return redirect('tech_act_upload')
+        except Exception as e:
+            messages.error(request, str(e))
+            return redirect('tech_act_upload')
     else:
         form = DanaoTechnicalActivitiesForm(instance=tech)
-    print("Current user ID:", request.user.id)
 
-    return render(request, "danao/general/danao_tech_act_upload.html",
-                  {"activity_form": form, "title": "Tech-Activity Form"})
+    return render(request, "danao/general/danao_tech_act_upload.html", {
+        "activity_form": form,
+        "title": "Tech-Activity Form",
+        "max_images": MAX_IMAGES,
+        "max_image_size": MAX_IMAGE_SIZE
+    })
 
 
 # This is for tech view list
@@ -924,3 +1043,274 @@ def facility_listDanao(request):
         'page_obj': page_obj,
         'query': query
     })
+
+
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
+@login_required(login_url='omsLogin')
+def danao_tech_activity_download(request):
+    """View for selecting technical activities to download as PDF."""
+    search_query = request.GET.get("search", "")
+    filter_option = request.GET.get("filter", "all")
+    page_number = request.GET.get("page", 1)
+    page_size = int(request.GET.get("page_size", 10))  # Default to 10 items per page
+
+    today = now()
+
+    # Determine filter date range
+    if filter_option == "week":
+        start_date = today - timedelta(days=7)
+    elif filter_option == "month":
+        start_date = today - timedelta(days=30)
+    elif filter_option == "year":
+        start_date = today - timedelta(days=365)
+    else:
+        start_date = None
+
+    # Apply filters
+    activities = DanaoTechActivities.objects.all().prefetch_related("imagesDanao").order_by('-created')
+    if start_date:
+        activities = activities.filter(created__gte=start_date)
+    if search_query:
+        activities = activities.filter(name__icontains=search_query)
+
+    # Add pagination with dynamic page size
+    paginator = Paginator(activities, page_size)
+    activities_page = paginator.get_page(page_number)
+
+    # Calculate visible page range (show 5 pages around current page)
+    page_range = []
+    current_page = activities_page.number
+    total_pages = paginator.num_pages
+
+    # Always show first page
+    if current_page > 3:
+        page_range.append(1)
+        if current_page > 4:
+            page_range.append(None)  # Represents ellipsis
+
+    # Show pages around current page
+    for i in range(max(1, current_page - 2), min(total_pages + 1, current_page + 3)):
+        page_range.append(i)
+
+    # Always show last page
+    if current_page < total_pages - 2:
+        if current_page < total_pages - 3:
+            page_range.append(None)  # Represents ellipsis
+        page_range.append(total_pages)
+
+    context = {
+        "activities": activities_page,
+        "filter_option": filter_option,
+        "search_query": search_query,
+        "page_size": page_size,
+        "page_range": page_range,
+        "title": "Download Technical Activities"
+    }
+
+    return render(request, "danao/general/danao_tech_activity_download.html", context)
+
+
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
+@login_required(login_url='omsLogin')
+def danao_tech_activity_pdf(request):
+    """Generate PDF for selected technical activities."""
+    selected_ids = request.GET.getlist("selected_ids", [])
+    download_all = request.GET.get("download_all") == "true"
+    include_images = request.GET.get("include_images") == "on"
+    include_details = request.GET.get("include_details") == "on"
+    page_size = request.GET.get("page_size", "letter")
+    orientation = request.GET.get("orientation", "portrait")
+    search_query = request.GET.get("search", "")
+    filter_option = request.GET.get("filter", "all")
+
+    # Get activities based on filters
+    activities = DanaoTechActivities.objects.all().prefetch_related("imagesDanao")
+
+    if not download_all:
+        if not selected_ids:
+            messages.error(request, "Please select at least one activity to download.")
+            return redirect('tech_activity_download')
+        activities = activities.filter(id__in=selected_ids)
+
+    # Apply search and time filters
+    if search_query:
+        activities = activities.filter(name__icontains=search_query)
+
+    today = now()
+    if filter_option == "week":
+        activities = activities.filter(created__gte=today - timedelta(days=7))
+    elif filter_option == "month":
+        activities = activities.filter(created__gte=today - timedelta(days=30))
+    elif filter_option == "year":
+        activities = activities.filter(created__gte=today - timedelta(days=365))
+
+    if not activities.exists():
+        messages.error(request, "No activities found matching your criteria.")
+        return redirect('tech_activity_download')
+
+    # Create PDF
+    buffer = BytesIO()
+
+    # Set up the PDF with proper page size
+    if page_size == "a4":
+        page_size_tuple = A4
+    elif page_size == "legal":
+        page_size_tuple = LEGAL
+    else:  # default to letter
+        page_size_tuple = letter
+
+    if orientation == "landscape":
+        page_size_tuple = landscape(page_size_tuple)
+
+    pdf = canvas.Canvas(buffer, pagesize=page_size_tuple)
+    width, height = page_size_tuple
+
+    # Track page number
+    page_num = 1
+
+    def add_page_header():
+        """Add header to each page"""
+        # Add page number at bottom of each page
+        pdf.drawString(width / 2 - 20, 30, f"Page {page_num}")
+
+    def start_new_page():
+        """Start a new page with header"""
+        nonlocal page_num
+        pdf.showPage()
+        page_num += 1
+        pdf.setFont("Helvetica", 12)
+        add_page_header()
+        return height - 100
+
+    # Add initial header
+    add_page_header()
+
+    # Add title with date range
+    pdf.setFont("Helvetica-Bold", 16)
+    title = "Technical Activities Report"
+    if filter_option != "all":
+        title += f" - Last {filter_option.title()}"
+    pdf.drawString(width / 2 - 100, height - 50, title)
+
+    pdf.setFont("Helvetica", 12)
+    if search_query:
+        pdf.drawString(50, height - 80, f"Search: {search_query}")
+
+    y_position = height - 100
+
+    # Calculate image layout parameters based on page orientation
+    margin = 50  # page margin
+    spacing = 10  # space between images
+    if orientation == "landscape":
+        images_per_row = 3
+        max_image_height = 180
+    else:
+        images_per_row = 2
+        max_image_height = 150
+
+    usable_width = width - (2 * margin)
+    image_width = (usable_width - (spacing * (images_per_row - 1))) / images_per_row
+
+    for activity in activities:
+        # Check if we need a new page for activity header
+        if y_position < 150:
+            y_position = start_new_page()
+
+        # Activity details
+        if include_details:
+            # Draw activity header without background highlight
+            pdf.setFont("Helvetica-Bold", 14)
+            pdf.drawString(margin, y_position, f"Activity: {activity.name}")
+            pdf.setFont("Helvetica", 12)
+            y_position -= 20
+            pdf.drawString(margin, y_position, f"Location: {activity.location}")
+            y_position -= 20
+            pdf.drawString(margin, y_position, f"Date: {localtime(activity.created).strftime('%Y-%m-%d %H:%M')}")
+            y_position -= 20
+            # Add uploader information
+            uploader_name = f"{activity.uploaded_by.name.first_name} {activity.uploaded_by.name.last_name}" if activity.uploaded_by and activity.uploaded_by.name else "Unknown"
+            pdf.drawString(margin, y_position, f"Uploaded by: {uploader_name}")
+            y_position -= 30
+
+        # Images
+        if include_images and activity.imagesDanao.exists():
+            images = list(activity.imagesDanao.all())
+            current_image = 0
+            total_images = len(images)
+
+            while current_image < total_images:
+                # Check if we need a new page for images
+                if y_position < max_image_height + margin:
+                    y_position = start_new_page()
+
+                # Calculate how many images we can fit in this row
+                images_this_row = min(images_per_row, total_images - current_image)
+
+                # Calculate row width to center images
+                row_width = (images_this_row * image_width) + ((images_this_row - 1) * spacing)
+                x_start = (width - row_width) / 2
+
+                for i in range(images_this_row):
+                    try:
+                        image = images[current_image + i]
+                        x_position = x_start + (i * (image_width + spacing))
+
+                        # Draw image with preserved aspect ratio
+                        img_reader = ImageReader(image.image.path)
+                        img_width = img_reader.getSize()[0]
+                        img_height = img_reader.getSize()[1]
+                        aspect = img_width / img_height
+
+                        # Calculate dimensions to fit in allocated space
+                        if aspect > 1:  # landscape image
+                            final_width = image_width
+                            final_height = image_width / aspect
+                        else:  # portrait image
+                            final_height = min(max_image_height, image_width / aspect)
+                            final_width = final_height * aspect
+
+                        # Center image in its allocated space
+                        x_offset = x_position + (image_width - final_width) / 2
+                        y_offset = y_position - final_height
+
+                        pdf.drawImage(
+                            img_reader,
+                            x_offset,
+                            y_offset,
+                            width=final_width,
+                            height=final_height,
+                            preserveAspectRatio=True
+                        )
+
+                        # Add image caption with activity name and number
+                        pdf.setFont("Helvetica", 8)
+                        image_number = current_image + i + 1
+                        caption = f"{activity.name} ({image_number})"
+                        # Center the caption under the image
+                        caption_width = pdf.stringWidth(caption, "Helvetica", 8)
+                        caption_x = x_offset + (final_width - caption_width) / 2
+                        pdf.drawString(caption_x, y_offset - 10, caption)
+                        pdf.setFont("Helvetica", 12)
+
+                    except Exception as e:
+                        print(f"Error adding image: {e}")
+
+                current_image += images_this_row
+                y_position -= (max_image_height + spacing + 20)  # Move down for next row
+
+            y_position -= 20  # Extra space after images
+
+        # Add separator line between activities
+        pdf.setStrokeColor(colors.grey)
+        pdf.line(margin, y_position - 10, width - margin, y_position - 10)
+        y_position -= 30
+
+    pdf.save()
+    buffer.seek(0)
+
+    # Create response
+    response = HttpResponse(buffer, content_type="application/pdf")
+    filename = f"technical_activities_report_{today.strftime('%Y%m%d')}.pdf"
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+
+    return response

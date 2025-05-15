@@ -795,7 +795,7 @@ def tech_act_upload(request, pk=None):
 
     if request.method == "POST":
         form = TechnicalActivitiesForm(request.POST, instance=tech)
-        
+
         try:
             if form.is_valid():
                 tech_activity = form.save(commit=False)
@@ -817,7 +817,7 @@ def tech_act_upload(request, pk=None):
                         if file.size > MAX_IMAGE_SIZE:
                             errors.append(f'File {file.name} exceeds 5MB limit')
                             continue
-                        
+
                         if file.size < MIN_IMAGE_SIZE:
                             errors.append(f'File {file.name} is too small (minimum 10KB)')
                             continue
@@ -829,7 +829,8 @@ def tech_act_upload(request, pk=None):
 
                         # Additional MIME type validation
                         if file.content_type not in ALLOWED_MIME_TYPES:
-                            errors.append(f'File {file.name} format not supported. Allowed formats: JPEG, PNG, GIF, WebP')
+                            errors.append(
+                                f'File {file.name} format not supported. Allowed formats: JPEG, PNG, GIF, WebP')
                             continue
 
                         # Validate image integrity
@@ -837,17 +838,17 @@ def tech_act_upload(request, pk=None):
                             from PIL import Image
                             img = Image.open(file)
                             img.verify()  # Verify image integrity
-                            
+
                             # Check minimum dimensions
                             if img.width < 100 or img.height < 100:
                                 errors.append(f'File {file.name} dimensions too small (minimum 100x100)')
                                 continue
-                                
+
                             # Check maximum dimensions
                             if img.width > 4096 or img.height > 4096:
                                 errors.append(f'File {file.name} dimensions too large (maximum 4096x4096)')
                                 continue
-                                
+
                         except Exception as e:
                             errors.append(f'File {file.name} appears to be corrupted')
                             continue
@@ -876,18 +877,18 @@ def tech_act_upload(request, pk=None):
 
                                 format, imgstr = img_data.split(';base64,')
                                 ext = format.split('/')[-1]
-                                
+
                                 # Validate image format
                                 if not f'image/{ext}' in ALLOWED_MIME_TYPES:
                                     errors.append(f'Captured image {idx + 1} format not supported')
                                     continue
-                                
+
                                 # Decode and validate size
                                 decoded_image = base64.b64decode(imgstr)
                                 if len(decoded_image) > MAX_IMAGE_SIZE:
                                     errors.append(f'Captured image {idx + 1} exceeds 5MB limit')
                                     continue
-                                    
+
                                 if len(decoded_image) < MIN_IMAGE_SIZE:
                                     errors.append(f'Captured image {idx + 1} is too small (minimum 10KB)')
                                     continue
@@ -898,17 +899,19 @@ def tech_act_upload(request, pk=None):
                                     import io
                                     img = Image.open(io.BytesIO(decoded_image))
                                     img.verify()  # Verify image integrity
-                                    
+
                                     # Check minimum dimensions
                                     if img.width < 100 or img.height < 100:
-                                        errors.append(f'Captured image {idx + 1} dimensions too small (minimum 100x100)')
+                                        errors.append(
+                                            f'Captured image {idx + 1} dimensions too small (minimum 100x100)')
                                         continue
-                                        
+
                                     # Check maximum dimensions
                                     if img.width > 4096 or img.height > 4096:
-                                        errors.append(f'Captured image {idx + 1} dimensions too large (maximum 4096x4096)')
+                                        errors.append(
+                                            f'Captured image {idx + 1} dimensions too large (maximum 4096x4096)')
                                         continue
-                                        
+
                                 except Exception as e:
                                     errors.append(f'Captured image {idx + 1} appears to be corrupted')
                                     continue
@@ -1045,23 +1048,6 @@ def facility_list(request):
     })
 
 
-# This is for Errors
-def custom_403(request, exception=None):
-    return render(request, "forbidden/403.html", status=403)
-
-
-def custom_404(request, exception):
-    return render(request, "forbidden/404.html", status=404)
-
-
-def custom_500(request):
-    return render(request, "forbidden/500.html", status=500)
-
-
-def trigger_500(request):
-    raise ValueError("Intentional Server Error")
-
-
 @restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @login_required(login_url='omsLogin')
 def tech_activity_download(request):
@@ -1126,6 +1112,7 @@ def tech_activity_download(request):
 
     return render(request, "c2/tech_activity_download.html", context)
 
+
 @restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
 @login_required(login_url='omsLogin')
 def tech_activity_pdf(request):
@@ -1141,7 +1128,7 @@ def tech_activity_pdf(request):
 
     # Get activities based on filters
     activities = C2TechActivities.objects.all().prefetch_related("images")
-    
+
     if not download_all:
         if not selected_ids:
             messages.error(request, "Please select at least one activity to download.")
@@ -1166,7 +1153,7 @@ def tech_activity_pdf(request):
 
     # Create PDF
     buffer = BytesIO()
-    
+
     # Set up the PDF with proper page size
     if page_size == "a4":
         page_size_tuple = A4
@@ -1187,7 +1174,7 @@ def tech_activity_pdf(request):
     def add_page_header():
         """Add header to each page"""
         # Add page number at bottom of each page
-        pdf.drawString(width/2 - 20, 30, f"Page {page_num}")
+        pdf.drawString(width / 2 - 20, 30, f"Page {page_num}")
 
     def start_new_page():
         """Start a new page with header"""
@@ -1206,8 +1193,8 @@ def tech_activity_pdf(request):
     title = "Technical Activities Report"
     if filter_option != "all":
         title += f" - Last {filter_option.title()}"
-    pdf.drawString(width/2 - 100, height - 50, title)
-    
+    pdf.drawString(width / 2 - 100, height - 50, title)
+
     pdf.setFont("Helvetica", 12)
     if search_query:
         pdf.drawString(50, height - 80, f"Search: {search_query}")
@@ -1223,7 +1210,7 @@ def tech_activity_pdf(request):
     else:
         images_per_row = 2
         max_image_height = 150
-    
+
     usable_width = width - (2 * margin)
     image_width = (usable_width - (spacing * (images_per_row - 1))) / images_per_row
 
@@ -1261,7 +1248,7 @@ def tech_activity_pdf(request):
 
                 # Calculate how many images we can fit in this row
                 images_this_row = min(images_per_row, total_images - current_image)
-                
+
                 # Calculate row width to center images
                 row_width = (images_this_row * image_width) + ((images_this_row - 1) * spacing)
                 x_start = (width - row_width) / 2
@@ -1270,7 +1257,7 @@ def tech_activity_pdf(request):
                     try:
                         image = images[current_image + i]
                         x_position = x_start + (i * (image_width + spacing))
-                        
+
                         # Draw image with preserved aspect ratio
                         img_reader = ImageReader(image.image.path)
                         img_width = img_reader.getSize()[0]
@@ -1323,10 +1310,27 @@ def tech_activity_pdf(request):
 
     pdf.save()
     buffer.seek(0)
-    
+
     # Create response
     response = HttpResponse(buffer, content_type="application/pdf")
     filename = f"technical_activities_report_{today.strftime('%Y%m%d')}.pdf"
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
-    
+
     return response
+
+
+# This is for Errors
+def custom_403(request, exception=None):
+    return render(request, "forbidden/403.html", status=403)
+
+
+def custom_404(request, exception):
+    return render(request, "forbidden/404.html", status=404)
+
+
+def custom_500(request):
+    return render(request, "forbidden/500.html", status=500)
+
+
+def trigger_500(request):
+    raise ValueError("Intentional Server Error")

@@ -1,147 +1,518 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
 {% block content %}
-<div class="container mt-4">
-    <div class="card shadow-lg p-4">
-        <h2 class="mb-4 text-center text-primary">Upload Image for {{ facility.name }}</h2>
+<style>
+    /* Enhanced Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
-        <form class="needs-validation" enctype="multipart/form-data" method="POST" novalidate>
-            {% csrf_token %}
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
 
-            <!-- Title -->
-            <div class="mb-3">
-                <label class="form-label fw-bold">Title</label>
-                {% render_field form.title|add_class:"form-control" required="true" %}
+    @keyframes slideIn {
+        from { transform: translateX(-20px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Enhanced Card Styles */
+    .upload-card {
+        animation: fadeInUp 0.6s ease-out forwards;
+        border: none;
+        border-radius: 15px;
+        background: linear-gradient(145deg, #ffffff, #f5f7fa);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .upload-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+    }
+
+    /* Title Styles */
+    .page-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 10px;
+    }
+
+    .page-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(90deg, #007bff, #00d2ff);
+        border-radius: 2px;
+    }
+
+    /* Form Controls */
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 12px;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        transform: translateY(-2px);
+    }
+
+    /* Input Method Selection */
+    .input-method-container {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+
+    .method-option {
+        flex: 1;
+        max-width: 200px;
+        text-align: center;
+        padding: 20px;
+        border-radius: 12px;
+        background: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        animation: slideIn 0.5s ease-out forwards;
+    }
+
+    .method-option:hover {
+        background: #e9ecef;
+        transform: translateY(-3px);
+    }
+
+    .method-option input[type="radio"] {
+        display: none;
+    }
+
+    .method-option input[type="radio"]:checked + label {
+        color: #007bff;
+        font-weight: bold;
+    }
+
+    .method-option i {
+        font-size: 24px;
+        margin-bottom: 10px;
+        color: #6c757d;
+        transition: color 0.3s ease;
+    }
+
+    .method-option:hover i {
+        color: #007bff;
+    }
+
+    /* Enhanced Button Styles */
+    .action-btn {
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .btn-capture {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        border: none;
+        color: white;
+    }
+
+    .btn-retake {
+        background: linear-gradient(45deg, #ffc107, #fd7e14);
+        border: none;
+        color: white;
+    }
+
+    .btn-submit {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        border: none;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Preview Containers */
+    .preview-container {
+        position: relative;
+        margin-top: 20px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .preview-container img, .preview-container video {
+        width: 100%;
+        max-height: 400px;
+        object-fit: contain;
+        border-radius: 15px;
+        background-color: #f8f9fa;
+    }
+
+    /* Section Transitions */
+    .section-switch {
+        opacity: 0;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .section-switch.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Loading Indicator */
+    .loading-spinner {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+    }
+
+    .loading-spinner.show {
+        display: block;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="upload-card p-4">
+                <h2 class="text-center page-title">Upload Image for {{ facility.name }}</h2>
+
+                <form class="needs-validation" enctype="multipart/form-data" method="POST" novalidate id="uploadForm">
+                    {% csrf_token %}
+
+                    <!-- Title -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-heading me-2"></i>Title
+                        </label>
+                        {% render_field form.title|add_class:"form-control" placeholder="Enter a descriptive title" required="true" %}
+                    </div>
+
+                    <!-- Input Method Selection -->
+                    <div class="input-method-container">
+                        <div class="method-option">
+                            <input type="radio" name="input_method" id="uploadOption" value="upload" checked>
+                            <label for="uploadOption">
+                                <i class="fas fa-file-upload d-block mb-2"></i>
+                                Upload File
+                            </label>
+                        </div>
+                        <div class="method-option">
+                            <input type="radio" name="input_method" id="cameraOption" value="camera">
+                            <label for="cameraOption">
+                                <i class="fas fa-camera d-block mb-2"></i>
+                                Use Camera
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Upload Section -->
+                    <div id="uploadSection" class="section-switch mb-4">
+                        <div class="text-center">
+                            <label for="imageUpload" class="form-label fw-bold">
+                                <i class="fas fa-cloud-upload-alt me-2"></i>Select an image
+                            </label>
+                            <input type="file" accept="image/*" id="imageUpload" name="recent_image"
+                                   class="form-control" required>
+                            <div class="preview-container">
+                                <img id="imagePreview" style="display: none;" alt="Preview" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Camera Section -->
+                    <div id="cameraSection" class="section-switch" style="display:none;">
+                        <div class="preview-container mb-4">
+                            <video autoplay playsinline id="cameraPreview"></video>
+                        </div>
+
+                        <div class="text-center mb-4">
+                            <button class="action-btn btn-capture" id="captureBtn" type="button">
+                                <i class="fas fa-camera me-2"></i>Capture Photo
+                            </button>
+                            <button class="action-btn btn-retake" id="retakeBtn" type="button" style="display: none;">
+                                <i class="fas fa-redo me-2"></i>Retake
+                            </button>
+                        </div>
+
+                        <canvas id="canvas" style="display:none;"></canvas>
+                        <div class="preview-container">
+                            <img id="cameraImagePreview" style="display: none;" alt="Camera Preview" />
+                        </div>
+                    </div>
+
+                    <!-- Hidden input for captured image -->
+                    <input type="hidden" id="capturedImageData" name="captured_image_data">
+
+                    <!-- Action Buttons -->
+                    <div class="text-center mt-4">
+                        <button class="action-btn btn-submit btn-primary me-3" type="submit" id="submitBtn">
+                            <i class="fas fa-upload me-2"></i>Upload
+                        </button>
+                        <a class="action-btn btn btn-secondary" href="{% url 'facility_qr_uploadDanao' facility.id %}">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
             </div>
+        </div>
+    </div>
 
-            <!-- Radio Button for Option -->
-            <div class="mb-3">
-                <label class="form-label fw-bold">Choose Input Method</label>
-                <div>
-                    <input type="radio" name="input_method" id="uploadOption" value="upload" checked>
-                    <label for="uploadOption">Upload from File</label>
-                </div>
-                <div>
-                    <input type="radio" name="input_method" id="cameraOption" value="camera">
-                    <label for="cameraOption">Capture from Camera</label>
-                </div>
-            </div>
-
-            <!-- Upload from File -->
-            <div id="uploadSection" class="mb-3 text-center">
-                <label for="imageUpload" class="form-label fw-bold">Select an image</label>
-                <input type="file" accept="image/*" id="imageUpload" name="recent_image" class="form-control" required>
-                <img id="imagePreview" class="img-fluid border rounded shadow mt-3" style="max-width: 400px; display: none;" alt="Preview" />
-            </div>
-
-            <!-- Camera Capture Section -->
-            <div id="cameraSection" style="display:none;">
-                <div class="text-center mb-3">
-                    <video autoplay class="border rounded shadow" id="cameraPreview" style="width:100%; max-width: 400px;"></video>
-                </div>
-                <div class="text-center mb-3">
-                    <button class="btn btn-success" id="captureBtn" type="button"><i class="fas fa-camera"></i> Capture Photo</button>
-                </div>
-                <canvas id="canvas" style="display:none;"></canvas>
-                <!-- This hidden file input is updated with the camera capture -->
-                <input accept="image/*" capture="environment" id="cameraImageInput" name="recent_image" style="display:none;" type="file">
-            </div>
-
-            <!-- Buttons -->
-            <div class="text-center">
-                <button class="btn btn-primary px-4" type="submit"><i class="fas fa-upload"></i> Upload</button>
-                <a class="btn btn-secondary px-4" href="{% url 'facility_qr_upload' facility.id %}"><i class="fas fa-times"></i> Cancel</a>
-            </div>
-        </form>
+    <!-- Loading Spinner -->
+    <div class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
     </div>
 </div>
 
-<!-- JavaScript Section -->
 <script>
-    const uploadOption = document.getElementById("uploadOption");
-    const cameraOption = document.getElementById("cameraOption");
-    const uploadSection = document.getElementById("uploadSection");
-    const cameraSection = document.getElementById("cameraSection");
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploadForm = document.getElementById("uploadForm");
+        
+        // Ensure form uses HTTP
+        if (uploadForm) {
+            let formAction = uploadForm.action;
+            if (formAction.startsWith('https:')) {
+                formAction = formAction.replace('https:', 'http:');
+                uploadForm.action = formAction;
+            }
 
-    const video = document.getElementById("cameraPreview");
-    const captureBtn = document.getElementById("captureBtn");
-    const canvas = document.getElementById("canvas");
-    const imageUploadFromCamera = document.getElementById("cameraImageInput");
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const title = document.querySelector('[name="title"]').value;
+                if (!title) {
+                    alert('Please enter a title');
+                    return;
+                }
 
-    let cameraStarted = false;
+                // Show loading spinner
+                document.querySelector('.loading-spinner').classList.add('show');
 
-    // Toggle view between Upload and Camera
-    function toggleSections() {
-        if (uploadOption.checked) {
-            uploadSection.style.display = "block";
-            cameraSection.style.display = "none";
-        } else {
-            uploadSection.style.display = "none";
-            cameraSection.style.display = "block";
-            if (!cameraStarted) {
-                startCamera();
+                // Create FormData
+                const formData = new FormData(this);
+
+                // Convert any captured image data if present
+                const capturedImageData = document.getElementById('capturedImageData');
+                if (capturedImageData && capturedImageData.value) {
+                    fetch(capturedImageData.value)
+                        .then(res => res.blob())
+                        .then(blob => {
+                            formData.set('recent_image', blob, 'captured-image.png');
+                            submitForm(formData);
+                        })
+                        .catch(error => {
+                            console.error('Error with captured image:', error);
+                            alert('Error processing captured image. Please try again.');
+                            document.querySelector('.loading-spinner').classList.remove('show');
+                        });
+                } else {
+                    submitForm(formData);
+                }
+            });
+
+            function submitForm(formData) {
+                // Submit the form using standard form submission
+                const tempForm = document.createElement('form');
+                tempForm.method = 'POST';
+                tempForm.action = uploadForm.action;
+                tempForm.enctype = 'multipart/form-data';
+
+                // Add CSRF token
+                const csrfToken = document.querySelector('[name="csrfmiddlewaretoken"]').value;
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = csrfToken;
+                tempForm.appendChild(csrfInput);
+
+                // Add all form data
+                for (let pair of formData.entries()) {
+                    if (pair[1] instanceof Blob) {
+                        // Handle file inputs
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.name = pair[0];
+                        const dt = new DataTransfer();
+                        const file = new File([pair[1]], pair[1].name || 'image.png', { type: pair[1].type });
+                        dt.items.add(file);
+                        input.files = dt.files;
+                        tempForm.appendChild(input);
+                    } else {
+                        // Handle other inputs
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = pair[0];
+                        input.value = pair[1];
+                        tempForm.appendChild(input);
+                    }
+                }
+
+                document.body.appendChild(tempForm);
+                tempForm.submit();
             }
         }
-    }
 
-    // Add event listeners
-    uploadOption.addEventListener("change", toggleSections);
-    cameraOption.addEventListener("change", toggleSections);
+        // Elements
+        const uploadOption = document.getElementById("uploadOption");
+        const cameraOption = document.getElementById("cameraOption");
+        const uploadSection = document.getElementById("uploadSection");
+        const cameraSection = document.getElementById("cameraSection");
+        const imageUpload = document.getElementById("imageUpload");
+        const capturedImageData = document.getElementById("capturedImageData");
 
-    // Initialize with default view
-    toggleSections();
+        // Camera elements
+        const video = document.getElementById("cameraPreview");
+        const captureBtn = document.getElementById("captureBtn");
+        const retakeBtn = document.getElementById("retakeBtn");
+        const canvas = document.getElementById("canvas");
+        const cameraImagePreview = document.getElementById("cameraImagePreview");
 
-    function startCamera() {
-        cameraStarted = true;
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-            .then((stream) => {
-                video.srcObject = stream;
-            })
-            .catch((error) => {
-                console.warn("Back camera not available. Trying default camera...");
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then((fallbackStream) => {
-                        video.srcObject = fallbackStream;
-                    })
-                    .catch((err) => {
-                        console.error("Camera error:", err);
-                        alert("Camera not available on this device or permission denied.");
-                    });
-            });
-    }
+        let stream = null;
+        let cameraStarted = false;
+        let hasCapture = false;
 
-    // Capture image and load into hidden input
-    captureBtn.addEventListener("click", function () {
-        let context = canvas.getContext("2d");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        canvas.toBlob(function (blob) {
-            let file = new File([blob], "captured-image.png", { type: "image/png" });
-            let dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            imageUploadFromCamera.files = dataTransfer.files;
-        }, "image/png");
-    });
-
-    // File preview for upload
-    document.getElementById('imageUpload').addEventListener('change', function (event) {
-        const preview = document.getElementById('imagePreview');
-        const file = event.target.files[0];
-        if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                preview.src = e.target.result;
-                preview.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        } else {
-            preview.src = '';
-            preview.style.display = 'none';
+        // Enhanced section switching with animations
+        function toggleSections() {
+            if (uploadOption.checked) {
+                cameraSection.classList.remove('active');
+                setTimeout(() => {
+                    cameraSection.style.display = "none";
+                    uploadSection.style.display = "block";
+                    setTimeout(() => {
+                        uploadSection.classList.add('active');
+                    }, 50);
+                }, 300);
+                stopCamera();
+                imageUpload.required = true;
+                hasCapture = false;
+            } else {
+                uploadSection.classList.remove('active');
+                setTimeout(() => {
+                    uploadSection.style.display = "none";
+                    cameraSection.style.display = "block";
+                    setTimeout(() => {
+                        cameraSection.classList.add('active');
+                    }, 50);
+                }, 300);
+                if (!cameraStarted) {
+                    startCamera();
+                }
+                imageUpload.required = false;
+                imageUpload.value = '';
+            }
         }
+
+        // Event listeners with animation
+        uploadOption.addEventListener("change", toggleSections);
+        cameraOption.addEventListener("change", toggleSections);
+        toggleSections();
+
+        // Camera functions
+        function startCamera() {
+            cameraStarted = true;
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                .then((mediaStream) => {
+                    stream = mediaStream;
+                    video.srcObject = mediaStream;
+                    video.style.opacity = '1';
+                })
+                .catch((err) => {
+                    alert("Unable to access camera: " + err.message);
+                    uploadOption.checked = true;
+                    toggleSections();
+                });
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            cameraStarted = false;
+        }
+
+        // Capture button with animation
+        captureBtn.addEventListener("click", function() {
+            this.classList.add('animate__animated', 'animate__pulse');
+            setTimeout(() => {
+                this.classList.remove('animate__animated', 'animate__pulse');
+            }, 1000);
+
+            const context = canvas.getContext("2d");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Create preview and store data
+            const dataUrl = canvas.toDataURL("image/png");
+            cameraImagePreview.src = dataUrl;
+            cameraImagePreview.style.display = "block";
+            capturedImageData.value = dataUrl;
+            hasCapture = true;
+
+            // UI updates
+            video.style.display = "none";
+            captureBtn.style.display = "none";
+            retakeBtn.style.display = "inline-block";
+        });
+
+        // Retake button
+        retakeBtn.addEventListener("click", function() {
+            video.style.display = "block";
+            cameraImagePreview.style.display = "none";
+            captureBtn.style.display = "inline-block";
+            retakeBtn.style.display = "none";
+            capturedImageData.value = '';
+            hasCapture = false;
+        });
+
+        // File upload preview with animation
+        imageUpload.addEventListener('change', function(event) {
+            const preview = document.getElementById('imagePreview');
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '';
+                preview.style.display = 'none';
+            }
+        });
+
+        // Clean up on page unload
+        window.addEventListener("beforeunload", stopCamera);
     });
 </script>
-
-
 {% endblock %}
