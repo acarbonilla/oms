@@ -58,10 +58,12 @@ class DanaoRecentImageFormUpdate(forms.ModelForm):
 
 
 class DanaoTechnicalActivitiesForm(forms.ModelForm):
-
     class Meta:
         model = DanaoTechActivities
-        fields = ['name', 'location']
+        fields = ['name', 'location', 'remarks']
+        widgets = {
+            'remarks': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -18,6 +18,9 @@ from django.core.files.base import ContentFile
 # Naming every upload image
 from django.utils.text import slugify
 
+# Editor for text field
+from ckeditor.fields import RichTextField
+
 
 def upload_to_technical(instance, filename):
     folder = settings.IMAGE_ENV
@@ -186,6 +189,8 @@ class C2TechActivities(models.Model):
     name = models.CharField(max_length=100, verbose_name="Activity")
     location = models.CharField(max_length=100)
     uploaded_by = models.ForeignKey(C2User, on_delete=models.CASCADE, related_name="uploaded_images_by")
+    remarks = RichTextField(blank=True, null=True)
+    remark_by = models.ForeignKey(C2User, on_delete=models.SET_NULL, null=True, blank=True, related_name='tech_remarks')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

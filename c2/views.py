@@ -1122,7 +1122,7 @@ def tech_activity_pdf(request):
     include_images = request.GET.get("include_images") == "on"
     include_details = request.GET.get("include_details") == "on"
     page_size = request.GET.get("page_size", "letter")
-    orientation = request.GET.get("orientation", "portrait")
+    orientation = request.GET.get("orientation", "landscape")
     search_query = request.GET.get("search", "")
     filter_option = request.GET.get("filter", "all")
 
@@ -1168,146 +1168,195 @@ def tech_activity_pdf(request):
     pdf = canvas.Canvas(buffer, pagesize=page_size_tuple)
     width, height = page_size_tuple
 
-    # Track page number
-    page_num = 1
+    # Define colors and styles
+    colors_dict = {
+        'primary': colors.HexColor('#4f46e5'),  # Indigo
+        'secondary': colors.HexColor('#6b7280'),  # Gray
+        'success': colors.HexColor('#10b981'),  # Green
+        'light': colors.HexColor('#f3f4f6'),  # Light Gray
+        'dark': colors.HexColor('#1f2937'),  # Dark Gray
+        'border': colors.HexColor('#e5e7eb'),  # Border Gray
+    }
 
-    def add_page_header():
-        """Add header to each page"""
-        # Add page number at bottom of each page
-        pdf.drawString(width / 2 - 20, 30, f"Page {page_num}")
+    def add_page_header(page_num):
+        """Add styled header to each page"""
+        # Add background rectangle
+        pdf.setFillColor(colors_dict['light'])
+        pdf.rect(0, height - 80, width, 80, fill=True)
+        
+        # Add title
+        pdf.setFillColor(colors_dict['dark'])
+        pdf.setFont("Helvetica-Bold", 24)
+        pdf.drawCentredString(width/2, height - 50, "Technical Activity Report")
+        
+        # Add date and page number with Philippines time
+        ph_time = localtime(today)  # Convert to Philippines time
+        pdf.setFont("Helvetica", 10)
+        pdf.drawString(50, height - 70, f"Generated on: {ph_time.strftime('%Y-%m-%d %I:%M %p')} (PHT)")
+        pdf.drawRightString(width - 50, height - 70, f"Page {page_num}")
 
-    def start_new_page():
-        """Start a new page with header"""
-        nonlocal page_num
-        pdf.showPage()
-        page_num += 1
-        pdf.setFont("Helvetica", 12)
-        add_page_header()
-        return height - 100
+    def add_activity_header(y_position, activity):
+        """Add styled activity header"""
+        # Background rectangle for activity header - Moved down by adjusting y_position
+        pdf.setFillColor(colors_dict['light'])
+        pdf.rect(50, y_position - 10, width - 100, 30, fill=True)
+        
+        # Activity name - Adjusted position
+        pdf.setFillColor(colors_dict['dark'])
+        pdf.setFont("Helvetica-Bold", 14)
+        pdf.drawString(60, y_position + 2, f"Activity: {activity.name}")
+        
+        return y_position - 40  # Increased spacing after header
 
-    # Add initial header
-    add_page_header()
-
-    # Add title with date range
-    pdf.setFont("Helvetica-Bold", 16)
-    title = "Technical Activities Report"
-    if filter_option != "all":
-        title += f" - Last {filter_option.title()}"
-    pdf.drawString(width / 2 - 100, height - 50, title)
-
-    pdf.setFont("Helvetica", 12)
-    if search_query:
-        pdf.drawString(50, height - 80, f"Search: {search_query}")
-
-    y_position = height - 100
-
-    # Calculate image layout parameters based on page orientation
-    margin = 50  # page margin
-    spacing = 10  # space between images
-    if orientation == "landscape":
-        images_per_row = 3
-        max_image_height = 180
-    else:
-        images_per_row = 2
-        max_image_height = 150
-
-    usable_width = width - (2 * margin)
-    image_width = (usable_width - (spacing * (images_per_row - 1))) / images_per_row
-
-    for activity in activities:
-        # Check if we need a new page for activity header
-        if y_position < 150:
-            y_position = start_new_page()
-
-        # Activity details
-        if include_details:
-            # Draw activity header without background highlight
-            pdf.setFont("Helvetica-Bold", 14)
-            pdf.drawString(margin, y_position, f"Activity: {activity.name}")
-            pdf.setFont("Helvetica", 12)
+    def add_metadata_section(y_position, activity):
+        """Add metadata section with icons and styled layout"""
+        pdf.setFont("Helvetica", 10)
+        pdf.setFillColor(colors_dict['secondary'])
+        
+        # Location
+        pdf.drawString(60, y_position, "📍 Location:")
+        pdf.setFillColor(colors_dict['dark'])
+        pdf.drawString(140, y_position, activity.location)
+        
+        # Created date
+        y_position -= 20
+        pdf.setFillColor(colors_dict['secondary'])
+        pdf.drawString(60, y_position, "📅 Created:")
+        pdf.setFillColor(colors_dict['dark'])
+        pdf.drawString(140, y_position, localtime(activity.created).strftime('%Y-%m-%d %H:%M'))
+        
+        # Updated date
+        y_position -= 20
+        pdf.setFillColor(colors_dict['secondary'])
+        pdf.drawString(60, y_position, "🔄 Updated:")
+        pdf.setFillColor(colors_dict['dark'])
+        pdf.drawString(140, y_position, localtime(activity.updated).strftime('%Y-%m-%d %H:%M'))
+        
+        # Uploaded by - with full name
+        y_position -= 20
+        pdf.setFillColor(colors_dict['secondary'])
+        pdf.drawString(60, y_position, "👤 Uploaded by:")
+        pdf.setFillColor(colors_dict['dark'])
+        if activity.uploaded_by and activity.uploaded_by.name:
+            first_name = activity.uploaded_by.name.first_name or ''
+            last_name = activity.uploaded_by.name.last_name or ''
+            full_name = f"{first_name} {last_name}".strip()
+            pdf.drawString(140, y_position, full_name or "N/A")
+        else:
+            pdf.drawString(140, y_position, "N/A")
+        
+        # Remarked by - with full name
+        if activity.remark_by:
             y_position -= 20
-            pdf.drawString(margin, y_position, f"Location: {activity.location}")
+            pdf.setFillColor(colors_dict['secondary'])
+            pdf.drawString(60, y_position, "👤 Remarked by:")
+            pdf.setFillColor(colors_dict['dark'])
+            first_name = activity.remark_by.name.first_name or ''
+            last_name = activity.remark_by.name.last_name or ''
+            full_name = f"{first_name} {last_name}".strip()
+            pdf.drawString(140, y_position, full_name or "N/A")
+        
+        return y_position - 30
+
+    def add_remarks_section(y_position, activity):
+        """Add styled remarks section"""
+        if activity.remarks:
+            # Remarks header
+            pdf.setFillColor(colors_dict['primary'])
+            pdf.setFont("Helvetica-Bold", 12)
+            pdf.drawString(60, y_position, "Remarks")
+            
+            # Remarks content
             y_position -= 20
-            pdf.drawString(margin, y_position, f"Date: {localtime(activity.created).strftime('%Y-%m-%d %H:%M')}")
-            y_position -= 20
-            # Add uploader information
-            uploader_name = f"{activity.uploaded_by.name.first_name} {activity.uploaded_by.name.last_name}" if activity.uploaded_by and activity.uploaded_by.name else "Unknown"
-            pdf.drawString(margin, y_position, f"Uploaded by: {uploader_name}")
+            pdf.setFillColor(colors_dict['dark'])
+            pdf.setFont("Helvetica", 10)
+            
+            # Handle HTML content
+            remarks_text = strip_tags(activity.remarks)
+            wrapped_text = textwrap.wrap(remarks_text, width=90)
+            
+            for line in wrapped_text:
+                pdf.drawString(70, y_position, line)
+                y_position -= 15
+            
+            y_position -= 10
+        
+        return y_position
+
+    def add_images_section(y_position, activity):
+        """Add images in a grid layout"""
+        if include_images and activity.images.exists():
+            # Images header
+            pdf.setFillColor(colors_dict['primary'])
+            pdf.setFont("Helvetica-Bold", 12)
+            pdf.drawString(60, y_position, f"Images ({activity.images.count()})")
             y_position -= 30
 
-        # Images
-        if include_images and activity.images.exists():
-            images = list(activity.images.all())
-            current_image = 0
-            total_images = len(images)
+            images = activity.images.all()
+            images_per_row = 3 if orientation == "landscape" else 2
+            image_width = (width - 120) / images_per_row
+            image_height = 150
 
-            while current_image < total_images:
-                # Check if we need a new page for images
-                if y_position < max_image_height + margin:
-                    y_position = start_new_page()
+            for i, image in enumerate(images):
+                if y_position < 100:  # Check if we need a new page
+                    pdf.showPage()
+                    y_position = height - 100
+                    add_page_header(pdf._pageNumber)
 
-                # Calculate how many images we can fit in this row
-                images_this_row = min(images_per_row, total_images - current_image)
+                row = i // images_per_row
+                col = i % images_per_row
+                x_position = 60 + (col * (image_width + 10))
+                
+                try:
+                    pdf.drawImage(
+                        ImageReader(image.image.path),
+                        x_position,
+                        y_position - image_height,
+                        width=image_width - 10,
+                        height=image_height,
+                        preserveAspectRatio=True
+                    )
+                except Exception as e:
+                    print(f"Error adding image: {e}")
 
-                # Calculate row width to center images
-                row_width = (images_this_row * image_width) + ((images_this_row - 1) * spacing)
-                x_start = (width - row_width) / 2
+                if (i + 1) % images_per_row == 0:
+                    y_position -= (image_height + 20)
 
-                for i in range(images_this_row):
-                    try:
-                        image = images[current_image + i]
-                        x_position = x_start + (i * (image_width + spacing))
+            if len(images) % images_per_row != 0:
+                y_position -= (image_height + 20)
 
-                        # Draw image with preserved aspect ratio
-                        img_reader = ImageReader(image.image.path)
-                        img_width = img_reader.getSize()[0]
-                        img_height = img_reader.getSize()[1]
-                        aspect = img_width / img_height
+        return y_position
 
-                        # Calculate dimensions to fit in allocated space
-                        if aspect > 1:  # landscape image
-                            final_width = image_width
-                            final_height = image_width / aspect
-                        else:  # portrait image
-                            final_height = min(max_image_height, image_width / aspect)
-                            final_width = final_height * aspect
+    # Generate PDF content
+    page_num = 1
+    for activity in activities:
+        if page_num > 1:
+            pdf.showPage()
+        
+        add_page_header(page_num)
+        y_position = height - 100
+        
+        # Add activity content
+        y_position = add_activity_header(y_position, activity)
+        y_position = add_metadata_section(y_position, activity)
+        
+        # Add separator line
+        pdf.setStrokeColor(colors_dict['border'])
+        pdf.line(60, y_position, width - 60, y_position)
+        y_position -= 20
+        
+        y_position = add_remarks_section(y_position, activity)
+        
+        # Another separator before images
+        pdf.setStrokeColor(colors_dict['border'])
+        pdf.line(60, y_position, width - 60, y_position)
+        y_position -= 20
+        
+        y_position = add_images_section(y_position, activity)
+        
+        page_num += 1
 
-                        # Center image in its allocated space
-                        x_offset = x_position + (image_width - final_width) / 2
-                        y_offset = y_position - final_height
-
-                        pdf.drawImage(
-                            img_reader,
-                            x_offset,
-                            y_offset,
-                            width=final_width,
-                            height=final_height,
-                            preserveAspectRatio=True
-                        )
-
-                        # Add image caption with activity name and number
-                        pdf.setFont("Helvetica", 8)
-                        image_number = current_image + i + 1
-                        caption = f"{activity.name} ({image_number})"
-                        # Center the caption under the image
-                        caption_width = pdf.stringWidth(caption, "Helvetica", 8)
-                        caption_x = x_offset + (final_width - caption_width) / 2
-                        pdf.drawString(caption_x, y_offset - 10, caption)
-                        pdf.setFont("Helvetica", 12)
-
-                    except Exception as e:
-                        print(f"Error adding image: {e}")
-
-                current_image += images_this_row
-                y_position -= (max_image_height + spacing + 20)  # Move down for next row
-
-            y_position -= 20  # Extra space after images
-
-        # Add separator line between activities
-        pdf.setStrokeColor(colors.grey)
-        pdf.line(margin, y_position - 10, width - margin, y_position - 10)
-        y_position -= 30
-
+    # Save PDF
     pdf.save()
     buffer.seek(0)
 
@@ -1334,3 +1383,27 @@ def custom_500(request):
 
 def trigger_500(request):
     raise ValueError("Intentional Server Error")
+
+
+@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
+@login_required(login_url='omsLogin')
+def tech_activity_update(request, pk):
+    """View for updating technical activities."""
+    activity = get_object_or_404(C2TechActivities, id=pk)
+    
+    if request.method == "POST":
+        form = TechnicalActivitiesForm(request.POST, instance=activity)
+        if form.is_valid():
+            tech_activity = form.save(commit=False)
+            tech_activity.remark_by = C2User.objects.get(name__id=request.user.id)
+            tech_activity.save()
+            messages.success(request, 'Activity updated successfully!')
+            return redirect('activity_list')
+    else:
+        form = TechnicalActivitiesForm(instance=activity)
+
+    return render(request, "c2/tech_activity_update.html", {
+        "form": form,
+        "activity": activity,
+        "title": f"Update Activity: {activity.name}"
+    })
