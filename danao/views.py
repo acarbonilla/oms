@@ -29,7 +29,7 @@ from django.utils.timezone import make_aware, is_naive
 from django.utils.timezone import now
 from reportlab.lib import colors
 # pdf
-from reportlab.lib.pagesizes import letter, landscape
+from reportlab.lib.pagesizes import letter, A4, LEGAL, landscape
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 
