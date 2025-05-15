@@ -1,10 +1,9 @@
-
 from django.urls import path
 from .views import (empMember, amMember, amAssessment, upload_recent_image_qr, update_recent_image,
                     recent_image_detail, evMember, standard_image_ev, failed_list, generate_pdf,
                     generate_selected_pdf, standard_image_ev_details, pass_list, not_visited_facilities_list,
                     access_denied, trigger_500, tech_act_upload, activity_list, activity_detail, facility_list,
-                    generate_qr_code
+                    generate_qr_code, tech_activity_download, tech_activity_pdf
                     )
 
 # app_name = 'c2'
@@ -25,10 +24,11 @@ urlpatterns = [
     path("standard-image/<int:pk>/", standard_image_ev_details, name="standard_image_ev_details"),  # ✅ Details Page
 
     # This is for Technical Activities Form tech_activity_upload
-    path('tech-act/upload/', tech_act_upload, name='tech_act_upload'),
-    path('tech-act/upload/<int:pk>/', tech_act_upload, name='tech_act_upload_with_pk'),
-    path('activities/', activity_list, name="activity_list"),
-    path("activity/<int:activity_id>/", activity_detail, name="activity_detail"),
+    path('tech-activity/upload/', tech_act_upload, name='tech_act_upload'),
+    path('tech-activity/list/', activity_list, name='activity_list'),
+    path('tech-activity/detail/<int:activity_id>/', activity_detail, name='activity_detail'),
+    path('tech-activity/download/', tech_activity_download, name='tech_activity_download'),
+    path('tech-activity/pdf/', tech_activity_pdf, name='tech_activity_pdf'),
 
     # Failed List
     path("failed-list/", failed_list, name="failed_list"),

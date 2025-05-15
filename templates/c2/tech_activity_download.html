@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .hover-scale {
+        transition: transform 0.2s ease;
+    }
+    
+    .hover-scale:hover {
+        transform: scale(1.02);
+    }
+    
+    .checkbox-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .custom-checkbox {
+        transition: background-color 0.3s ease;
+    }
+    
+    .table-hover tbody tr {
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+        transform: translateX(5px);
+    }
+    
+    .btn {
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .card {
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    
+    .form-control, .form-select {
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .pagination .page-link {
+        transition: all 0.3s ease;
+    }
+    
+    .pagination .page-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .alert {
+        animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateX(-100%); }
+        to { transform: translateX(0); }
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="row mb-4 fade-in">
+        <div class="col">
+            <h2 class="display-5 text-primary">
+                <i class="fas fa-file-download me-2"></i>Download Technical Activities Report
+            </h2>
+            <p class="text-muted">Generate customized PDF reports of your technical activities</p>
+        </div>
+    </div>
+
+    <div class="card shadow hover-scale fade-in">
+        <div class="card-body">
+            <form method="get" action="{% url 'tech_activity_pdf' %}" class="mb-3">
+                <div class="row g-3 align-items-center mb-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" id="search" name="search" value="{{ search_query }}" 
+                                   placeholder="Search by activity name..." aria-label="Search activities">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                            <select class="form-select" id="filter" name="filter">
+                                <option value="all" {% if filter_option == 'all' %}selected{% endif %}>All Time</option>
+                                <option value="week" {% if filter_option == 'week' %}selected{% endif %}>Last Week</option>
+                                <option value="month" {% if filter_option == 'month' %}selected{% endif %}>Last Month</option>
+                                <option value="year" {% if filter_option == 'year' %}selected{% endif %}>Last Year</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            {% if activities %}
+            <form method="get" action="{% url 'tech_activity_pdf' %}">
+                <input type="hidden" name="search" value="{{ search_query }}">
+                <input type="hidden" name="filter" value="{{ filter_option }}">
+                
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>
+                                    <div class="checkbox-wrapper">
+                                        <input type="checkbox" id="select-all" class="form-check-input custom-checkbox">
+                                    </div>
+                                </th>
+                                <th><i class="fas fa-tasks me-2"></i>Activity Name</th>
+                                <th><i class="fas fa-map-marker-alt me-2"></i>Location</th>
+                                <th><i class="fas fa-calendar-alt me-2"></i>Date</th>
+                                <th><i class="fas fa-images me-2"></i>Images</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in activities %}
+                            <tr>
+                                <td>
+                                    <div class="checkbox-wrapper">
+                                        <input type="checkbox" name="selected_ids" value="{{ activity.id }}" 
+                                               class="form-check-input activity-checkbox custom-checkbox">
+                                    </div>
+                                </td>
+                                <td>{{ activity.name }}</td>
+                                <td>{{ activity.location }}</td>
+                                <td>{{ activity.created|date:"Y-m-d H:i" }}</td>
+                                <td><span class="badge bg-info">{{ activity.images.count }} images</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm hover-scale">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">
+                                    <i class="fas fa-cog me-2"></i>PDF Options
+                                </h5>
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Include in PDF:</label>
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input custom-checkbox" 
+                                               id="include_images" name="include_images" checked>
+                                        <label class="form-check-label" for="include_images">
+                                            <i class="fas fa-image me-2"></i>Images
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input custom-checkbox" 
+                                               id="include_details" name="include_details" checked>
+                                        <label class="form-check-label" for="include_details">
+                                            <i class="fas fa-info-circle me-2"></i>Activity Details
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="page_size" class="form-label fw-bold">
+                                        <i class="fas fa-file-alt me-2"></i>Page Size:
+                                    </label>
+                                    <select class="form-select" id="page_size" name="page_size">
+                                        <option value="letter">Letter</option>
+                                        <option value="a4">A4</option>
+                                        <option value="legal">Legal</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="orientation" class="form-label fw-bold">
+                                        <i class="fas fa-arrows-alt me-2"></i>Orientation:
+                                    </label>
+                                    <select class="form-select" id="orientation" name="orientation">
+                                        <option value="portrait">Portrait</option>
+                                        <option value="landscape">Landscape</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary me-2" id="download-btn" disabled>
+                        <i class="fas fa-download me-2"></i>Download Selected
+                    </button>
+                    <button type="submit" name="download_all" value="true" class="btn btn-secondary">
+                        <i class="fas fa-cloud-download-alt me-2"></i>Download All
+                    </button>
+                </div>
+            </form>
+            
+            {% if activities.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if activities.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ activities.previous_page_number }}&search={{ search_query }}&filter={{ filter_option }}">
+                            <i class="fas fa-chevron-left me-2"></i>Previous
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in activities.paginator.page_range %}
+                    <li class="page-item {% if activities.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}&search={{ search_query }}&filter={{ filter_option }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if activities.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ activities.next_page_number }}&search={{ search_query }}&filter={{ filter_option }}">
+                            Next<i class="fas fa-chevron-right ms-2"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="alert alert-info fade-in">
+                <i class="fas fa-info-circle me-2"></i>No activities found matching your criteria.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAll = document.getElementById('select-all');
+    const activityCheckboxes = document.querySelectorAll('.activity-checkbox');
+    const downloadBtn = document.getElementById('download-btn');
+
+    // Handle select all checkbox
+    selectAll.addEventListener('change', function() {
+        activityCheckboxes.forEach(checkbox => {
+            checkbox.checked = selectAll.checked;
+            updateCheckboxStyle(checkbox);
+        });
+        updateDownloadButton();
+    });
+
+    // Handle individual checkboxes
+    activityCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateDownloadButton();
+            updateCheckboxStyle(this);
+            // Update select all checkbox
+            selectAll.checked = Array.from(activityCheckboxes).every(cb => cb.checked);
+            updateCheckboxStyle(selectAll);
+        });
+    });
+
+    function updateCheckboxStyle(checkbox) {
+        const row = checkbox.closest('tr');
+        if (row) {
+            if (checkbox.checked) {
+                row.style.backgroundColor = 'rgba(0, 123, 255, 0.1)';
+            } else {
+                row.style.backgroundColor = '';
+            }
+        }
+    }
+
+    function updateDownloadButton() {
+        const checkedCount = Array.from(activityCheckboxes).filter(cb => cb.checked).length;
+        downloadBtn.disabled = checkedCount === 0;
+        
+        if (checkedCount > 0) {
+            downloadBtn.innerHTML = `<i class="fas fa-download me-2"></i>Download Selected (${checkedCount})`;
+        } else {
+            downloadBtn.innerHTML = '<i class="fas fa-download me-2"></i>Download Selected';
+        }
+    }
+
+    // Initialize checkbox styles
+    activityCheckboxes.forEach(updateCheckboxStyle);
+});
+</script>
+{% endblock %} 

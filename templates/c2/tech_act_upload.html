@@ -33,14 +33,27 @@
         <div class="mb-3" id="upload-section">
             <label class="form-label" for="image-input">Upload Images:</label>
             <input type="file" name="image" id="image-input" multiple accept="image/*">
+            <small class="text-muted d-block">Maximum 10 images, each up to 5MB</small>
         </div>
 
         <!-- Camera Section -->
         <div class="mb-3 d-none" id="camera-section">
+            <div id="camera-error" class="alert alert-danger d-none"></div>
+            <div class="camera-controls mb-2">
+                <select class="form-select mb-2" id="camera-select">
+                    <option value="">Loading cameras...</option>
+                </select>
+                <select class="form-select mb-2" id="resolution-select">
+                    <option value="high">High Quality</option>
+                    <option value="medium" selected>Medium Quality</option>
+                    <option value="low">Low Quality</option>
+                </select>
+            </div>
             <video id="cameraPreview" autoplay playsinline style="width: 100%; max-width: 400px;"></video>
             <button type="button" class="btn btn-secondary mt-2" id="captureBtn">Capture Photo</button>
             <input type="hidden" name="captured_images" id="captured-images">
             <div class="d-flex flex-wrap mt-2" id="captured-images-preview"></div>
+            <small class="text-muted d-block">Maximum 10 photos allowed</small>
         </div>
 
         <!-- Image Previews -->
@@ -57,10 +70,81 @@
     const cameraSection = document.getElementById('camera-section');
     const capturedImagesInput = document.getElementById('captured-images');
     const capturedImagesPreview = document.getElementById('captured-images-preview');
+    const cameraError = document.getElementById('camera-error');
+    const cameraSelect = document.getElementById('camera-select');
+    const resolutionSelect = document.getElementById('resolution-select');
     let stream;
+    let capturedImages = [];
+    const MAX_IMAGES = 10;
+    const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 
     uploadRadio.addEventListener('change', toggleInputMethod);
     cameraRadio.addEventListener('change', toggleInputMethod);
+
+    // Resolution presets
+    const resolutionPresets = {
+        high: { width: 1920, height: 1080 },
+        medium: { width: 1280, height: 720 },
+        low: { width: 640, height: 480 }
+    };
+
+    async function loadCameras() {
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = devices.filter(device => device.kind === 'videoinput');
+            
+            cameraSelect.innerHTML = videoDevices.length 
+                ? videoDevices.map(device => 
+                    `<option value="${device.deviceId}">${device.label || `Camera ${videoDevices.indexOf(device) + 1}`}</option>`
+                ).join('')
+                : '<option value="">No cameras found</option>';
+        } catch (error) {
+            showError('Failed to load cameras: ' + error.message);
+        }
+    }
+
+    function showError(message) {
+        cameraError.textContent = message;
+        cameraError.classList.remove('d-none');
+    }
+
+    function hideError() {
+        cameraError.classList.add('d-none');
+    }
+
+    async function startCamera() {
+        stopCamera();
+        hideError();
+
+        const resolution = resolutionPresets[resolutionSelect.value];
+        
+        try {
+            const constraints = {
+                video: {
+                    deviceId: cameraSelect.value ? { exact: cameraSelect.value } : undefined,
+                    width: { ideal: resolution.width },
+                    height: { ideal: resolution.height },
+                    facingMode: { ideal: "environment" }
+                }
+            };
+
+            stream = await navigator.mediaDevices.getUserMedia(constraints);
+            const video = document.getElementById('cameraPreview');
+            video.srcObject = stream;
+            await loadCameras();
+        } catch (error) {
+            showError('Camera access error: ' + error.message);
+            uploadRadio.checked = true;
+            toggleInputMethod();
+        }
+    }
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+    }
 
     function toggleInputMethod() {
         if (uploadRadio.checked) {
@@ -74,32 +158,16 @@
         }
     }
 
-    function startCamera() {
-        const constraints = {
-            video: {
-                facingMode: { ideal: "environment" }
-            }
-        };
-        navigator.mediaDevices.getUserMedia(constraints)
-            .then(mediaStream => {
-                stream = mediaStream;
-                const video = document.getElementById('cameraPreview');
-                video.srcObject = mediaStream;
-            })
-            .catch(error => {
-                console.error("Camera access error:", error);
-                alert("Unable to access camera.");
-            });
-    }
-
-    function stopCamera() {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            stream = null;
-        }
-    }
+    // Handle camera and resolution changes
+    cameraSelect.addEventListener('change', startCamera);
+    resolutionSelect.addEventListener('change', startCamera);
 
     document.getElementById('captureBtn').addEventListener('click', () => {
+        if (capturedImages.length >= MAX_IMAGES) {
+            showError(`Maximum ${MAX_IMAGES} images allowed`);
+            return;
+        }
+
         const canvas = document.createElement('canvas');
         const video = document.getElementById('cameraPreview');
         canvas.width = video.videoWidth;
@@ -107,43 +175,90 @@
         const context = canvas.getContext('2d');
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        const base64Image = canvas.toDataURL('image/png');
-
+        // Compress image if needed
+        let quality = 0.8;
+        let base64Image = canvas.toDataURL('image/jpeg', quality);
+        
+        // Create preview container
+        const container = document.createElement('div');
+        container.className = 'position-relative m-2';
+        
         const img = document.createElement('img');
         img.src = base64Image;
         img.style.width = '100px';
-        img.style.margin = '5px';
+        img.style.height = '100px';
+        img.style.objectFit = 'cover';
         img.style.borderRadius = '8px';
         img.style.boxShadow = '0 0 5px rgba(0,0,0,0.2)';
-        capturedImagesPreview.appendChild(img);
+        
+        // Add delete button
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '×';
+        deleteBtn.className = 'btn btn-danger btn-sm position-absolute top-0 end-0';
+        deleteBtn.style.padding = '0 6px';
+        deleteBtn.onclick = (e) => {
+            e.preventDefault();
+            const index = capturedImages.indexOf(base64Image);
+            if (index > -1) {
+                capturedImages.splice(index, 1);
+                container.remove();
+                capturedImagesInput.value = JSON.stringify(capturedImages);
+            }
+        };
+        
+        container.appendChild(img);
+        container.appendChild(deleteBtn);
+        capturedImagesPreview.appendChild(container);
 
-        let images = capturedImagesInput.value ? JSON.parse(capturedImagesInput.value) : [];
-        images.push(base64Image);
-        capturedImagesInput.value = JSON.stringify(images);
+        capturedImages.push(base64Image);
+        capturedImagesInput.value = JSON.stringify(capturedImages);
+        hideError();
     });
 
+    // Handle file upload preview
     document.getElementById('image-input').addEventListener('change', function (event) {
-        const previewContainer = document.getElementById('preview-container');
-        previewContainer.innerHTML = ""; // Clear previews
+        const files = Array.from(event.target.files);
+        
+        if (files.length > MAX_IMAGES) {
+            alert(`Maximum ${MAX_IMAGES} images allowed`);
+            this.value = '';
+            return;
+        }
 
-        for (let file of event.target.files) {
+        // Check file sizes
+        const oversizedFiles = files.filter(file => file.size > MAX_IMAGE_SIZE);
+        if (oversizedFiles.length > 0) {
+            alert(`Some files exceed the ${MAX_IMAGE_SIZE / 1024 / 1024}MB limit:\n${oversizedFiles.map(f => f.name).join('\n')}`);
+            this.value = '';
+            return;
+        }
+
+        const previewContainer = document.getElementById('preview-container');
+        previewContainer.innerHTML = '';
+
+        files.forEach(file => {
             const reader = new FileReader();
             reader.onload = function (e) {
+                const container = document.createElement('div');
+                container.className = 'position-relative m-2';
+                
                 const img = document.createElement('img');
                 img.src = e.target.result;
-                img.style.width = "100px";
-                img.style.margin = "5px";
-                img.style.borderRadius = "8px";
-                img.style.boxShadow = "0 0 5px rgba(0,0,0,0.2)";
-                previewContainer.appendChild(img);
+                img.style.width = '100px';
+                img.style.height = '100px';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '8px';
+                img.style.boxShadow = '0 0 5px rgba(0,0,0,0.2)';
+                
+                container.appendChild(img);
+                previewContainer.appendChild(container);
             };
             reader.readAsDataURL(file);
-        }
+        });
     });
 
     // Stop camera on unload
     window.addEventListener("beforeunload", stopCamera);
 </script>
-
 
 {% endblock %}
