@@ -246,87 +246,157 @@
             height: 80px;
         }
     }
+
+    .btn-group .btn {
+        margin-left: 5px;
+    }
+
+    .btn-details {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-details:hover {
+        background-color: #5a6268;
+        color: white;
+    }
 </style>
 
-<div class="container">
-    <h2>📋 Technical Activities</h2>
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="text-center">{{ title }}</h2>
+        </div>
+    </div>
 
-    <!-- Search and Filter Section -->
-    <div class="search-filter-container">
-        <form method="GET" class="mb-3 d-flex">
-            <input type="text" name="search" class="form-control me-2"
-                   placeholder="Search activities..." value="{{ search_query }}">
-            <button type="submit" class="btn btn-primary">Search</button>
-        </form>
-
-        <form method="GET">
-            <label class="form-label">Filter by time period:</label>
-            <select name="filter" class="form-select" onchange="this.form.submit()">
-                <option value="all" {% if filter_option == "all" %}selected{% endif %}>All Activities</option>
-                <option value="week" {% if filter_option == "week" %}selected{% endif %}>Last Week</option>
-                <option value="month" {% if filter_option == "month" %}selected{% endif %}>Last Month</option>
-                <option value="year" {% if filter_option == "year" %}selected{% endif %}>Last Year</option>
-            </select>
-        </form>
+    <!-- Search and Filter Form -->
+    <div class="row mb-4">
+        <div class="col">
+            <form method="get" class="d-flex gap-3">
+                <div class="flex-grow-1">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" name="search" class="form-control"
+                               placeholder="Search activities..." value="{{ search_query }}">
+                    </div>
+                </div>
+                <div>
+                    <select name="filter" class="form-select">
+                        <option value="all" {% if filter_option == 'all' %}selected{% endif %}>All Time</option>
+                        <option value="week" {% if filter_option == 'week' %}selected{% endif %}>Last Week</option>
+                        <option value="month" {% if filter_option == 'month' %}selected{% endif %}>Last Month</option>
+                        <option value="year" {% if filter_option == 'year' %}selected{% endif %}>Last Year</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter me-2"></i>Apply Filter
+                </button>
+            </form>
+        </div>
     </div>
 
     <!-- Activities List -->
     <div class="row">
         {% for activity in activities %}
         <div class="col-md-6 mb-4">
-            <div class="activity-card" style="animation: cardEntry 0.6s ease-out {{ forloop.counter|add:"-1"|divisibleby:"2"|yesno:"0.2s,0.4s" }} forwards; opacity: 0;">
+            <div class="card h-100 shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">{{ activity.name }}</h5>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title mb-0">{{ activity.name }}</h5>
+                        <div class="btn-group">
+                            <a href="{% url 'activity_detailDanao' activity.id %}" class="btn btn-sm btn-details">
+                                <i class="fas fa-eye"></i> Details
+                            </a>
+                            <a href="{% url 'tech_activity_update_danao' activity.id %}"" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </div>
+                    </div>
                     <p class="card-text"><strong>📍 Location:</strong> {{ activity.location }}</p>
-                    <p class="card-text"><small class="text-muted">📅 {{ activity.created }}</small></p>
+                    <p class="card-text">
+                        <small class="text-muted">📅 {{ activity.created|date:"Y-m-d H:i" }}</small>
+                    </p>
 
                     <!-- Activity Images -->
-                    <div class="activity-images">
-                        {% for image in activity.imagesDanao.all %}
-                            <img src="{{ image.image.url }}" class="activity-image"
-                                 alt="Activity Image">
-                        {% empty %}
-                            <p class="text-muted">No images available</p>
-                        {% endfor %}
+                    <div class="activity-images mt-3">
+                        <h6 class="mb-2">
+                            <i class="fas fa-images me-2"></i>Images
+                            <span class="badge bg-info">{{ activity.imagesDanao.count }}</span>
+                        </h6>
+                        <div class="row g-2">
+                            {% for image in activity.imagesDanao.all|slice:":4" %}
+                            <div class="col-3">
+                                <img src="{{ image.image.url }}" alt="Activity image"
+                                     class="img-thumbnail" style="width: 100%; height: 60px; object-fit: cover;">
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
-
-                    <p class="card-text mt-3">
-                        <small class="text-muted">
-                            <a href="{% url 'activity_detailDanao' activity.id %}" class="see-more-link"> See More...</a>
-                        </small>
-                    </p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <small class="text-muted">
+                        <i class="fas fa-user me-1"></i>{{ activity.uploaded_by.name }}
+                    </small>
                 </div>
             </div>
         </div>
         {% empty %}
-        <div class="col-12">
-            <div class="empty-state">
-                <p>🌟 No activities found. Try adjusting your search or filters.</p>
+        <div class="col">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>No activities found.
             </div>
         </div>
         {% endfor %}
     </div>
 
     <!-- Pagination -->
-    <nav>
+    {% if activities.has_other_pages %}
+    <nav aria-label="Page navigation" class="mt-4">
         <ul class="pagination justify-content-center">
             {% if activities.has_previous %}
-                <li class="page-item"><a class="page-link" href="?page=1&search={{ search_query }}&filter={{ filter_option }}">First</a></li>
-                <li class="page-item"><a class="page-link" href="?page={{ activities.previous_page_number }}&search={{ search_query }}&filter={{ filter_option }}">Previous</a></li>
+            <li class="page-item">
+                <a class="page-link" href="?page=1&search={{ search_query }}&filter={{ filter_option }}">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ activities.previous_page_number }}&search={{ search_query }}&filter={{ filter_option }}">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            </li>
             {% endif %}
 
-            <li class="page-item disabled"><span class="page-link">Page {{ activities.number }} of {{ activities.paginator.num_pages }}</span></li>
+            {% for num in activities.paginator.page_range %}
+            {% if activities.number == num %}
+            <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+            </li>
+            {% elif num > activities.number|add:'-3' and num < activities.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}&search={{ search_query }}&filter={{ filter_option }}">
+                    {{ num }}
+                </a>
+            </li>
+            {% endif %}
+            {% endfor %}
 
             {% if activities.has_next %}
-                <li class="page-item"><a class="page-link" href="?page={{ activities.next_page_number }}&search={{ search_query }}&filter={{ filter_option }}">Next</a></li>
-                <li class="page-item"><a class="page-link" href="?page={{ activities.paginator.num_pages }}&search={{ search_query }}&filter={{ filter_option }}">Last</a></li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ activities.next_page_number }}&search={{ search_query }}&filter={{ filter_option }}">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ activities.paginator.num_pages }}&search={{ search_query }}&filter={{ filter_option }}">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </li>
             {% endif %}
         </ul>
     </nav>
-
-    <a href="{% url 'danao_tech_activity_download' %}" class="btn btn-primary">
-        <i class="fas fa-download me-2"></i>Download Activities
-    </a>
+    {% endif %}
 </div>
 
 <script>

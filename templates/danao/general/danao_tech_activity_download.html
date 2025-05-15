@@ -1,30 +1,50 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block content %}
 <style>
+    .download-options {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .custom-checkbox {
+        width: 1.2rem;
+        height: 1.2rem;
+    }
+
+    .checkbox-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
+    .hover-scale {
+        transition: transform 0.2s;
+    }
+
+    .hover-scale:hover {
+        transform: translateY(-2px);
+    }
+
     .fade-in {
         animation: fadeIn 0.5s ease-in;
     }
 
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
+        from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
-    }
-
-    .hover-scale {
-        transition: transform 0.2s ease;
-    }
-
-    .hover-scale:hover {
-        transform: scale(1.02);
-    }
-
-    .checkbox-wrapper {
-        position: relative;
-        display: inline-block;
-    }
-
-    .custom-checkbox {
-        transition: background-color 0.3s ease;
     }
 
     .table-hover tbody tr {
@@ -127,12 +147,11 @@
     <div class="card shadow hover-scale fade-in">
         <div class="card-body">
             <form method="get" action="{% url 'danao_tech_activity_pdf' %}" class="mb-3">
-                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                 <div class="row g-3 align-items-center mb-3">
                     <div class="col-md-4">
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-search"></i></span>
-                            <input type="text" class="form-control" id="search" name="search" value="{{ search_query }}"
+                            <input type="text" class="form-control" id="search" name="search" value="{{ search_query }}" 
                                    placeholder="Search by activity name..." aria-label="Search activities">
                         </div>
                     </div>
@@ -166,21 +185,11 @@
                 </div>
             </form>
 
-            <!-- Loading Spinner -->
-            <div class="loading-spinner">
-                <div class="spinner-content">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <div class="spinner-text">Generating PDF...</div>
-                </div>
-            </div>
-
             {% if activities %}
             <form method="get" action="{% url 'danao_tech_activity_pdf' %}">
                 <input type="hidden" name="search" value="{{ search_query }}">
                 <input type="hidden" name="filter" value="{{ filter_option }}">
-
+                
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead class="table-light">
@@ -201,7 +210,7 @@
                             <tr>
                                 <td>
                                     <div class="checkbox-wrapper">
-                                        <input type="checkbox" name="selected_ids" value="{{ activity.id }}"
+                                        <input type="checkbox" name="selected_ids" value="{{ activity.id }}" 
                                                class="form-check-input activity-checkbox custom-checkbox">
                                     </div>
                                 </td>
@@ -225,14 +234,14 @@
                                 <div class="mb-4">
                                     <label class="form-label fw-bold">Include in PDF:</label>
                                     <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input custom-checkbox"
+                                        <input type="checkbox" class="form-check-input custom-checkbox" 
                                                id="include_images" name="include_images" checked>
                                         <label class="form-check-label" for="include_images">
                                             <i class="fas fa-image me-2"></i>Images
                                         </label>
                                     </div>
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input custom-checkbox"
+                                        <input type="checkbox" class="form-check-input custom-checkbox" 
                                                id="include_details" name="include_details" checked>
                                         <label class="form-check-label" for="include_details">
                                             <i class="fas fa-info-circle me-2"></i>Activity Details
@@ -278,7 +287,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="pagination-info">
                         <span class="text-muted">
-                            Showing {{ activities.start_index }} to {{ activities.end_index }}
+                            Showing {{ activities.start_index }} to {{ activities.end_index }} 
                             of {{ activities.paginator.count }} entries
                         </span>
                     </div>
@@ -338,39 +347,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectAll = document.getElementById('select-all');
     const activityCheckboxes = document.querySelectorAll('.activity-checkbox');
     const downloadBtn = document.getElementById('download-btn');
-    const form = document.querySelector('form');
-
-    // Handle form submission
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const checkedBoxes = document.querySelectorAll('.activity-checkbox:checked');
-        if (checkedBoxes.length === 0 && !form.querySelector('[name="download_all"]')) {
-            alert('Please select at least one activity to download');
-            return;
-        }
-
-        // Show loading spinner
-        document.querySelector('.loading-spinner').classList.add('show');
-
-        // Get the form URL and ensure it uses HTTP
-        let formUrl = form.action;
-        if (formUrl.startsWith('https:')) {
-            formUrl = formUrl.replace('https:', 'http:');
-        }
-
-        // Get all form data
-        const formData = new FormData(form);
-        const queryString = new URLSearchParams(formData).toString();
-
-        // Make the request
-        window.location.href = `${formUrl}?${queryString}`;
-
-        // Hide loading spinner after a short delay
-        setTimeout(() => {
-            document.querySelector('.loading-spinner').classList.remove('show');
-        }, 2000);
-    });
 
     // Handle select all checkbox
     selectAll.addEventListener('change', function() {
@@ -406,7 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateDownloadButton() {
         const checkedCount = Array.from(activityCheckboxes).filter(cb => cb.checked).length;
         downloadBtn.disabled = checkedCount === 0;
-
+        
         if (checkedCount > 0) {
             downloadBtn.innerHTML = `<i class="fas fa-download me-2"></i>Download Selected (${checkedCount})`;
         } else {
@@ -416,37 +392,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize checkbox styles
     activityCheckboxes.forEach(updateCheckboxStyle);
-
-    // Add event listener for page size changes
-    const pageSizeSelect = document.getElementById('page_size');
-    pageSizeSelect.addEventListener('change', function() {
-        const searchParams = new URLSearchParams(window.location.search);
-        searchParams.set('page_size', this.value);
-        searchParams.set('page', '1'); // Reset to first page when changing page size
-        window.location.search = searchParams.toString();
-    });
-
-    // Add event listener for filter changes
-    const filterSelect = document.getElementById('filter');
-    filterSelect.addEventListener('change', function() {
-        const searchParams = new URLSearchParams(window.location.search);
-        searchParams.set('filter', this.value);
-        searchParams.set('page', '1'); // Reset to first page when changing filter
-        window.location.search = searchParams.toString();
-    });
-
-    // Add event listener for search input (with debounce)
-    const searchInput = document.getElementById('search');
-    let searchTimeout;
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            const searchParams = new URLSearchParams(window.location.search);
-            searchParams.set('search', this.value);
-            searchParams.set('page', '1'); // Reset to first page when searching
-            window.location.search = searchParams.toString();
-        }, 500); // 500ms debounce delay
-    });
 });
 </script>
 {% endblock %}

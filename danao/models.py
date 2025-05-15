@@ -185,7 +185,7 @@ class DanaoTechActivities(models.Model):
     location = models.CharField(max_length=100)
     uploaded_by = models.ForeignKey(DanaoUser, on_delete=models.CASCADE, related_name="uploaded_images_byDanao")
     remarks = models.TextField(blank=True, null=True)
-    remark_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="danao_tech_remarks")
+    remark_by = models.ForeignKey(DanaoUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="danao_tech_remarks")
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
