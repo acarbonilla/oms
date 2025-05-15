@@ -806,7 +806,7 @@ def tech_act_uploadDanao(request, pk=None):
                 files = request.FILES.getlist('image')
                 if len(files) > MAX_IMAGES:
                     messages.error(request, f'Maximum {MAX_IMAGES} images allowed')
-                    return redirect('tech_act_upload')
+                    return redirect('tech_act_uploadDanao')
 
                 for file in files:
                     try:
@@ -863,7 +863,7 @@ def tech_act_uploadDanao(request, pk=None):
                         if len(images) + uploaded_images > MAX_IMAGES:
                             messages.error(request, f'Total images exceed maximum limit of {MAX_IMAGES}')
                             tech_activity.delete()
-                            return redirect('tech_act_upload')
+                            return redirect('tech_act_uploadDanao')
 
                         for idx, img_data in enumerate(images):
                             try:
@@ -928,26 +928,26 @@ def tech_act_uploadDanao(request, pk=None):
                     if errors:
                         for error in errors:
                             messages.warning(request, error)
-                    return redirect('tech_act_upload')
+                    return redirect('tech_act_uploadDanao')
 
                 messages.success(request, f'Successfully uploaded {uploaded_images} images')
                 if errors:
                     for error in errors:
                         messages.warning(request, error)
 
-                return redirect('activity_list')
+                return redirect('activity_listDanao')
             else:
                 for field, error_list in form.errors.items():
                     for error in error_list:
                         messages.error(request, f'{field}: {error}')
-                return redirect('tech_act_upload')
+                return redirect('tech_act_uploadDanao')
 
         except DanaoUser.DoesNotExist:
             messages.error(request, 'User not found')
-            return redirect('tech_act_upload')
+            return redirect('tech_act_uploadDanao')
         except Exception as e:
             messages.error(request, str(e))
-            return redirect('tech_act_upload')
+            return redirect('tech_act_uploadDanao')
     else:
         form = DanaoTechnicalActivitiesForm(instance=tech)
 
