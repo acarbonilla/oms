@@ -1184,7 +1184,7 @@ def danao_tech_activity_pdf(request):
         # Add title
         pdf.setFillColor(colors_dict['dark'])
         pdf.setFont("Helvetica-Bold", 24)
-        pdf.drawCentredString(width/2, height - 50, "Technical Activity Report")
+        pdf.drawCentredString(width/2, height - 50, "Facility Management Inspection Report")
         
         # Add date and page number with Philippines time
         ph_time = localtime(today)  # Convert to Philippines time
@@ -1375,6 +1375,17 @@ def tech_activity_update_danao(request, pk):
         form = DanaoTechnicalActivitiesForm(request.POST, instance=activity)
         if form.is_valid():
             tech_activity = form.save(commit=False)
+            
+            # Decode HTML entities in remarks before saving
+            if tech_activity.remarks:
+                import html
+                
+                # Decode all HTML entities
+                decoded_remarks = html.unescape(tech_activity.remarks)
+                
+                # Update the remarks with decoded text
+                tech_activity.remarks = decoded_remarks
+            
             tech_activity.remark_by = DanaoUser.objects.get(name__id=request.user.id)
             tech_activity.save()
             messages.success(request, 'Activity updated successfully!')

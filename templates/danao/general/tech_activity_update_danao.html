@@ -439,10 +439,140 @@
             }
         });
 
-        // Ensure form submission includes editor content
-        document.querySelector('form').addEventListener('submit', function() {
+        // HTML Entity Decoder
+        function decodeHTMLEntities(text) {
+            const entities = {
+                'amp': '&',
+                'apos': "'",
+                'lt': '<',
+                'gt': '>',
+                'quot': '"',
+                'nbsp': ' ',
+                'ndash': '-',
+                'mdash': '--',
+                'lsquo': "'",
+                'rsquo': "'",
+                'sbquo': "'",
+                'ldquo': '"',
+                'rdquo': '"',
+                'bdquo': '"',
+                'prime': "'",
+                'Prime': '"',
+                'euro': '€',
+                'pound': '£',
+                'reg': '®',
+                'copy': '©',
+                'trade': '™',
+                'bull': '•',
+                'middot': '·',
+                'deg': '°',
+                '#39': "'",      // Add explicit mapping for &#39;
+                '#x27': "'",     // Add hex mapping for apostrophe
+                '#x2019': "'",   // Add hex mapping for right single quotation mark
+                '#x2018': "'",   // Add hex mapping for left single quotation mark
+                'percnt': '%'    // Add percent sign mapping
+            };
+
+            // Create a temporary textarea for robust HTML entity decoding
+            const textarea = document.createElement('textarea');
+            
+            // First pass: Handle numeric and hex entities
+            text = text.replace(/&#(x[0-9a-f]+|\d+);/gi, function(match, num) {
+                textarea.innerHTML = match;
+                return textarea.value;
+            });
+
+            // Second pass: Handle named entities
+            text = text.replace(/&([a-z]+|#[0-9]+|#x[0-9a-f]+);/gi, function(match, entity) {
+                if (entities[entity]) {
+                    return entities[entity];
+                }
+                textarea.innerHTML = match;
+                return textarea.value;
+            });
+
+            // Cleanup
+            textarea.remove();
+            return text;
+        }
+
+        // Clean HTML content
+        function cleanHtmlContent(html) {
+            // Step 1: Initial HTML entity decoding with double pass
+            let content = decodeHTMLEntities(decodeHTMLEntities(html));
+
+            // Step 2: Create a temporary div for HTML parsing
+            let temp = document.createElement('div');
+            temp.innerHTML = content;
+
+            // Step 3: Handle HTML structure
+            // Process paragraphs
+            let paragraphs = temp.getElementsByTagName('p');
+            for (let p of paragraphs) {
+                // Ensure proper spacing within paragraphs
+                p.innerHTML = p.innerHTML.trim().replace(/\s+/g, ' ');
+                p.innerHTML += '\n\n';  // Double newline after paragraphs
+            }
+
+            // Process lists
+            let lists = temp.querySelectorAll('ul, ol');
+            for (let list of lists) {
+                let items = list.getElementsByTagName('li');
+                for (let i = 0; i < items.length; i++) {
+                    let item = items[i];
+                    // Clean the list item content
+                    let itemContent = decodeHTMLEntities(item.innerHTML).trim();
+                    item.innerHTML = '• ' + itemContent + (i < items.length - 1 ? '\n' : '\n\n');
+                }
+            }
+
+            // Step 4: Get text content
+            content = temp.textContent || temp.innerText;
+
+            // Step 5: Text normalization
+            content = content
+                // Normalize quotes and apostrophes
+                .replace(/[''′]/g, "'")
+                .replace(/[""″]/g, '"')
+                .replace(/\u2019/g, "'")  // Handle Unicode right single quotation mark
+                .replace(/\u2018/g, "'")  // Handle Unicode left single quotation mark
+                
+                // Clean up whitespace
+                .replace(/\s*\n\s*/g, '\n')     // Clean up spaces around newlines
+                .replace(/\n{3,}/g, '\n\n')     // Max 2 consecutive newlines
+                .replace(/[ \t]+/g, ' ')        // Normalize spaces and tabs
+                
+                // Keep only desired characters and ensure proper spacing
+                .replace(/([.,!?:])([A-Za-z0-9])/g, '$1 $2')  // Add space after punctuation
+                .replace(/\s+/g, ' ')                         // Clean up any double spaces
+                .split('\n')
+                .map(line => {
+                    // Capitalize first letter of each sentence
+                    return line.trim().replace(/^[a-z]/, c => c.toUpperCase());
+                })
+                .filter(line => line)
+                .join('\n')
+                .trim();
+
+            // Step 6: Final cleanup
+            content = content
+                // Preserve contractions and possessives
+                .replace(/([A-Za-z0-9])'([A-Za-z])/g, '$1\'$2')
+                // Convert double apostrophes to quotes
+                .replace(/''/g, '"')
+                // Final space normalization
+                .replace(/\s+/g, ' ')
+                .trim();
+
+            return content;
+        }
+
+        // Ensure form submission includes cleaned editor content
+        document.querySelector('form').addEventListener('submit', function(e) {
             var editorContent = editor.getData();
-            document.getElementById('id_remarks').value = editorContent;
+            // Clean the content before submission
+            var cleanedContent = cleanHtmlContent(editorContent);
+            document.getElementById('id_remarks').value = cleanedContent;
         });
     });
 

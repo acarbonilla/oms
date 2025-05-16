@@ -799,6 +799,17 @@ def tech_act_upload(request, pk=None):
         try:
             if form.is_valid():
                 tech_activity = form.save(commit=False)
+                
+                # Decode HTML entities in remarks before saving
+                if tech_activity.remarks:
+                    import html
+                    
+                    # Decode all HTML entities
+                    decoded_remarks = html.unescape(tech_activity.remarks)
+                    
+                    # Update the remarks with decoded text
+                    tech_activity.remarks = decoded_remarks
+                
                 tech_activity.uploaded_by = C2User.objects.get(name__id=request.user.id)
                 tech_activity.save()
 
@@ -1259,29 +1270,34 @@ def tech_activity_pdf(request):
         return y_position - 30
 
     def add_remarks_section(y_position, activity):
-        """Add styled remarks section"""
-        if activity.remarks:
-            # Remarks header
-            pdf.setFillColor(colors_dict['primary'])
-            pdf.setFont("Helvetica-Bold", 12)
-            pdf.drawString(60, y_position, "Remarks")
-            
-            # Remarks content
-            y_position -= 20
-            pdf.setFillColor(colors_dict['dark'])
-            pdf.setFont("Helvetica", 10)
-            
-            # Handle HTML content
-            remarks_text = strip_tags(activity.remarks)
-            wrapped_text = textwrap.wrap(remarks_text, width=90)
-            
-            for line in wrapped_text:
-                pdf.drawString(70, y_position, line)
-                y_position -= 15
-            
-            y_position -= 10
+        """Add remarks section with proper text wrapping and HTML entity decoding"""
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.setFillColor(colors_dict['primary'])
+        pdf.drawString(60, y_position, "📝 Remarks:")
+        y_position -= 25
+
+        pdf.setFont("Helvetica", 10)
+        pdf.setFillColor(colors_dict['dark'])
         
-        return y_position
+        if activity.remarks:
+            import html
+            from django.utils.html import strip_tags
+            
+            # First decode any HTML entities
+            decoded_remarks = html.unescape(activity.remarks)
+            # Then strip HTML tags
+            clean_remarks = strip_tags(decoded_remarks)
+            
+            # Wrap text and draw each line
+            wrapped_text = textwrap.wrap(clean_remarks, width=100)
+            for line in wrapped_text:
+                pdf.drawString(60, y_position, line)
+                y_position -= 15
+        else:
+            pdf.drawString(60, y_position, "No remarks provided")
+            y_position -= 15
+
+        return y_position - 10
 
     def add_images_section(y_position, activity):
         """Add images in a grid layout"""
@@ -1395,6 +1411,17 @@ def tech_activity_update(request, pk):
         form = TechnicalActivitiesForm(request.POST, instance=activity)
         if form.is_valid():
             tech_activity = form.save(commit=False)
+            
+            # Decode HTML entities in remarks before saving
+            if tech_activity.remarks:
+                import html
+                
+                # Decode all HTML entities
+                decoded_remarks = html.unescape(tech_activity.remarks)
+                
+                # Update the remarks with decoded text
+                tech_activity.remarks = decoded_remarks
+            
             tech_activity.remark_by = C2User.objects.get(name__id=request.user.id)
             tech_activity.save()
             messages.success(request, 'Activity updated successfully!')

@@ -69,6 +69,18 @@ class DanaoTechnicalActivitiesForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # No need to modify 'uploaded_by' here; handled in the view
 
+    def clean_remarks(self):
+        """Clean and decode HTML entities in remarks field."""
+        remarks = self.cleaned_data.get('remarks')
+        if remarks:
+            import html
+            
+            # Decode all HTML entities in one pass
+            decoded_remarks = html.unescape(remarks)
+            
+            return decoded_remarks
+        return remarks
+
 
 class DanaoTechActivityImageForm(forms.ModelForm):
     class Meta:
