@@ -1346,13 +1346,18 @@ def danao_tech_activity_pdf(request):
             # Images header
             pdf.setFillColor(colors_dict['primary'])
             pdf.setFont("Helvetica-Bold", 12)
-            pdf.drawString(60, y_position, f"Images ({activity.imagesDanao.count()})")
+            pdf.drawString(40, y_position, f"Images ({activity.imagesDanao.count()})")
             y_position -= 30
 
             images = activity.imagesDanao.all()
             images_per_row = 3 if orientation == "landscape" else 2
-            image_width = (width - 120) / images_per_row
-            image_height = 150
+            # Adjust margins and spacing
+            left_margin = 40
+            right_margin = 40
+            spacing = 20  # Space between images
+            available_width = width - left_margin - right_margin
+            image_width = (available_width - (spacing * (images_per_row - 1))) / images_per_row
+            image_height = 160  # Adjusted height for better proportions
 
             for i, image in enumerate(images):
                 if y_position < 100:  # Check if we need a new page
@@ -1362,14 +1367,14 @@ def danao_tech_activity_pdf(request):
 
                 row = i // images_per_row
                 col = i % images_per_row
-                x_position = 60 + (col * (image_width + 10))
+                x_position = left_margin + (col * (image_width + spacing))
                 
                 try:
                     pdf.drawImage(
                         ImageReader(image.image.path),
                         x_position,
                         y_position - image_height,
-                        width=image_width - 10,
+                        width=image_width,
                         height=image_height,
                         preserveAspectRatio=True
                     )
@@ -1377,10 +1382,10 @@ def danao_tech_activity_pdf(request):
                     print(f"Error adding image: {e}")
 
                 if (i + 1) % images_per_row == 0:
-                    y_position -= (image_height + 20)
+                    y_position -= (image_height + 30)  # Increased spacing between rows
 
             if len(images) % images_per_row != 0:
-                y_position -= (image_height + 20)
+                y_position -= (image_height + 30)
 
         return y_position
 
