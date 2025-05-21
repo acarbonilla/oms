@@ -111,12 +111,12 @@ def evMemberDanao(request):
     # Get the start of this year
     start_of_year = ph_time_now.replace(month=1, day=1)
 
-    # ✅ Count form entries for this week, month, and year
+    # Count form entries for this week, month, and year
     weekly_count = DanaoRecentImage.objects.filter(created__gte=start_of_week).count()
     monthly_count = DanaoRecentImage.objects.filter(created__gte=start_of_month).count()
     yearly_count = DanaoRecentImage.objects.filter(created__gte=start_of_year).count()
 
-    # ✅ Get Passed Facilities within this month
+    # Get Passed Facilities within this month
     search_query = request.GET.get("search", "")
 
     passed_facilities = DanaoRecentImage.objects.filter(
@@ -124,14 +124,30 @@ def evMemberDanao(request):
         created__gte=start_of_month
     ).values("id", "s_image__facility__name", "created").distinct()
 
-    # ✅ Apply search filter
+    # Apply search filter
     if search_query:
         passed_facilities = passed_facilities.filter(s_image__facility__name__icontains=search_query)
 
-    # ✅ Pagination (10 per page)
+    # Pagination (10 per page)
     paginator = Paginator(passed_facilities, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
+
+    # New metrics for the dashboard
+    total_users = DanaoUser.objects.count()
+    active_facilities = DanaoFacility.objects.count()
+    pending_assessments = DanaoRecentImage.objects.filter(status="Pending").count()
+    tech_activities_count = DanaoTechActivities.objects.count()
+    
+    # Get facilities not visited in the last 30 days
+    one_month_ago = ph_time_now - timedelta(days=30)
+    visited_facilities = DanaoRecentImage.objects.filter(
+        created__gte=one_month_ago
+    ).values_list("s_image__facility__id", flat=True).distinct()
+    not_visited_count = DanaoFacility.objects.exclude(id__in=visited_facilities).count()
+
+    # Get pending count
+    pending_count = DanaoRecentImage.objects.filter(status="Pending").count()
 
     context = {
         "failed_sites_count": DanaoRecentImage.objects.filter(
@@ -142,12 +158,18 @@ def evMemberDanao(request):
         "passed_facilities_count": passed_facilities.count(),
         "page_obj": page_obj,
         "search_query": search_query,
-
-        # ✅ New Data for Weekly, Monthly, Yearly Form Counts
         "weekly_count": weekly_count,
         "monthly_count": monthly_count,
         "yearly_count": yearly_count,
         "title": "Evaluator Dashboard",
+        
+        # New context data
+        "total_users": total_users,
+        "active_facilities": active_facilities,
+        "pending_assessments": pending_assessments,
+        "tech_activities_count": tech_activities_count,
+        "not_visited_count": not_visited_count,
+        "pending_count": pending_count,
     }
     return render(request, 'danao/ev/danao_ev_dashboard.html', context)
 
