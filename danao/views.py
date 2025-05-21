@@ -1352,8 +1352,8 @@ def danao_tech_activity_pdf(request):
             images = activity.imagesDanao.all()
             images_per_row = 3 if orientation == "landscape" else 2
             # Adjust margins and spacing
-            left_margin = 40
-            right_margin = 40
+            left_margin = 20
+            right_margin = 20
             spacing = 20  # Space between images
             available_width = width - left_margin - right_margin
             image_width = (available_width - (spacing * (images_per_row - 1))) / images_per_row
