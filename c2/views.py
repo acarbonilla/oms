@@ -1270,34 +1270,89 @@ def tech_activity_pdf(request):
         return y_position - 30
 
     def add_remarks_section(y_position, activity):
-        """Add remarks section with proper text wrapping and HTML entity decoding"""
-        pdf.setFont("Helvetica-Bold", 12)
-        pdf.setFillColor(colors_dict['primary'])
-        pdf.drawString(60, y_position, "📝 Remarks:")
-        y_position -= 25
-
-        pdf.setFont("Helvetica", 10)
-        pdf.setFillColor(colors_dict['dark'])
-        
+        """Add styled remarks section with preserved formatting"""
         if activity.remarks:
-            import html
-            from django.utils.html import strip_tags
+            # Remarks header
+            pdf.setFillColor(colors_dict['primary'])
+            pdf.setFont("Helvetica-Bold", 12)
+            pdf.drawString(60, y_position, "Remarks")
             
-            # First decode any HTML entities
-            decoded_remarks = html.unescape(activity.remarks)
-            # Then strip HTML tags
-            clean_remarks = strip_tags(decoded_remarks)
+            # Remarks content
+            y_position -= 20
+            pdf.setFillColor(colors_dict['dark'])
+            pdf.setFont("Helvetica", 10)
             
-            # Wrap text and draw each line
-            wrapped_text = textwrap.wrap(clean_remarks, width=100)
-            for line in wrapped_text:
-                pdf.drawString(60, y_position, line)
-                y_position -= 15
-        else:
-            pdf.drawString(60, y_position, "No remarks provided")
-            y_position -= 15
-
-        return y_position - 10
+            # Handle HTML content with preserved formatting
+            remarks_text = activity.remarks
+            
+            # Replace common HTML bullets with PDF-friendly bullets
+            remarks_text = remarks_text.replace('<ul>', '').replace('</ul>', '')
+            remarks_text = remarks_text.replace('<ol>', '').replace('</ol>', '')
+            remarks_text = remarks_text.replace('<li>', '• ').replace('</li>', '')
+            
+            # Handle arrows and other special characters
+            remarks_text = remarks_text.replace('→', '→')
+            remarks_text = remarks_text.replace('←', '←')
+            remarks_text = remarks_text.replace('↑', '↑')
+            remarks_text = remarks_text.replace('↓', '↓')
+            remarks_text = remarks_text.replace('⇒', '⇒')
+            remarks_text = remarks_text.replace('⇐', '⇐')
+            
+            # Remove other HTML tags but preserve line breaks
+            remarks_text = strip_tags(remarks_text)
+            
+            # Split into lines and handle indentation
+            lines = remarks_text.split('\n')
+            current_number = 1  # Counter for numbered lists
+            
+            for line in lines:
+                # Skip empty lines
+                if not line.strip():
+                    y_position -= 15
+                    continue
+                
+                # Handle bullet points
+                if line.strip().startswith('•'):
+                    # Draw bullet point
+                    pdf.drawString(70, y_position, '•')
+                    # Draw text after bullet with proper indentation
+                    text = line.strip()[1:].strip()
+                    wrapped_text = textwrap.wrap(text, width=85)
+                    for i, wrapped_line in enumerate(wrapped_text):
+                        if i == 0:
+                            pdf.drawString(85, y_position, wrapped_line)
+                        else:
+                            pdf.drawString(85, y_position - (i * 15), wrapped_line)
+                    y_position -= (len(wrapped_text) * 15) + 5
+                # Handle numbered lists
+                elif line.strip().startswith(str(current_number) + '.'):
+                    # Draw number
+                    number_text = f"{current_number}."
+                    pdf.drawString(70, y_position, number_text)
+                    # Draw text after number with proper indentation
+                    text = line.strip()[len(number_text):].strip()
+                    wrapped_text = textwrap.wrap(text, width=85)
+                    for i, wrapped_line in enumerate(wrapped_text):
+                        if i == 0:
+                            pdf.drawString(85, y_position, wrapped_line)
+                        else:
+                            pdf.drawString(85, y_position - (i * 15), wrapped_line)
+                    y_position -= (len(wrapped_text) * 15) + 5
+                    current_number += 1
+                else:
+                    # Regular text without bullet or number
+                    wrapped_text = textwrap.wrap(line, width=90)
+                    for wrapped_line in wrapped_text:
+                        pdf.drawString(70, y_position, wrapped_line)
+                        y_position -= 15
+                    # Reset number counter for new lists
+                    current_number = 1
+                
+                y_position -= 5  # Add some spacing between lines
+            
+            y_position -= 10
+        
+        return y_position
 
     def add_images_section(y_position, activity):
         """Add images in a grid layout"""
