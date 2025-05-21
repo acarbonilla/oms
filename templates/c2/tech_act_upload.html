@@ -142,7 +142,7 @@
     }
 
     .preview-item img {
-        width: 120px;
+        width: 160px;
         height: 120px;
         object-fit: cover;
         border-radius: 12px;
@@ -283,7 +283,7 @@
                                multiple accept="image/*">
                         <div class="helper-text">
                             <i class="fas fa-info-circle"></i>
-                            Maximum 10 images, each up to 5MB
+                            Maximum 10 images, each up to 5MB. Images must have a 4:3 aspect ratio.
                         </div>
                     </div>
 
@@ -320,7 +320,7 @@
                         
                         <div class="helper-text">
                             <i class="fas fa-info-circle"></i>
-                            Maximum 10 photos allowed
+                            Maximum 10 photos allowed. Photos must have a 4:3 aspect ratio.
                         </div>
                     </div>
 
@@ -358,9 +358,9 @@
 
     // Resolution presets
     const resolutionPresets = {
-        high: { width: 1920, height: 1080 },
-        medium: { width: 1280, height: 720 },
-        low: { width: 640, height: 480 }
+        high: { width: 1920, height: 1440 },  // 4:3 ratio
+        medium: { width: 1280, height: 960 },  // 4:3 ratio
+        low: { width: 640, height: 480 }  // 4:3 ratio
     };
 
     async function loadCameras() {
@@ -445,10 +445,19 @@
 
         const canvas = document.createElement('canvas');
         const video = document.getElementById('cameraPreview');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        
+        // Force 4:3 aspect ratio
+        const targetWidth = video.videoWidth;
+        const targetHeight = Math.round(targetWidth * (3/4));
+        
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
         const context = canvas.getContext('2d');
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Center the image and crop to 4:3
+        const sourceX = 0;
+        const sourceY = (video.videoHeight - targetHeight) / 2;
+        context.drawImage(video, sourceX, sourceY, targetWidth, targetHeight, 0, 0, targetWidth, targetHeight);
 
         let quality = 0.8;
         let base64Image = canvas.toDataURL('image/jpeg', quality);
@@ -515,22 +524,36 @@
         files.forEach((file, index) => {
             const reader = new FileReader();
             reader.onload = function(e) {
-                const container = document.createElement('div');
-                container.className = 'preview-item';
-                container.style.opacity = '0';
-                container.style.transform = 'scale(0.8)';
-                
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                
-                container.appendChild(img);
-                previewContainer.appendChild(container);
+                const img = new Image();
+                img.onload = function() {
+                    // Check aspect ratio
+                    const aspectRatio = img.width / img.height;
+                    const targetRatio = 4/3;
+                    const tolerance = 0.1;
+                    
+                    if (Math.abs(aspectRatio - targetRatio) > tolerance) {
+                        alert(`Image "${file.name}" must have a 4:3 aspect ratio (current ratio: ${aspectRatio.toFixed(2)})`);
+                        return;
+                    }
 
-                // Staggered animation
-                setTimeout(() => {
-                    container.style.opacity = '1';
-                    container.style.transform = 'scale(1)';
-                }, 50 * index);
+                    const container = document.createElement('div');
+                    container.className = 'preview-item';
+                    container.style.opacity = '0';
+                    container.style.transform = 'scale(0.8)';
+                    
+                    const previewImg = document.createElement('img');
+                    previewImg.src = e.target.result;
+                    
+                    container.appendChild(previewImg);
+                    previewContainer.appendChild(container);
+
+                    // Staggered animation
+                    setTimeout(() => {
+                        container.style.opacity = '1';
+                        container.style.transform = 'scale(1)';
+                    }, 50 * index);
+                };
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         });

@@ -846,6 +846,15 @@ def tech_act_uploadDanao(request, pk=None):
                                 errors.append(f'File {file.name} dimensions too large (maximum 4096x4096)')
                                 continue
 
+                            # Check aspect ratio (4:3)
+                            aspect_ratio = img.width / img.height
+                            target_ratio = 4/3
+                            tolerance = 0.1  # Allow 10% deviation from perfect 4:3 ratio
+                            
+                            if abs(aspect_ratio - target_ratio) > tolerance:
+                                errors.append(f'File {file.name} must have a 4:3 aspect ratio (current ratio: {aspect_ratio:.2f})')
+                                continue
+
                         except Exception as e:
                             errors.append(f'File {file.name} appears to be corrupted')
                             continue
@@ -907,6 +916,15 @@ def tech_act_uploadDanao(request, pk=None):
                                     if img.width > 4096 or img.height > 4096:
                                         errors.append(
                                             f'Captured image {idx + 1} dimensions too large (maximum 4096x4096)')
+                                        continue
+
+                                    # Check aspect ratio (4:3)
+                                    aspect_ratio = img.width / img.height
+                                    target_ratio = 4/3
+                                    tolerance = 0.1  # Allow 10% deviation from perfect 4:3 ratio
+                                    
+                                    if abs(aspect_ratio - target_ratio) > tolerance:
+                                        errors.append(f'Captured image {idx + 1} must have a 4:3 aspect ratio (current ratio: {aspect_ratio:.2f})')
                                         continue
 
                                 except Exception as e:
