@@ -544,6 +544,7 @@
   .animated-text {
   animation: cyberpunkGlow 5s infinite alternate;
   transition: color 0.3s ease-in-out;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
 
 @keyframes cyberpunkGlow {
@@ -568,10 +569,7 @@
     <div class="dashboard-content">
         <!-- Quick Stats Section -->
         <div class="quick-stats">
-            <div class="quick-stat-item">
-                <div class="stat-label">👥 Total Users</div>
-                <div class="stat-value counter" data-target="{{ total_users }}">0</div>
-            </div>
+
             <div class="quick-stat-item">
                 <div class="stat-label">🏢 Active Facilities</div>
                 <div class="stat-value counter" data-target="{{ active_facilities }}">0</div>
