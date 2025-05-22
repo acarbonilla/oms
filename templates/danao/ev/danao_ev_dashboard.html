@@ -3,6 +3,27 @@
 {% block content %}
 
 <style>
+  body {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradientBG 10s ease infinite;
+    min-height: 100vh;
+  }
+
+  @keyframes gradientBG {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+
+
     /* Modern Color Palette - Enhanced Vibrant Colors */
     :root {
         --primary: #4361ee;
@@ -33,17 +54,16 @@
         min-height: 100vh;
         overflow-x: hidden;
         position: relative;
-        background: rgba(67, 97, 238, 0.1);
     }
 
     /* Bubble Animation */
     .bubble {
         position: absolute;
         border-radius: 50%;
-        background: rgba(67, 97, 238, 0.1);
+        background: rgba(67, 97, 238, 0.3); /* Increased opacity */
         filter: blur(5px);
-        z-index: 0;
-        animation: floatBubble 15s infinite ease-in-out, colorChange 20s infinite alternate;
+        z-index: 0; /* already correct */
+        animation: floatBubble 10s infinite ease-in-out, colorChange 15s infinite alternate;
     }
 
     @keyframes floatBubble {
@@ -140,7 +160,9 @@
         padding: 2rem;
         background: var(--gray-100);
         min-height: 100vh;
+
     }
+
 
     .dashboard-header {
         margin-bottom: 2rem;
@@ -158,7 +180,7 @@
         height: 2px;
         background: linear-gradient(to right, var(--primary), var(--primary-light));
     }
-
+/*
     .dashboard-header h2 {
         color: var(--dark);
         font-weight: 700;
@@ -178,7 +200,7 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
-
+*/
     /* Card Enhancements */
     .metric-card {
         background: linear-gradient(135deg, var(--primary), var(--primary-dark));
@@ -347,39 +369,6 @@
         margin: 0;
     }
 
-    /* Search Bar */
-    .search-container {
-        position: relative;
-        margin: 2rem 0;
-        max-width: 600px;
-    }
-
-    .search-container .form-control {
-        border-radius: 50px;
-        padding: 1rem 1.5rem;
-        border: 2px solid var(--gray-200);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        font-size: 1rem;
-        transition: all 0.3s ease;
-    }
-
-    .search-container .form-control:focus {
-        border-color: var(--primary);
-        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.15);
-    }
-
-    .search-container .btn {
-        background: linear-gradient(to right, var(--primary), var(--primary-light));
-        border: none;
-        transition: all 0.3s;
-        font-weight: 500;
-    }
-
-    .search-container .btn:hover {
-        background: linear-gradient(to right, var(--primary-dark), var(--primary));
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
-    }
 
     /* Facilities Table */
     .facilities-card {
@@ -550,12 +539,30 @@
             font-size: 1.5rem;
         }
     }
+
+    /* This is for animated text color title */
+  .animated-text {
+  animation: cyberpunkGlow 5s infinite alternate;
+  transition: color 0.3s ease-in-out;
+}
+
+@keyframes cyberpunkGlow {
+  0%   { color: #ff00ff; }   /* Neon Magenta */
+  25%  { color: #00ffff; }   /* Cyan */
+  50%  { color: #39ff14; }   /* Neon Green */
+  75%  { color: #ff3131; }   /* Hot Red */
+  100% { color: #f5f242; }   /* Neon Yellow */
+}
+
 </style>
 
 <div class="container-fluid dashboard-containers">
     <!-- Bubbles will be added here by JavaScript -->
     <div class="dashboard-header">
-        <h2><i class="fas fa-chart-line"></i> Evaluator Dashboard</h2>
+       <h2 class="animated-text">
+          <i class="fas fa-chart-line"></i>
+         Evaluator Dashboard
+       </h2>
     </div>
 
     <div class="dashboard-content">
