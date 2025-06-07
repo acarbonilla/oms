@@ -175,23 +175,177 @@
 
     /* Responsive Adjustments */
     @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
         .metric-card .card-title {
             font-size: 1.8rem;
         }
+
         .entry-card .card-text {
             font-size: 1.5rem;
+        }
+
+        .search-container {
+            margin: 1rem 0;
+        }
+
+        .search-container .form-control {
+            padding: 10px 15px;
+            font-size: 0.95rem;
+        }
+
+        .search-container .btn {
+            padding: 6px 15px;
+            font-size: 0.9rem;
+        }
+
+        .table {
+            font-size: 0.9rem;
+        }
+
+        .table thead th {
+            padding: 0.75rem;
+        }
+
+        .table tbody td {
+            padding: 0.75rem;
+        }
+
+        .pagination .page-link {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .card-header {
+            font-size: 1rem;
+            padding: 0.75rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .dashboard-container {
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+        }
+
+        .metric-card {
+            margin-bottom: 0.75rem;
+        }
+
+        .metric-card .card-title {
+            font-size: 1.5rem;
+        }
+
+        .entry-card .card-text {
+            font-size: 1.3rem;
+        }
+
+        .entry-card .card-title {
+            font-size: 0.9rem;
+        }
+
+        .facilities-card .card-header {
+            font-size: 0.95rem;
+            padding: 0.6rem;
+        }
+
+        .table {
+            font-size: 0.85rem;
+        }
+
+        .table thead th {
+            padding: 0.5rem;
+        }
+
+        .table tbody td {
+            padding: 0.5rem;
+        }
+
+        .pagination {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+
+        .pagination .page-link {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.85rem;
+        }
+
+        .search-container .form-control {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .search-container .btn {
+            padding: 5px 12px;
+            font-size: 0.85rem;
+        }
+    }
+
+    @media (max-width: 360px) {
+        .dashboard-container {
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .metric-card .card-title {
+            font-size: 1.3rem;
+        }
+
+        .entry-card .card-text {
+            font-size: 1.1rem;
+        }
+
+        .entry-card .card-title {
+            font-size: 0.85rem;
+        }
+
+        .facilities-card .card-header {
+            font-size: 0.9rem;
+            padding: 0.5rem;
+        }
+
+        .table {
+            font-size: 0.8rem;
+        }
+
+        .table thead th {
+            padding: 0.4rem;
+        }
+
+        .table tbody td {
+            padding: 0.4rem;
+        }
+
+        .pagination .page-link {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .search-container .form-control {
+            padding: 6px 10px;
+            font-size: 0.85rem;
+        }
+
+        .search-container .btn {
+            padding: 4px 10px;
+            font-size: 0.8rem;
         }
     }
 
 </style>
 
-<div class="container dashboard-container">
-    <h2 class="mb-4" style="color: var(--dark); font-weight: 700;">Evaluator Dashboard</h2>
+<div class="container-fluid dashboard-container">
+    <h2 class="mb-4" style="color: var(--dark); font-weight: 700; font-size: clamp(1.5rem, 4vw, 2rem);">Evaluator Dashboard</h2>
 
     <!-- Metrics Row with Animated Counters -->
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card text-white  text-center bg-danger mb-3 metric-card" id="failed-sites-card">
+    <div class="row g-2">
+        <div class="col-12 col-md-4">
+            <div class="card text-white text-center bg-danger mb-2 metric-card" id="failed-sites-card">
                 <div class="card-header">Failed Sites (Last 30 Days)</div>
                 <div class="card-body">
                     <h4 class="card-title counter" data-target="{{ failed_sites_count }}">0</h4>
@@ -199,8 +353,8 @@
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card text-white text-center bg-primary mb-3 metric-card" id="total-facilities-card">
+        <div class="col-12 col-md-4">
+            <div class="card text-white text-center bg-primary mb-2 metric-card" id="total-facilities-card">
                 <div class="card-header">Total Facilities</div>
                 <div class="card-body">
                     <h4 class="card-title counter" data-target="{{ total_facilities }}">0</h4>
@@ -208,8 +362,8 @@
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card text-white text-center bg-success mb-3 metric-card" id="passed-facilities-card">
+        <div class="col-12 col-md-4">
+            <div class="card text-white text-center bg-success mb-2 metric-card" id="passed-facilities-card">
                 <div class="card-header">Facilities Passed This Month</div>
                 <div class="card-body">
                     <h4 class="card-title counter" data-target="{{ passed_facilities_count }}">0</h4>
@@ -219,8 +373,8 @@
     </div>
 
     <!-- Form Entry Counts -->
-    <div class="row mt-4">
-        <div class="col-md-4">
+    <div class="row g-2 mt-3">
+        <div class="col-12 col-md-4">
             <div class="card entry-card h-100" style="animation-delay: 0.1s;">
                 <div class="card-body text-center">
                     <h5 class="card-title">🗓 Form Entries This Week</h5>
@@ -229,7 +383,7 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <div class="card entry-card h-100" style="animation-delay: 0.2s;">
                 <div class="card-body text-center">
                     <h5 class="card-title">📆 Form Entries This Month</h5>
@@ -238,7 +392,7 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <div class="card entry-card h-100" style="animation-delay: 0.3s;">
                 <div class="card-body text-center">
                     <h5 class="card-title">📅 Form Entries This Year</h5>

@@ -173,21 +173,115 @@
             padding: 1rem;
             margin-top: 0.5rem;
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            max-height: calc(100vh - 60px);
+            overflow-y: auto;
+            position: fixed;
+            top: 56px;
+            left: 0;
+            right: 0;
+            z-index: 1000;
         }
 
         .nav-link {
             margin: 0.25rem 0;
             padding: 0.75rem 1rem !important;
+            white-space: nowrap;
+        }
+
+        .dropdown-menu {
+            background: rgba(15, 42, 72, 0.95);
+            border: none;
+            box-shadow: none;
+            padding: 0.5rem 0;
+            position: static !important;
+            transform: none !important;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .navbar-nav {
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar-brand {
+            font-size: 1.4rem;
+        }
+
+        .dropdown-toggle::after {
+            float: right;
+            margin-top: 0.5rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .navbar-brand {
+            font-size: 1.2rem;
+        }
+
+        .nav-link {
+            font-size: 0.95rem;
+            padding: 0.6rem 0.8rem !important;
+        }
+
+        .dropdown-item {
+            font-size: 0.9rem;
+            padding: 0.4rem 0.8rem;
+        }
+
+        #topA span {
+            display: none;
+        }
+
+        .navbar-toggler {
+            padding: 0.4rem;
+        }
+
+        .navbar-collapse {
+            padding: 0.8rem;
+        }
+
+        .dropdown-menu {
+            margin-top: 0.3rem;
+        }
+    }
+
+    @media (max-width: 360px) {
+        .navbar-brand {
+            font-size: 1.1rem;
+        }
+
+        .nav-link {
+            font-size: 0.9rem;
+            padding: 0.5rem 0.7rem !important;
+        }
+
+        .dropdown-item {
+            font-size: 0.85rem;
+            padding: 0.35rem 0.7rem;
+        }
+
+        .navbar-toggler {
+            padding: 0.3rem;
+        }
+
+        .navbar-collapse {
+            padding: 0.6rem;
         }
     }
 </style>
 
 <nav class="navbar navbar-expand-lg fixed-top" id="nav">
-    <div class="container-fluid">
+    <div class="container-fluid px-2">
         <a class="navbar-brand" href="#" id="glow">
             ZFC-C2
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-expanded="false">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
