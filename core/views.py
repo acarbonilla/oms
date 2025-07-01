@@ -31,4 +31,13 @@ def group_based_redirect(request):
     if user.groups.filter(name='AM_D').exists():
         return redirect('amMemberDanao')
 
+    if user.groups.filter(name='EMP_M').exists():
+        return redirect('empMemberMindanao')
+
+    if user.groups.filter(name='EV_M').exists():
+        return redirect('evMemberMindanao')
+
+    if user.groups.filter(name='AM_M').exists():
+        return redirect('amMemberMindanao')
+
     return redirect('defaultPage')

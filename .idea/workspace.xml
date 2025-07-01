@@ -4,7 +4,50 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="66939e78-aa53-4976-9238-052a50849d6b" name="Changes" comment="" />
+    <list default="true" id="66939e78-aa53-4976-9238-052a50849d6b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/mindanao/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/am/mindanao_am_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/am/navbar.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/emp/danao_emp_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/emp/emp_qr_upload.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/emp/form/upload_recent_image.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/emp/navbar.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/ev/mindanao_ev_dashboard.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/ev/mindanao_not_visited_facilities_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/ev/mindanao_s_image_standard.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/ev/mindanao_standard_image_details.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/ev/mindanao_upload_recent_image_qr.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/ev/navbar.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/general/mindanao_activity_detail.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/general/mindanao_activity_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/general/mindanao_assessment.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/general/mindanao_ev_update_recent_image.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/general/mindanao_facility_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/general/mindanao_failed_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/general/mindanao_pass_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/general/mindanao_recent_image_detail.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/general/mindanao_report_selection.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/general/mindanao_tech_act_upload.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/general/mindanao_tech_activity_download.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/general/navbar.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/general/report.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/mindanao/general/tech_activity_update_mindanao.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/danao/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/mindanao/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/danao/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/danao/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/danao/danao_context.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/danao/forms.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/danao/migrations/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/mindanao/mindanao_context.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/danao/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/danao/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/danao/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/danao/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oms/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/oms/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oms/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/oms/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -41,20 +84,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/dc/PycharmProjects/oms/media/danao&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/dc/PycharmProjects/oms/templates/mindanao"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\dc\PycharmProjects\oms\templates\mindanao" />
       <recent name="C:\Users\dc\PycharmProjects\oms\media\danao" />
       <recent name="C:\Users\dc\PycharmProjects\oms\templates\danao\am" />
       <recent name="C:\Users\dc\PycharmProjects\oms\templates\danao" />
       <recent name="C:\Users\dc\PycharmProjects\oms\media\img\production" />
-      <recent name="C:\Users\dc\PycharmProjects\oms\media\img\development" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\dc\PycharmProjects\oms\templates\danao\general" />
@@ -176,6 +219,15 @@
           <url>file://$PROJECT_DIR$/danao/views.py</url>
           <line>765</line>
           <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/mindanao/views.py</url>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/mindanao/views.py</url>
+          <line>1156</line>
+          <option name="timeStamp" value="19" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

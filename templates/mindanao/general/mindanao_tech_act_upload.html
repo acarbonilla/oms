@@ -1,0 +1,678 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    /* Enhanced Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideIn {
+        from { transform: translateX(-20px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
+
+    /* Enhanced Card Styles */
+    .upload-card {
+        animation: fadeInUp 0.6s ease-out forwards;
+        border: none;
+        border-radius: 15px;
+        background: linear-gradient(145deg, #ffffff, #f5f7fa);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .upload-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+    }
+
+    /* Title Styles */
+    .page-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 10px;
+    }
+
+    .page-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(90deg, #007bff, #00d2ff);
+        border-radius: 2px;
+    }
+
+    /* Form Controls */
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 12px;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        transform: translateY(-2px);
+    }
+
+    /* Section Transitions */
+    #upload-section, #camera-section {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    #upload-section.d-none, #camera-section.d-none {
+        display: none !important;
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    #upload-section:not(.d-none), #camera-section:not(.d-none) {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Input Method Selection */
+    .input-method-container {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+
+    .method-option {
+        flex: 1;
+        max-width: 200px;
+        text-align: center;
+        padding: 20px;
+        border-radius: 12px;
+        background: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: slideIn 0.5s ease-out forwards;
+        position: relative;
+        border: 2px solid transparent;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .method-option:hover {
+        background: #e9ecef;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .method-option::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 10px;
+        background: linear-gradient(45deg, #007bff, #00d2ff);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 0;
+    }
+
+    .method-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        cursor: pointer;
+        z-index: 3;
+        margin: 0;
+    }
+
+    .method-option label {
+        display: block;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        position: relative;
+        z-index: 2;
+        transition: all 0.3s ease;
+        padding: 10px;
+    }
+
+    .method-option input[type="radio"]:checked + label {
+        color: #007bff;
+        font-weight: 600;
+        transform: translateY(-2px);
+    }
+
+    .method-option input[type="radio"]:checked + label i {
+        color: #007bff;
+        transform: scale(1.1);
+    }
+
+    .method-option input[type="radio"]:checked ~ .method-option {
+        background: #ffffff;
+        border: 2px solid #007bff;
+    }
+
+    .method-option input[type="radio"]:checked + label::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 3px;
+        background: #007bff;
+        border-radius: 2px;
+        animation: fadeInUp 0.3s ease forwards;
+    }
+
+    .method-option i {
+        font-size: 28px;
+        margin-bottom: 12px;
+        color: #6c757d;
+        transition: all 0.3s ease;
+        display: block;
+    }
+
+    .method-option:hover i {
+        color: #007bff;
+        transform: scale(1.05);
+    }
+
+    .method-option span {
+        display: block;
+        margin-top: 8px;
+        font-size: 0.95rem;
+        color: #495057;
+        transition: color 0.3s ease;
+    }
+
+    /* Preview Containers */
+    .preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .preview-item {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .preview-item:hover {
+        transform: translateY(-3px);
+    }
+
+    .preview-item img {
+        width: 160px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 12px;
+    }
+
+    .delete-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .delete-btn:hover {
+        background: #dc3545;
+        color: white;
+    }
+
+    /* Camera Section */
+    .camera-section {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .camera-preview {
+        width: 100%;
+        max-width: 500px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin: 0 auto;
+    }
+
+    /* Action Buttons */
+    .action-btn {
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .btn-capture {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        border: none;
+        color: white;
+    }
+
+    .btn-submit {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        border: none;
+        color: white;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Helper Text */
+    .helper-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Error Messages */
+    .error-message {
+        animation: fadeInUp 0.4s ease-out;
+        border-radius: 10px;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="upload-card p-4">
+                <h2 class="text-center page-title">
+                    <i class="fas fa-tasks me-2"></i>Upload Technical Activity
+                </h2>
+
+                <form enctype="multipart/form-data" method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" for="id_name">
+                            <i class="fas fa-clipboard me-2"></i>Activity Name
+                        </label>
+                        <input class="form-control" id="id_name" name="name"
+                               placeholder="Enter activity name" type="text" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" for="id_location">
+                            <i class="fas fa-map-marker-alt me-2"></i>Location
+                        </label>
+                        <input class="form-control" id="id_location" name="location"
+                               placeholder="Enter location" required type="text">
+                    </div>
+                    <!--
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" for="id_remarks">
+                            <i class="fas fa-comment me-2"></i>Remarks
+                        </label>
+                        <textarea class="form-control" id="id_remarks" name="remarks"
+                                  placeholder="Enter remarks (optional)" rows="4"></textarea>
+                    </div>
+                    -->
+                    <div class="input-method-container">
+                        <div class="method-option">
+                            <input type="radio" name="input_method" id="uploadRadio" value="upload" checked>
+                            <label for="uploadRadio">
+                                <i class="fas fa-file-upload"></i>
+                                <span>Upload Images</span>
+                            </label>
+                        </div>
+                        <div class="method-option">
+                            <input type="radio" name="input_method" id="cameraRadio" value="camera">
+                            <label for="cameraRadio">
+                                <i class="fas fa-camera"></i>
+                                <span>Use Camera</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Upload Section -->
+                    <div class="mb-4 d-none" id="upload-section">
+                        <label class="form-label fw-bold" for="image-input">
+                            <i class="fas fa-images me-2"></i>Upload Images
+                        </label>
+                        <input type="file" class="form-control" name="image" id="image-input"
+                               multiple accept="image/*">
+                        <div class="helper-text">
+                            <i class="fas fa-info-circle"></i>
+                            Maximum 10 images, each up to 5MB. Images must have a 4:3 aspect ratio.
+                        </div>
+                    </div>
+
+                    <!-- Camera Section -->
+                    <div class="camera-section d-none" id="camera-section">
+                        <div id="camera-error" class="error-message alert alert-danger d-none"></div>
+
+                        <div class="camera-controls mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-video me-2"></i>Camera Settings
+                            </label>
+                            <select class="form-select mb-2" id="camera-select">
+                                <option value="">Loading cameras...</option>
+                            </select>
+                            <select class="form-select" id="resolution-select">
+                                <option value="high">High Quality</option>
+                                <option value="medium" selected>Medium Quality</option>
+                                <option value="low">Low Quality</option>
+                            </select>
+                        </div>
+
+                        <div class="camera-preview mb-3">
+                            <video id="cameraPreview" autoplay playsinline style="width: 100%;"></video>
+                        </div>
+
+                        <div class="text-center mb-3">
+                            <button type="button" class="action-btn btn-capture" id="captureBtn">
+                                <i class="fas fa-camera me-2"></i>Capture Photo
+                            </button>
+                        </div>
+
+                        <input type="hidden" name="captured_images" id="captured-images">
+                        <div class="preview-container" id="captured-images-preview"></div>
+
+                        <div class="helper-text">
+                            <i class="fas fa-info-circle"></i>
+                            Maximum 10 photos allowed. Photos must have a 4:3 aspect ratio.
+                        </div>
+                    </div>
+
+                    <!-- Image Previews -->
+                    <div class="preview-container" id="preview-container"></div>
+
+                    <div class="text-center mt-4">
+                        <button class="action-btn btn-submit" type="submit">
+                            <i class="fas fa-upload me-2"></i>Upload Activity
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const uploadRadio = document.getElementById('uploadRadio');
+    const cameraRadio = document.getElementById('cameraRadio');
+    const uploadSection = document.getElementById('upload-section');
+    const cameraSection = document.getElementById('camera-section');
+    const capturedImagesInput = document.getElementById('captured-images');
+    const capturedImagesPreview = document.getElementById('captured-images-preview');
+    const cameraError = document.getElementById('camera-error');
+    const cameraSelect = document.getElementById('camera-select');
+    const resolutionSelect = document.getElementById('resolution-select');
+    let stream;
+    let capturedImages = [];
+    const MAX_IMAGES = 10;
+    const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+
+    // Initialize sections on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initially hide both sections
+        uploadSection.classList.add('d-none');
+        cameraSection.classList.add('d-none');
+        
+        // Show the default section (upload) since uploadRadio is checked by default
+        toggleInputMethod();
+    });
+
+    uploadRadio.addEventListener('change', toggleInputMethod);
+    cameraRadio.addEventListener('change', toggleInputMethod);
+
+    // Resolution presets
+    const resolutionPresets = {
+        high: { width: 1920, height: 1440 },  // 4:3 ratio
+        medium: { width: 1280, height: 960 },  // 4:3 ratio
+        low: { width: 640, height: 480 }  // 4:3 ratio
+    };
+
+    async function loadCameras() {
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = devices.filter(device => device.kind === 'videoinput');
+
+            cameraSelect.innerHTML = videoDevices.length
+                ? videoDevices.map(device =>
+                    `<option value="${device.deviceId}">${device.label || `Camera ${videoDevices.indexOf(device) + 1}`}</option>`
+                ).join('')
+                : '<option value="">No cameras found</option>';
+        } catch (error) {
+            showError('Failed to load cameras: ' + error.message);
+        }
+    }
+
+    function showError(message) {
+        cameraError.textContent = message;
+        cameraError.classList.remove('d-none');
+    }
+
+    function hideError() {
+        cameraError.classList.add('d-none');
+    }
+
+    async function startCamera() {
+        stopCamera();
+        hideError();
+
+        const resolution = resolutionPresets[resolutionSelect.value];
+
+        try {
+            const constraints = {
+                video: {
+                    deviceId: cameraSelect.value ? { exact: cameraSelect.value } : undefined,
+                    width: { ideal: resolution.width },
+                    height: { ideal: resolution.height },
+                    facingMode: { ideal: "environment" }
+                }
+            };
+
+            stream = await navigator.mediaDevices.getUserMedia(constraints);
+            const video = document.getElementById('cameraPreview');
+            video.srcObject = stream;
+            await loadCameras();
+        } catch (error) {
+            showError('Camera access error: ' + error.message);
+            uploadRadio.checked = true;
+            toggleInputMethod();
+        }
+    }
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+    }
+
+    function toggleInputMethod() {
+        // First remove the display:none to allow for transitions
+        if (uploadRadio.checked) {
+            uploadSection.style.display = '';
+            setTimeout(() => {
+                uploadSection.classList.remove('d-none');
+                cameraSection.classList.add('d-none');
+            }, 50);
+            stopCamera();
+        } else {
+            cameraSection.style.display = '';
+            setTimeout(() => {
+                cameraSection.classList.remove('d-none');
+                uploadSection.classList.add('d-none');
+            }, 50);
+            startCamera();
+        }
+    }
+
+    // Handle camera and resolution changes
+    cameraSelect.addEventListener('change', startCamera);
+    resolutionSelect.addEventListener('change', startCamera);
+
+    document.getElementById('captureBtn').addEventListener('click', () => {
+        if (capturedImages.length >= MAX_IMAGES) {
+            showError(`Maximum ${MAX_IMAGES} images allowed`);
+            return;
+        }
+
+        const canvas = document.createElement('canvas');
+        const video = document.getElementById('cameraPreview');
+        
+        // Force 4:3 aspect ratio
+        const targetWidth = video.videoWidth;
+        const targetHeight = Math.round(targetWidth * (3/4));
+        
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+        const context = canvas.getContext('2d');
+        
+        // Center the image and crop to 4:3
+        const sourceX = 0;
+        const sourceY = (video.videoHeight - targetHeight) / 2;
+        context.drawImage(video, sourceX, sourceY, targetWidth, targetHeight, 0, 0, targetWidth, targetHeight);
+
+        let quality = 0.8;
+        let base64Image = canvas.toDataURL('image/jpeg', quality);
+
+        const container = document.createElement('div');
+        container.className = 'preview-item';
+
+        const img = document.createElement('img');
+        img.src = base64Image;
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.onclick = (e) => {
+            e.preventDefault();
+            container.style.opacity = '0';
+            container.style.transform = 'scale(0.8)';
+            setTimeout(() => {
+                const index = capturedImages.indexOf(base64Image);
+                if (index > -1) {
+                    capturedImages.splice(index, 1);
+                    container.remove();
+                    capturedImagesInput.value = JSON.stringify(capturedImages);
+                }
+            }, 300);
+        };
+
+        container.appendChild(img);
+        container.appendChild(deleteBtn);
+        capturedImagesPreview.appendChild(container);
+
+        // Animation
+        container.style.opacity = '0';
+        container.style.transform = 'scale(0.8)';
+        setTimeout(() => {
+            container.style.opacity = '1';
+            container.style.transform = 'scale(1)';
+        }, 50);
+
+        capturedImages.push(base64Image);
+        capturedImagesInput.value = JSON.stringify(capturedImages);
+        hideError();
+    });
+
+    document.getElementById('image-input').addEventListener('change', function(event) {
+        const files = Array.from(event.target.files);
+        
+        if (files.length > MAX_IMAGES) {
+            alert(`Maximum ${MAX_IMAGES} images allowed`);
+            this.value = '';
+            return;
+        }
+
+        const oversizedFiles = files.filter(file => file.size > MAX_IMAGE_SIZE);
+        if (oversizedFiles.length > 0) {
+            alert(`Some files exceed the ${MAX_IMAGE_SIZE / 1024 / 1024}MB limit:\n${oversizedFiles.map(f => f.name).join('\n')}`);
+            this.value = '';
+            return;
+        }
+
+        const previewContainer = document.getElementById('preview-container');
+        previewContainer.innerHTML = '';
+
+        files.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // Check aspect ratio
+                    const aspectRatio = img.width / img.height;
+                    const targetRatio = 4/3;
+                    const tolerance = 0.1;
+                    
+                    if (Math.abs(aspectRatio - targetRatio) > tolerance) {
+                        alert(`Image "${file.name}" must have a 4:3 aspect ratio (current ratio: ${aspectRatio.toFixed(2)})`);
+                        return;
+                    }
+
+                    const container = document.createElement('div');
+                    container.className = 'preview-item';
+                    container.style.opacity = '0';
+                    container.style.transform = 'scale(0.8)';
+                    
+                    const previewImg = document.createElement('img');
+                    previewImg.src = e.target.result;
+                    
+                    container.appendChild(previewImg);
+                    previewContainer.appendChild(container);
+
+                    // Staggered animation
+                    setTimeout(() => {
+                        container.style.opacity = '1';
+                        container.style.transform = 'scale(1)';
+                    }, 50 * index);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    // Stop camera on unload
+    window.addEventListener("beforeunload", stopCamera);
+</script>
+
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+
+#shadow {
+  box-shadow: 10px 10px 5px lightblue;
+}
+</style>
+<div class="container mt-4 border-top rounded-end" id="shadow">
+    <h2 class="mb-3 mt-4">Recent Image Details</h2>
+
+    <div class="row">
+        <!-- ✅ Left Side: Information -->
+        <div class="col-md-4 mb-3">
+            <ul class="list-group">
+                <li class="list-group-item"><strong>ID #:</strong> {{ image.id }}</li>
+                <li class="list-group-item"><strong>Title:</strong> {{ image.title }}</li>
+                <li class="list-group-item"><strong>Facility Name:</strong> {{ image.s_image.facility.name }}</li>
+                <li class="list-group-item"><strong>Status:</strong> {{ image.status }}</li>
+                <li class="list-group-item"><strong>Updated:</strong> {{ image.updated|date:"F j, Y, g:i a" }}</li>
+                <li class="list-group-item"><strong>Created:</strong> {{ image.created|date:"F j, Y, g:i a" }}</li>
+                 <li class="list-group-item"><strong>Evaluated By:</strong>
+                    {% if image.remark_by %}
+                         {{ image.remark_by.first_name }} {{ image.remark_by.last_name }}
+                    {% else %}
+                        Not Evaluated!
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+
+        <!-- ✅ Right Side: Image -->
+        <div class="col-md-8 text-center">
+            <img src="{{ image.recent_image.url }}" width="500" class="img-fluid rounded shadow" alt="Recent Image"
+                 style="max-width: 90%; height: auto;">
+        </div>
+    </div>
+
+    <a href="{% url 'assessmentDanao' %}" class="btn btn-secondary mt-2 mb-2">Back</a>
+</div>
+
+{% endblock %}

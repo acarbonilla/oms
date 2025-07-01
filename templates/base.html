@@ -94,6 +94,18 @@
     <div class="row">{% include 'danao/am/navbar.html' %}</div>
     <br/><br/><br/>
 
+    <!-- This is for Mindanao -->
+    {% elif user in all_ev_m %}
+    <div class="row">{% include 'mindanao/ev/navbar.html' %}</div>
+    <br/><br/><br/>
+
+    {% elif user in all_emp_m %}
+    <div class="row">{% include 'mindanao/emp/navbar.html' %}</div>
+    <br/><br/><br/>
+    {% elif user in all_am_m %}
+    <div class="row">{% include 'mindanao/am/navbar.html' %}</div>
+    <br/><br/><br/>
+
     {% else %}
 
     {% endif %}

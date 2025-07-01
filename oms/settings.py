@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'core',
     'c2',
     'danao',
+    'mindanao',
 
     # Editor
     'ckeditor',
@@ -77,6 +78,11 @@ TEMPLATES = [
                 'danao.danao_context.am_group_danao',
                 'danao.danao_context.emp_group_danao',
                 'danao.danao_context.ev_group_danao',
+
+                # Mindanao Group
+                'mindanao.mindanao_context.am_group_mindanao',
+                'mindanao.mindanao_context.emp_group_mindanao',
+                'mindanao.mindanao_context.ev_group_mindanao',
 
             ],
         },

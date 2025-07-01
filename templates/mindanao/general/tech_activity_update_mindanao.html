@@ -1,0 +1,602 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<style>
+    .update-container {
+        display: flex;
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+
+    .form-section {
+        flex: 1;
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .images-section {
+        flex: 1;
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .image-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .image-card {
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+
+    .image-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .image-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .image-info {
+        padding: 0.5rem;
+        background: rgba(0,0,0,0.05);
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        color: #333;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #007bff;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #555;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+    }
+
+    .btn-update {
+        background: #007bff;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        border: none;
+        transition: all 0.3s;
+    }
+
+    .btn-update:hover {
+        background: #0056b3;
+        transform: translateY(-2px);
+    }
+
+    .metadata {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+    }
+
+    .metadata-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .metadata-item i {
+        margin-right: 0.5rem;
+        color: #007bff;
+    }
+
+    /* Rich Text Editor Styling */
+    .remarks-section {
+        margin-bottom: 2rem;
+    }
+
+    .remarks-label {
+        display: block;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Enhanced CKEditor Styling */
+    .cke_chrome {
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .cke_inner {
+        background: #fff !important;
+        border-radius: 8px !important;
+    }
+
+    .cke_top {
+        background: #f8fafc !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        padding: 8px !important;
+        border-radius: 8px 8px 0 0 !important;
+    }
+
+    /* Hide all unwanted UI elements */
+    .cke_bottom,
+    .cke_resizer,
+    .cke_path,
+    .cke_voice_label,
+    .cke_combo_text,
+    .cke_button_label,
+    .cke_notification_warning {
+        display: none !important;
+    }
+
+    /* Toolbar button styling */
+    .cke_button {
+        padding: 4px 6px !important;
+        border-radius: 4px !important;
+        transition: all 0.2s !important;
+    }
+
+    .cke_button:hover {
+        background-color: #e2e8f0 !important;
+    }
+
+    .cke_button_on {
+        background-color: #e2e8f0 !important;
+    }
+
+    /* Toolbar group spacing */
+    .cke_toolbar {
+        margin-right: 8px !important;
+    }
+
+    /* Editor content area */
+    .cke_editable {
+        padding: 16px !important;
+        font-family: 'Poppins', sans-serif !important;
+        font-size: 14px !important;
+        line-height: 1.6 !important;
+    }
+
+    /* Separator styling */
+    .cke_toolbar_separator {
+        background-color: #e2e8f0 !important;
+        margin: 0 8px !important;
+    }
+
+    /* Remove button borders */
+    .cke_toolgroup {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Enhanced preview section */
+    .remarks-preview {
+        margin-top: 1.5rem;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .remarks-preview h6 {
+        margin: 0;
+        padding: 12px 16px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 0.875rem;
+        color: #4a5568;
+    }
+
+    .remarks-content {
+        padding: 16px;
+        color: #2d3748;
+        font-size: 0.875rem;
+    }
+
+    /* Style for formatted content in preview */
+    .remarks-content p {
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+
+    .remarks-content ul,
+    .remarks-content ol {
+        margin-bottom: 1rem;
+        padding-left: 1.5rem;
+    }
+
+    .remarks-content li {
+        margin-bottom: 0.5rem;
+    }
+
+    .remarks-content a {
+        color: #4299e1;
+        text-decoration: none;
+    }
+
+    .remarks-content a:hover {
+        text-decoration: underline;
+    }
+
+    /* Form Controls Enhancement */
+    .form-control-lg {
+        font-size: 1rem;
+        padding: 1rem;
+    }
+
+    .form-floating label {
+        padding: 1rem;
+    }
+
+    .image-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.9);
+    }
+
+    .modal-content {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+    }
+
+    .close {
+        position: absolute;
+        right: 35px;
+        top: 15px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+</style>
+
+<div class="container">
+    <h1 class="text-center mb-4">{{ title }}</h1>
+
+    <div class="update-container">
+        <!-- Left Side - Form -->
+        <div class="form-section">
+            <h2 class="section-title">
+                <i class="fas fa-edit me-2"></i>Edit Activity Details
+            </h2>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control form-control-lg" id="{{ form.name.id_for_label }}"
+                           name="{{ form.name.html_name }}" value="{{ form.name.value|default:'' }}"
+                           placeholder="Activity Name">
+                    <label for="{{ form.name.id_for_label }}">
+                        <i class="fas fa-tasks me-2"></i>Activity Name
+                    </label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control form-control-lg" id="{{ form.location.id_for_label }}"
+                           name="{{ form.location.html_name }}" value="{{ form.location.value|default:'' }}"
+                           placeholder="Location">
+                    <label for="{{ form.location.id_for_label }}">
+                        <i class="fas fa-map-marker-alt me-2"></i>Location
+                    </label>
+                </div>
+
+                <div class="remarks-section mb-4">
+                    <label class="remarks-label mb-2" for="id_remarks">
+                        <i class="fas fa-comment me-2"></i>Remarks
+                    </label>
+                    <div class="editor-container">
+                        <textarea id="id_remarks" name="remarks" class="form-control">{{ form.remarks.value|default_if_none:'' }}</textarea>
+                    </div>
+
+                    {% if activity.remarks %}
+                    <div class="remarks-preview mt-3">
+                        <h6><i class="fas fa-eye me-2"></i>Current Remarks Preview</h6>
+                        <div class="remarks-content">
+                            {{ activity.remarks|safe }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-update w-100">
+                    <i class="fas fa-save me-2"></i>Update Activity
+                </button>
+            </form>
+
+            <div class="metadata">
+                <div class="metadata-item">
+                    <i class="fas fa-user"></i>
+                    <span>Uploaded by: {{ activity.uploaded_by.name }}</span>
+                </div>
+                <div class="metadata-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Created: {{ activity.created|date:"Y-m-d H:i" }}</span>
+                </div>
+                <div class="metadata-item">
+                    <i class="fas fa-pencil-alt"></i>
+                    <span>Last updated: {{ activity.updated|date:"Y-m-d H:i" }}</span>
+                </div>
+                {% if activity.remark_by %}
+                <div class="metadata-item">
+                    <i class="fas fa-comment-dots"></i>
+                    <span>Last remarked by: {{ activity.remark_by.name }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Side - Images -->
+        <div class="images-section">
+            <h2 class="section-title">
+                <i class="fas fa-images me-2"></i>Activity Images
+                <span class="badge bg-info float-end">{{ activity.imagesMindanao.count }} images</span>
+            </h2>
+
+            <div class="image-grid">
+                {% for image in activity.imagesMindanao.all %}
+                <div class="image-card">
+                    <img src="{{ image.image.url }}" alt="Activity image" class="img-fluid" onclick="openModal(this.src)">
+                    <div class="image-info">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            {{ image.uploaded_at|date:"Y-m-d H:i" }}
+                        </small>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="alert alert-info w-100">
+                    <i class="fas fa-info-circle me-2"></i>No images available for this activity.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="image-modal">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <img class="modal-content" id="modalImage">
+</div>
+
+{% block extra_js %}
+<script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize CKEditor with a simpler configuration
+        var editor = CKEDITOR.replace('id_remarks', {
+            height: '300px',
+            toolbar: [
+                ['Bold', 'Italic', 'Underline'],
+                ['NumberedList', 'BulletedList'],
+                ['Link', 'Unlink'],
+                ['JustifyLeft', 'JustifyCenter', 'JustifyRight'],
+                ['Source']
+            ],
+            removeButtons: '',
+            removePlugins: 'elementspath,resize,maximize',
+            contentsCss: [
+                'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css',
+                'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap'
+            ],
+            allowedContent: true,
+            enterMode: CKEDITOR.ENTER_BR,
+            width: '100%'
+        });
+
+        // Handle editor ready event
+        editor.on('instanceReady', function(evt) {
+            // Remove any unwanted notifications
+            var notifications = document.querySelectorAll('.cke_notification_warning');
+            notifications.forEach(function(notification) {
+                notification.remove();
+            });
+
+            // Focus the editor if it's empty
+            if (!evt.editor.getData()) {
+                evt.editor.focus();
+            }
+        });
+
+        // HTML Entity Decoder
+        function decodeHTMLEntities(text) {
+            const entities = {
+                'amp': '&',
+                'apos': "'",
+                'lt': '<',
+                'gt': '>',
+                'quot': '"',
+                'nbsp': ' ',
+                'ndash': '-',
+                'mdash': '--',
+                'lsquo': "'",
+                'rsquo': "'",
+                'sbquo': "'",
+                'ldquo': '"',
+                'rdquo': '"',
+                'bdquo': '"',
+                'prime': "'",
+                'Prime': '"',
+                'euro': '€',
+                'pound': '£',
+                'reg': '®',
+                'copy': '©',
+                'trade': '™',
+                'bull': '•',
+                'middot': '·',
+                'deg': '°',
+                '#39': "'",      // Add explicit mapping for &#39;
+                '#x27': "'",     // Add hex mapping for apostrophe
+                '#x2019': "'",   // Add hex mapping for right single quotation mark
+                '#x2018': "'",   // Add hex mapping for left single quotation mark
+                'percnt': '%'    // Add percent sign mapping
+            };
+
+            // Create a temporary textarea for robust HTML entity decoding
+            const textarea = document.createElement('textarea');
+            
+            // First pass: Handle numeric and hex entities
+            text = text.replace(/&#(x[0-9a-f]+|\d+);/gi, function(match, num) {
+                textarea.innerHTML = match;
+                return textarea.value;
+            });
+
+            // Second pass: Handle named entities
+            text = text.replace(/&([a-z]+|#[0-9]+|#x[0-9a-f]+);/gi, function(match, entity) {
+                if (entities[entity]) {
+                    return entities[entity];
+                }
+                textarea.innerHTML = match;
+                return textarea.value;
+            });
+
+            // Cleanup
+            textarea.remove();
+            return text;
+        }
+
+        // Clean HTML content
+        function cleanHtmlContent(html) {
+            // Step 1: Initial HTML entity decoding with double pass
+            let content = decodeHTMLEntities(decodeHTMLEntities(html));
+
+            // Step 2: Create a temporary div for HTML parsing
+            let temp = document.createElement('div');
+            temp.innerHTML = content;
+
+            // Step 3: Handle HTML structure
+            // Process paragraphs
+            let paragraphs = temp.getElementsByTagName('p');
+            for (let p of paragraphs) {
+                // Ensure proper spacing within paragraphs
+                p.innerHTML = p.innerHTML.trim().replace(/\s+/g, ' ');
+                p.innerHTML += '\n\n';  // Double newline after paragraphs
+            }
+
+            // Process lists
+            let lists = temp.querySelectorAll('ul, ol');
+            for (let list of lists) {
+                let items = list.getElementsByTagName('li');
+                for (let i = 0; i < items.length; i++) {
+                    let item = items[i];
+                    // Clean the list item content
+                    let itemContent = decodeHTMLEntities(item.innerHTML).trim();
+                    item.innerHTML = '• ' + itemContent + (i < items.length - 1 ? '\n' : '\n\n');
+                }
+            }
+
+            // Step 4: Get text content
+            content = temp.textContent || temp.innerText;
+
+            // Step 5: Text normalization
+            content = content
+                // Normalize quotes and apostrophes
+                .replace(/[''′]/g, "'")
+                .replace(/[""″]/g, '"')
+                .replace(/\u2019/g, "'")  // Handle Unicode right single quotation mark
+                .replace(/\u2018/g, "'")  // Handle Unicode left single quotation mark
+                
+                // Clean up whitespace
+                .replace(/\s*\n\s*/g, '\n')     // Clean up spaces around newlines
+                .replace(/\n{3,}/g, '\n\n')     // Max 2 consecutive newlines
+                .replace(/[ \t]+/g, ' ')        // Normalize spaces and tabs
+                
+                // Keep only desired characters and ensure proper spacing
+                .replace(/([.,!?:])([A-Za-z0-9])/g, '$1 $2')  // Add space after punctuation
+                .replace(/\s+/g, ' ')                         // Clean up any double spaces
+                .split('\n')
+                .map(line => {
+                    // Capitalize first letter of each sentence
+                    return line.trim().replace(/^[a-z]/, c => c.toUpperCase());
+                })
+                .filter(line => line)
+                .join('\n')
+                .trim();
+
+            // Step 6: Final cleanup
+            content = content
+                // Preserve contractions and possessives
+                .replace(/([A-Za-z0-9])'([A-Za-z])/g, '$1\'$2')
+                // Convert double apostrophes to quotes
+                .replace(/''/g, '"')
+                // Final space normalization
+                .replace(/\s+/g, ' ')
+                .trim();
+
+            return content;
+        }
+
+        // Ensure form submission includes cleaned editor content
+        document.querySelector('form').addEventListener('submit', function(e) {
+            var editorContent = editor.getData();
+            // Clean the content before submission
+            var cleanedContent = cleanHtmlContent(editorContent);
+            document.getElementById('id_remarks').value = cleanedContent;
+        });
+    });
+
+    // Image modal functionality
+    function openModal(src) {
+        document.getElementById('imageModal').style.display = "block";
+        document.getElementById('modalImage').src = src;
+    }
+
+    function closeModal() {
+        document.getElementById('imageModal').style.display = "none";
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('imageModal')) {
+            closeModal();
+        }
+    }
+
+    // Add Bootstrap classes to form inputs
+    document.querySelectorAll('input[type="text"]').forEach(input => {
+        input.classList.add('form-control');
+    });
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,727 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+  body {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradientBG 10s ease infinite;
+    min-height: 100vh;
+  }
+
+  @keyframes gradientBG {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+
+
+    /* Modern Color Palette - Enhanced Vibrant Colors */
+    :root {
+        --primary: #4361ee;
+        --primary-light: #4895ef;
+        --primary-dark: #3a0ca3;
+        --secondary: #7209b7;
+        --secondary-light: #b5179e;
+        --success: #4cc9f0;
+        --success-light: #56cfe1;
+        --danger: #f72585;
+        --danger-light: #ff4d6d;
+        --warning: #ffd60a;
+        --warning-light: #ffc300;
+        --info: #4895ef;
+        --info-light: #4cc9f0;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --gray-100: #f8f9fa;
+        --gray-200: #e9ecef;
+        --gray-300: #dee2e6;
+        --gray-400: #ced4da;
+        --gray-500: #adb5bd;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+    }
+
+    /* Bubble Animation */
+    .bubble {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(67, 97, 238, 0.3); /* Increased opacity */
+        filter: blur(5px);
+        z-index: 0; /* already correct */
+        animation: floatBubble 10s infinite ease-in-out, colorChange 15s infinite alternate;
+    }
+
+    @keyframes floatBubble {
+        0% {
+            transform: translateY(0) translateX(0) rotate(0deg);
+        }
+        25% {
+            transform: translateY(-100px) translateX(50px) rotate(90deg);
+        }
+        50% {
+            transform: translateY(-200px) translateX(0) rotate(180deg);
+        }
+        75% {
+            transform: translateY(-100px) translateX(-50px) rotate(270deg);
+        }
+        100% {
+            transform: translateY(0) translateX(0) rotate(360deg);
+        }
+    }
+
+    @keyframes colorChange {
+        0% {
+            background: rgba(67, 97, 238, 0.1);
+        }
+        20% {
+            background: rgba(114, 9, 183, 0.1);
+        }
+        40% {
+            background: rgba(76, 201, 240, 0.1);
+        }
+        60% {
+            background: rgba(247, 37, 133, 0.1);
+        }
+        80% {
+            background: rgba(255, 214, 10, 0.1);
+        }
+        100% {
+            background: rgba(72, 149, 239, 0.1);
+        }
+    }
+
+    /* Base Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-5px); }
+        100% { transform: translateY(0px); }
+    }
+
+    /* Content Container */
+    .dashboard-content {
+        position: relative;
+        z-index: 1;
+        padding: 2rem;
+    }
+
+    /* Enhanced Card Styles for Better Contrast */
+    .metric-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .quick-stat-item {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Dashboard Structure */
+    .dashboard-containers {
+        animation: fadeIn 0.6s ease-out;
+        padding: 2rem;
+        background: var(--gray-100);
+        min-height: 100vh;
+
+    }
+
+
+    .dashboard-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--gray-200);
+        position: relative;
+    }
+
+    .dashboard-header::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(to right, var(--primary), var(--primary-light));
+    }
+/*
+    .dashboard-header h2 {
+        color: var(--dark);
+        font-weight: 700;
+        font-size: 2rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .dashboard-header h2 i {
+        font-size: 2.2rem;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+*/
+    /* Card Enhancements */
+    .metric-card {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(67, 97, 238, 0.2);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        animation: fadeIn 0.8s ease-out;
+        position: relative;
+    }
+
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: rgba(255,255,255,0.4);
+    }
+
+    .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(67, 97, 238, 0.3);
+    }
+
+    .metric-card.bg-primary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    }
+
+    .metric-card.bg-success {
+        background: linear-gradient(135deg, var(--success), var(--success-light));
+    }
+
+    .metric-card.bg-danger {
+        background: linear-gradient(135deg, var(--danger), var(--danger-light));
+    }
+
+    .metric-card .card-header {
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        padding: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .metric-card .card-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 1rem 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Quick Stats Section */
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .quick-stat-item {
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 1px solid var(--gray-200);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .quick-stat-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(to right, var(--primary), var(--primary-light));
+    }
+
+    .quick-stat-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(67, 97, 238, 0.15);
+    }
+
+    .quick-stat-item .stat-label {
+        font-size: 1rem;
+        color: var(--gray-500);
+        margin-bottom: 0.75rem;
+        font-weight: 500;
+    }
+
+    .quick-stat-item .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+    }
+
+    .quick-stat-item .stat-link {
+        display: block;
+        margin-top: 1rem;
+        color: var(--primary);
+        text-decoration: none;
+        font-size: 0.95rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .quick-stat-item .stat-link:hover {
+        color: var(--primary-dark);
+        transform: translateX(5px);
+    }
+
+    /* Form Entry Cards */
+    .entry-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border-left: 4px solid var(--info);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .entry-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--info), var(--info-light));
+    }
+
+    .entry-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(72, 149, 239, 0.2);
+    }
+
+    .entry-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .entry-card .card-title {
+        color: var(--dark);
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .entry-card .card-text {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+    }
+
+
+    /* Facilities Table */
+    .facilities-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        background: white;
+    }
+
+    .facilities-card .card-header {
+        background: linear-gradient(135deg, var(--success), var(--success-light));
+        color: white;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        font-size: 1.2rem;
+        padding: 1.25rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background: linear-gradient(to right, var(--gray-100), white);
+        font-weight: 600;
+        border-bottom: 2px solid var(--gray-300);
+        padding: 1rem;
+        color: var(--dark);
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background: linear-gradient(to right, rgba(72, 149, 239, 0.05), rgba(76, 201, 240, 0.05));
+        transform: translateX(3px);
+    }
+
+    /* Pagination */
+    .pagination {
+        margin: 1.5rem 0;
+    }
+
+    .pagination .page-item .page-link {
+        border: none;
+        color: var(--primary);
+        margin: 0 3px;
+        border-radius: 8px !important;
+        padding: 0.5rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(to right, var(--primary), var(--primary-light));
+        color: white;
+        box-shadow: 0 4px 8px rgba(67, 97, 238, 0.2);
+    }
+
+    .pagination .page-item .page-link:hover {
+        background: linear-gradient(to right, var(--primary-light), var(--primary));
+        transform: translateY(-2px);
+    }
+
+    /* Status Cards */
+    .status-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .status-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+    }
+
+    .status-card.pending::before {
+        background: linear-gradient(to bottom, var(--warning), var(--warning-light));
+    }
+
+    .status-card.tech-activity::before {
+        background: linear-gradient(to bottom, var(--success), var(--success-light));
+    }
+
+    .status-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+    }
+
+    .status-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .status-card .card-title {
+        font-size: 1.1rem;
+        color: var(--dark);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .status-card .card-text {
+        font-size: 1.8rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+    }
+
+    .status-card .card-footer {
+        background: transparent;
+        border-top: 1px solid var(--gray-200);
+        padding: 1rem 1.5rem;
+    }
+
+    .status-card .card-footer a {
+        color: var(--primary);
+        text-decoration: none;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .status-card .card-footer a:hover {
+        color: var(--secondary);
+        transform: translateX(5px);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .dashboard-containers {
+            padding: 1rem;
+        }
+
+        .metric-card .card-title {
+            font-size: 2rem;
+        }
+
+        .entry-card .card-text {
+            font-size: 1.8rem;
+        }
+
+        .quick-stat-item .stat-value {
+            font-size: 1.8rem;
+        }
+
+        .status-card .card-text {
+            font-size: 1.5rem;
+        }
+    }
+
+    /* This is for animated text color title */
+  .animated-text {
+  animation: cyberpunkGlow 5s infinite alternate;
+  transition: color 0.3s ease-in-out;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+@keyframes cyberpunkGlow {
+  0%   { color: #ff00ff; }   /* Neon Magenta */
+  25%  { color: #00ffff; }   /* Cyan */
+  50%  { color: #39ff14; }   /* Neon Green */
+  75%  { color: #ff3131; }   /* Hot Red */
+  100% { color: #f5f242; }   /* Neon Yellow */
+}
+
+</style>
+
+<div class="container-fluid dashboard-containers">
+    <!-- Bubbles will be added here by JavaScript -->
+    <div class="dashboard-header">
+       <h2 class="animated-text">
+          <i class="fas fa-chart-line"></i>
+         Evaluator Dashboard
+       </h2>
+    </div>
+
+    <div class="dashboard-content">
+        <!-- Quick Stats Section -->
+        <div class="quick-stats">
+
+            <div class="quick-stat-item">
+                <div class="stat-label">🏢 Active Facilities</div>
+                <div class="stat-value counter" data-target="{{ active_facilities }}">0</div>
+                <a href="{% url 'facility_listDanao' %}" class="stat-link">View Active Facilities →</a>
+            </div>
+            <div class="quick-stat-item">
+                <div class="stat-label">🚫 Not Visited Facilities</div>
+                <div class="stat-value counter" data-target="{{ not_visited_count }}">0</div>
+                <a href="{% url 'not_visited_facilities_listDanao' %}" class="stat-link">View Not Visited →</a>
+            </div>
+            <div class="quick-stat-item">
+                <div class="stat-label">📊 Failed Sites (30 Days)</div>
+                <div class="stat-value counter" data-target="{{ failed_sites_count }}">0</div>
+                <a href="{% url 'failed_listDanao' %}" class="stat-link">View Failed Sites →</a>
+            </div>
+        </div>
+
+        <!-- Metrics Row with Animated Counters -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card text-white text-center bg-primary mb-3 metric-card" id="total-facilities-card">
+                    <div class="card-header">Total Facilities</div>
+                    <div class="card-body">
+                        <h4 class="card-title counter" data-target="{{ total_facilities }}">0</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card text-white text-center bg-success mb-3 metric-card" id="passed-facilities-card">
+                    <div class="card-header">Facilities Passed This Month</div>
+                    <div class="card-body">
+                        <h4 class="card-title counter" data-target="{{ passed_facilities_count }}">0</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Entry Counts -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card entry-card h-100" style="animation-delay: 0.1s;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">🗓 Form Entries This Week</h5>
+                        <h4 class="card-text counter" data-target="{{ weekly_count }}">0</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card entry-card h-100" style="animation-delay: 0.2s;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">📆 Form Entries This Month</h5>
+                        <h4 class="card-text counter" data-target="{{ monthly_count }}">0</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card entry-card h-100" style="animation-delay: 0.3s;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">📅 Form Entries This Year</h5>
+                        <h4 class="card-text counter" data-target="{{ yearly_count }}">0</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Cards Section -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="status-card pending">
+                    <div class="card-body">
+                        <h5 class="card-title">⏳ Pending Assessments</h5>
+                        <p class="card-text counter" data-target="{{ pending_count }}">0</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{% url 'assessmentDanao' %}">View All Pending →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="status-card tech-activity">
+                    <div class="card-body">
+                        <h5 class="card-title">🔧 Technical Activities</h5>
+                        <p class="card-text counter" data-target="{{ tech_activities_count }}">0</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{% url 'activity_listDanao' %}">View Activities →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Counter Animation
+    document.addEventListener('DOMContentLoaded', function() {
+        const counters = document.querySelectorAll('.counter');
+
+        counters.forEach(counter => {
+            const target = parseInt(counter.getAttribute('data-target'));
+            const duration = 2000; // 2 seconds
+            const step = target / (duration / 16); // 60fps
+            let current = 0;
+
+            const updateCounter = () => {
+                current += step;
+                if (current < target) {
+                    counter.textContent = Math.ceil(current);
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    counter.textContent = target;
+                }
+            };
+
+            updateCounter();
+        });
+
+        // Create floating bubbles
+        function createBubbles() {
+            const container = document.querySelector('.dashboard-containers');
+            const bubbleCount = 15;
+
+            for (let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+
+                // Random size between 50px and 150px
+                const size = Math.random() * 100 + 50;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+
+                // Random position
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                bubble.style.left = `${posX}%`;
+                bubble.style.top = `${posY}%`;
+
+                // Random animation duration and delay
+                const duration = Math.random() * 20 + 10;
+                const delay = Math.random() * 10;
+                bubble.style.animationDuration = `${duration}s`;
+                bubble.style.animationDelay = `${delay}s`;
+
+                container.appendChild(bubble);
+            }
+        }
+
+        createBubbles();
+    });
+</script>
+{% endblock %}

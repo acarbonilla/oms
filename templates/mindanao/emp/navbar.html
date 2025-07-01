@@ -1,0 +1,287 @@
+<style>
+    /* Modern Navigation Bar */
+    #nav {
+        background: linear-gradient(135deg, #09203f 0%, #1b4b6a 100%);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        padding: 0.8rem 1rem;
+        transition: all 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    /* Scrolled State */
+    #nav.scrolled {
+        background: rgba(9, 32, 63, 0.96);
+        backdrop-filter: blur(12px);
+        padding: 0.4rem 1rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Animated Brand Logo */
+    #glow {
+        font-size: 1.6rem;
+        font-weight: 700;
+        background: linear-gradient(90deg, #00ff9d 0%, #00e8ff 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        position: relative;
+        padding: 0 12px;
+        transition: all 0.4s ease;
+    }
+
+    #glow:hover {
+        animation: neonPulse 1.5s infinite alternate;
+        transform: translateY(-2px);
+    }
+
+    @keyframes neonPulse {
+        0% {
+            text-shadow: 0 0 5px rgba(0, 255, 157, 0.3),
+                         0 0 10px rgba(0, 232, 255, 0.2);
+        }
+        100% {
+            text-shadow: 0 0 10px rgba(0, 255, 157, 0.6),
+                         0 0 20px rgba(0, 232, 255, 0.4),
+                         0 0 30px rgba(0, 232, 255, 0.2);
+        }
+    }
+
+    /* Navigation Links */
+    .nav-link {
+        color: rgba(255, 255, 255, 0.85) !important;
+        font-weight: 500;
+        margin: 0 0.25rem;
+        padding: 0.6rem 1rem !important;
+        border-radius: 8px;
+        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-link:hover {
+        color: white !important;
+        background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-2px);
+    }
+
+    .nav-link.active {
+        background: rgba(255, 255, 255, 0.15);
+        font-weight: 600;
+    }
+
+    .nav-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 50%;
+        height: 3px;
+        background: linear-gradient(90deg, #00ff9d, #00e8ff);
+        border-radius: 3px;
+        animation: underlineGrow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes underlineGrow {
+        from { width: 0; opacity: 0; }
+        to { width: 50%; opacity: 1; }
+    }
+
+    /* Dropdown Menus */
+    .dropdown-menu {
+        background: rgba(15, 42, 72, 0.98);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        animation: menuFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes menuFadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dropdown-item {
+        color: rgba(255, 255, 255, 0.8);
+        padding: 0.6rem 1.5rem;
+        transition: all 0.25s ease;
+        position: relative;
+    }
+
+    .dropdown-item:hover {
+        color: white !important;
+        background: linear-gradient(90deg, rgba(0, 255, 157, 0.1), rgba(0, 232, 255, 0.1));
+        padding-left: 1.8rem;
+    }
+
+    .dropdown-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: linear-gradient(to bottom, #00ff9d, #00e8ff);
+        transform: scaleY(0);
+        transform-origin: bottom;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .dropdown-item:hover::before {
+        transform: scaleY(1);
+    }
+
+    /* User Profile Section */
+    #topA {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    #ulID {
+        right: 0;
+        left: auto;
+        min-width: 180px;
+    }
+
+    /* Mobile Menu */
+    .navbar-toggler {
+        border: none;
+        padding: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .navbar-toggler:focus {
+        box-shadow: 0 0 0 3px rgba(0, 255, 157, 0.3);
+    }
+
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 255, 157, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        transition: transform 0.3s ease;
+    }
+
+    .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
+        transform: rotate(90deg);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 991.98px) {
+        .navbar-collapse {
+            background: rgba(9, 32, 63, 0.98);
+            backdrop-filter: blur(15px);
+            border-radius: 0 0 15px 15px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-link {
+            margin: 0.25rem 0;
+            padding: 0.75rem 1rem !important;
+        }
+    }
+</style>
+
+<nav class="navbar navbar-expand-lg fixed-top" id="nav">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#" id="glow">
+            <i class="fas fa-shield-alt me-2"></i>PQFI
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-expanded="false">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'empMemberDanao' %}">
+                        <i class="fas fa-home me-1"></i> Home
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-tasks me-1"></i> Gen_Activities
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'standard_image_evDanao' %}"><i class="fas fa-image me-2"></i>Standard Image</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{%url 'failed_listDanao' %}"><i class="fas fa-times-circle me-2"></i>Failed</a></li>
+                        <li><a class="dropdown-item" href="{%url 'pass_listDanao' %}"><i class="fas fa-check-circle me-2"></i>Passed</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-microchip me-1"></i> Tech_Activities
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'tech_act_uploadDanao' %}"><i class="fas fa-upload me-2"></i>Tech-Activities Form</a></li>
+                        <li><a class="dropdown-item" href="{% url 'activity_listDanao' %}"><i class="fas fa-list-ul me-2"></i>Activity List</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-folder me-1"></i> File
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'facility_listDanao'%}"><i class="fas fa-qrcode me-2"></i>QR code</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <!-- User Section -->
+            {% if user.is_authenticated %}
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="topA" role="button" data-bs-toggle="dropdown">
+                        <div class="avatar-circle-sm bg-gradient-primary me-2">
+                            <!--{{ user.first_name|first|upper }} -->
+                             <i class="fas fa-user-circle" style="font-size: 1.2rem;"></i>
+                        </div>
+                        <span>{{ user.first_name }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" id="ulID">
+                        <li><a class="dropdown-item" href="{% url 'omsLogout'%}">
+                           <i class="fas fa-sign-out-alt me-2"></i> Sign Out</a></li>
+                        {% else %}
+                        <li><a class="dropdown-item" href="{% url 'omsLogin'%}">Login</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</nav>
+
+<script>
+    // Scroll effect
+    window.addEventListener('scroll', function() {
+        const nav = document.getElementById('nav');
+        if (window.scrollY > 30) {
+            nav.classList.add('scrolled');
+        } else {
+            nav.classList.remove('scrolled');
+        }
+    });
+
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add any tooltips you need
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Add smooth scroll to all links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    });
+</script>

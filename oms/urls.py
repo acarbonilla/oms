@@ -13,6 +13,7 @@ urlpatterns = [
     path('', include('members.urls')),
     path('c2/', include('c2.urls')),
     path('danao/', include('danao.urls')),
+    path('mindanao/', include('mindanao.urls')),
     path('core/', include('core.urls')),
 ]
 if settings.DEBUG:
