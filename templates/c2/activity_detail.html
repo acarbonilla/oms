@@ -176,6 +176,128 @@
         to { opacity: 1; transform: scale(1); }
     }
 
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .modal-content {
+        position: relative;
+        margin: auto;
+        padding: 0;
+        width: 90%;
+        max-width: 1200px;
+        top: 50%;
+        transform: translateY(-50%);
+        animation: zoomIn 0.3s ease-out;
+    }
+
+    .modal-image {
+        width: 100%;
+        height: auto;
+        max-height: 80vh;
+        object-fit: contain;
+        border-radius: 8px;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 1001;
+        transition: all 0.3s ease;
+    }
+
+    .modal-close:hover,
+    .modal-close:focus {
+        color: #bbb;
+        text-decoration: none;
+        transform: scale(1.1);
+    }
+
+    .modal-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        font-size: 24px;
+        padding: 15px 20px;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        z-index: 1001;
+    }
+
+    .modal-nav:hover {
+        background: rgba(0, 0, 0, 0.8);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .modal-prev {
+        left: 20px;
+    }
+
+    .modal-next {
+        right: 20px;
+    }
+
+    .modal-counter {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+        z-index: 1001;
+    }
+
+    .activity-image {
+        cursor: pointer;
+    }
+
+    .activity-image::after {
+        content: '\f065';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 8px;
+        border-radius: 50%;
+        font-size: 14px;
+        opacity: 0;
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+
+    .activity-image:hover::after {
+        opacity: 1;
+    }
+
+    @keyframes zoomIn {
+        from { opacity: 0; transform: translateY(-50%) scale(0.8); }
+        to { opacity: 1; transform: translateY(-50%) scale(1); }
+    }
+
     /* Responsive adjustments */
     @media (max-width: 768px) {
         .activity-card {
@@ -189,6 +311,29 @@
 
         .activity-image {
             height: 150px;
+        }
+
+        .modal-content {
+            width: 95%;
+        }
+
+        .modal-close {
+            top: 10px;
+            right: 20px;
+            font-size: 30px;
+        }
+
+        .modal-nav {
+            padding: 10px 15px;
+            font-size: 20px;
+        }
+
+        .modal-prev {
+            left: 10px;
+        }
+
+        .modal-next {
+            right: 10px;
         }
     }
 </style>
@@ -220,8 +365,8 @@
             <div class="row">
                 {% for image in activity.images.all %}
                     <div class="col-md-3 col-6">
-                        <div class="activity-image" style="animation: imageEntry 0.6s ease-out {{ forloop.counter|add:"-1"|divisibleby:"4"|yesno:"0.1s,0.2s,0.3s,0.4s" }} forwards;">
-                            <img src="{{ image.image.url }}" alt="Activity Image">
+                        <div class="activity-image" data-image-index="{{ forloop.counter0 }}" style="animation: imageEntry 0.6s ease-out forwards;">
+                            <img src="{{ image.image.url }}" alt="Activity Image" data-full-src="{{ image.image.url }}">
                         </div>
                     </div>
                 {% endfor %}
@@ -239,12 +384,40 @@
     </div>
 </div>
 
-<script>
-    // Add hover zoom effect to images
-    document.addEventListener('DOMContentLoaded', function() {
-        const images = document.querySelectorAll('.activity-image img');
+<!-- Image Modal -->
+<div id="imageModal" class="modal">
+    <span class="modal-close" onclick="closeModal()">&times;</span>
+    <div class="modal-content">
+        <img id="modalImage" class="modal-image" src="" alt="Activity Image">
+        <button class="modal-nav modal-prev" onclick="changeImage(-1)">&#10094;</button>
+        <button class="modal-nav modal-next" onclick="changeImage(1)">&#10095;</button>
+        <div class="modal-counter">
+            <span id="currentImageNumber">1</span> / <span id="totalImages">1</span>
+        </div>
+    </div>
+</div>
 
-        images.forEach(img => {
+<script>
+    let currentImageIndex = 0;
+    let imageSources = [];
+    let totalImages = 0;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Collect all image sources
+        const images = document.querySelectorAll('.activity-image img');
+        imageSources = Array.from(images).map(img => img.getAttribute('data-full-src'));
+        totalImages = imageSources.length;
+
+        // Update total images counter
+        document.getElementById('totalImages').textContent = totalImages;
+
+        // Add click event listeners to images
+        images.forEach((img, index) => {
+            img.parentElement.addEventListener('click', function() {
+                openModal(index);
+            });
+
+            // Keep hover zoom effect
             img.parentElement.addEventListener('mouseenter', function() {
                 img.style.transform = 'scale(1.05)';
             });
@@ -253,7 +426,79 @@
                 img.style.transform = 'scale(1)';
             });
         });
+
+        // Close modal when clicking outside the image
+        document.getElementById('imageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('imageModal').style.display === 'block') {
+                switch(e.key) {
+                    case 'Escape':
+                        closeModal();
+                        break;
+                    case 'ArrowLeft':
+                        changeImage(-1);
+                        break;
+                    case 'ArrowRight':
+                        changeImage(1);
+                        break;
+                }
+            }
+        });
     });
+
+    function openModal(index) {
+        currentImageIndex = index;
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        const currentNumber = document.getElementById('currentImageNumber');
+
+        modal.style.display = 'block';
+        modalImg.src = imageSources[currentImageIndex];
+        currentNumber.textContent = currentImageIndex + 1;
+
+        // Hide navigation buttons if only one image
+        const prevBtn = document.querySelector('.modal-prev');
+        const nextBtn = document.querySelector('.modal-next');
+        
+        if (totalImages <= 1) {
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+        } else {
+            prevBtn.style.display = 'block';
+            nextBtn.style.display = 'block';
+        }
+
+        // Prevent body scroll when modal is open
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        document.getElementById('imageModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    function changeImage(direction) {
+        currentImageIndex += direction;
+
+        // Handle wrapping
+        if (currentImageIndex >= totalImages) {
+            currentImageIndex = 0;
+        } else if (currentImageIndex < 0) {
+            currentImageIndex = totalImages - 1;
+        }
+
+        const modalImg = document.getElementById('modalImage');
+        const currentNumber = document.getElementById('currentImageNumber');
+
+        modalImg.src = imageSources[currentImageIndex];
+        currentNumber.textContent = currentImageIndex + 1;
+    }
 </script>
 
 {% endblock %}
