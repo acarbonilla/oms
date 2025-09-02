@@ -245,11 +245,50 @@
             width: 80px;
             height: 80px;
         }
+
+        /* Make search and filter form stack vertically on small screens */
+        .search-filter-form {
+            flex-direction: column !important;
+        }
+
+        .search-filter-form .flex-grow-1,
+        .search-filter-form .form-select,
+        .search-filter-form .btn-primary {
+            width: 100% !important;
+            margin-bottom: 0.75rem;
+        }
+
+        .search-filter-form .btn-primary {
+            margin-bottom: 0;
+        }
+
+        /* Mobile-friendly button layout */
+        .btn-group {
+            gap: 8px;
+            padding: 0 1rem;
+            margin: 0 -1rem;
+        }
+        
+        .btn-group .btn {
+            width: 95px;
+            height: 40px;
+            font-size: 0.85rem;
+            padding: 0.5rem 0.5rem;
+            border-radius: 8px;
+            flex: 0 0 95px;
+            margin: 0;
+            border: none;
+            line-height: 1;
+            vertical-align: top;
+        }
+        
+        /* Ensure card body has proper padding on mobile */
+        .card-body {
+            padding: 1.5rem 1rem;
+        }
     }
 
-    .btn-group .btn {
-        margin-left: 5px;
-    }
+
 
     .btn-details {
         background-color: #6c757d;
@@ -259,6 +298,60 @@
     .btn-details:hover {
         background-color: #5a6268;
         color: white;
+    }
+
+    /* Override Bootstrap button defaults for perfect alignment */
+    .btn-group .btn.btn-sm {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1;
+        border-radius: 6px;
+    }
+
+    .btn-group .btn.btn-primary,
+    .btn-group .btn.btn-details {
+        margin: 0;
+        border: none;
+        vertical-align: top;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Consistent button sizing and perfect alignment */
+    .btn-group {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-start;
+        align-items: stretch;
+    }
+
+    .btn-group .btn {
+        width: 85px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        padding: 0.375rem 0.5rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        flex: 0 0 85px;
+        touch-action: manipulation;
+        box-sizing: border-box;
+        margin: 0;
+        border: none;
+        line-height: 1;
+        vertical-align: top;
+    }
+
+    .btn-group .btn:first-child {
+        margin-left: 0;
+    }
+
+    .btn-group .btn:last-child {
+        margin-right: 0;
     }
 </style>
 
@@ -272,7 +365,7 @@
     <!-- Search and Filter Form -->
     <div class="row mb-4">
         <div class="col">
-            <form method="get" class="d-flex gap-3">
+            <form method="get" class="d-flex gap-3 search-filter-form">
                 <div class="flex-grow-1">
                     <div class="input-group">
                         <span class="input-group-text">
@@ -303,16 +396,14 @@
         <div class="col-md-6 mb-4">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <h5 class="card-title mb-0">{{ activity.name }}</h5>
-                        <div class="btn-group">
-                            <a href="{% url 'activity_detailMindanao' activity.id %}" class="btn btn-sm btn-details">
-                                <i class="fas fa-eye"></i> Details
-                            </a>
-                            <a href="{% url 'tech_activity_update_mindanao' activity.id %}"" class="btn btn-sm btn-primary">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                        </div>
+                    <h5 class="card-title mb-3">{{ activity.name }}</h5>
+                    <div class="btn-group mb-3">
+                        <a href="{% url 'activity_detailMindanao' activity.id %}" class="btn btn-sm btn-details">
+                            <i class="fas fa-eye"></i> Details
+                        </a>
+                        <a href="{% url 'tech_activity_update_mindanao' activity.id %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
                     </div>
                     <p class="card-text"><strong>📍 Location:</strong> {{ activity.location }}</p>
                     <p class="card-text">

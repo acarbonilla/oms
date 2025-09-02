@@ -261,32 +261,351 @@
         padding: 1rem;
     }
 
-    .image-modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.9);
+    .btn-cancel {
+        background: #6c757d;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        border: none;
+        transition: all 0.3s;
+    }
+
+    .btn-cancel:hover {
+        background: #545b62;
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    .btn-cancel:focus {
+        box-shadow: 0 0 0 0.2rem rgba(108,117,125,0.25);
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+        .update-container {
+            flex-direction: column;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .form-section,
+        .images-section {
+            padding: 1rem;
+            margin: 0;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-control-lg {
+            font-size: 16px; /* Prevents zoom on iOS */
+            padding: 0.75rem;
+        }
+
+        .form-floating label {
+            padding: 0.75rem;
+        }
+
+        .btn-update,
+        .btn-cancel {
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .d-flex.gap-2 {
+            flex-direction: column;
+            gap: 0.75rem !important;
+        }
+
+        .image-grid {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .image-card img {
+            height: 150px;
+        }
+
+        .metadata {
+            font-size: 0.85rem;
+        }
+
+        .metadata-item {
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .metadata-item i {
+            margin-right: 0;
+            margin-bottom: 0.25rem;
+        }
+
+        /* CKEditor mobile optimizations */
+        .cke_chrome {
+            border-radius: 6px !important;
+        }
+
+        .cke_top {
+            padding: 6px !important;
+        }
+
+        .cke_button {
+            padding: 6px 8px !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+        }
+
+        .cke_toolbar {
+            margin-right: 4px !important;
+        }
+
+        .cke_editable {
+            padding: 12px !important;
+            font-size: 16px !important; /* Prevents zoom on iOS */
+        }
+
+        .remarks-preview {
+            margin-top: 1rem;
+        }
+
+        .remarks-preview h6 {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+        }
+
+        .remarks-content {
+            padding: 12px;
+            font-size: 0.85rem;
+        }
+
+        /* Container adjustments */
+        .container {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Badge adjustments */
+        .badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        /* Alert adjustments */
+        .alert {
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    /* Extra small devices (phones, 480px and down) */
+    @media (max-width: 480px) {
+        .update-container {
+            gap: 0.75rem;
+        }
+
+        .form-section,
+        .images-section {
+            padding: 0.75rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+        }
+
+        .image-grid {
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .image-card img {
+            height: 120px;
+        }
+
+        .form-control-lg {
+            padding: 0.5rem;
+        }
+
+        .form-floating label {
+            padding: 0.5rem;
+        }
+
+        .btn-update,
+        .btn-cancel {
+            padding: 0.875rem 1rem;
+        }
+
+        .container {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        h1 {
+            font-size: 1.25rem;
+        }
+
+        .metadata {
+            font-size: 0.8rem;
+        }
+
+        .remarks-content {
+            padding: 8px;
+            font-size: 0.8rem;
+        }
+    }
+
+    /* Landscape orientation adjustments for mobile */
+    @media (max-width: 768px) and (orientation: landscape) {
+        .update-container {
+            flex-direction: row;
+            gap: 1rem;
+        }
+
+        .form-section,
+        .images-section {
+            flex: 1;
+        }
+
+        .image-grid {
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        }
+
+        .image-card img {
+            height: 100px;
+        }
+    }
+
+    /* Image Modal Styles */
+    .image-card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .image-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .modal-dialog {
+        max-width: 90vw;
+        margin: 1rem auto;
     }
 
     .modal-content {
-        margin: auto;
-        display: block;
-        width: 80%;
-        max-width: 700px;
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
 
-    .close {
-        position: absolute;
-        right: 35px;
-        top: 15px;
-        color: #f1f1f1;
-        font-size: 40px;
-        font-weight: bold;
-        cursor: pointer;
+    .modal-header {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        border-radius: 12px 12px 0 0;
+        border-bottom: none;
+    }
+
+    .modal-header .btn-close {
+        filter: invert(1);
+        opacity: 0.8;
+    }
+
+    .modal-header .btn-close:hover {
+        opacity: 1;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        background: #f8f9fa;
+    }
+
+    .modal-body img {
+        max-height: 70vh;
+        width: auto;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .modal-footer {
+        background: white;
+        border-top: 1px solid #dee2e6;
+        border-radius: 0 0 12px 12px;
+    }
+
+    /* Mobile Modal Adjustments */
+    @media (max-width: 768px) {
+        .modal-dialog {
+            max-width: 95vw;
+            margin: 0.5rem auto;
+        }
+
+        .modal-content {
+            border-radius: 8px;
+        }
+
+        .modal-header {
+            padding: 0.75rem 1rem;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .modal-header h5 {
+            font-size: 1rem;
+        }
+
+        .modal-body {
+            padding: 1rem;
+        }
+
+        .modal-body img {
+            max-height: 60vh;
+        }
+
+        .modal-footer {
+            padding: 0.75rem 1rem;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .modal-footer .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .modal-dialog {
+            max-width: 98vw;
+            margin: 0.25rem auto;
+        }
+
+        .modal-header {
+            padding: 0.5rem 0.75rem;
+        }
+
+        .modal-header h5 {
+            font-size: 0.9rem;
+        }
+
+        .modal-body {
+            padding: 0.75rem;
+        }
+
+        .modal-body img {
+            max-height: 50vh;
+        }
+
+        .modal-footer {
+            padding: 0.5rem 0.75rem;
+        }
+
+        .modal-footer .btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
     }
 </style>
 
@@ -339,9 +658,14 @@
                     {% endif %}
                 </div>
 
-                <button type="submit" class="btn btn-update w-100">
-                    <i class="fas fa-save me-2"></i>Update Activity
-                </button>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-update flex-fill">
+                        <i class="fas fa-save me-2"></i>Update Activity
+                    </button>
+                    <button type="button" class="btn btn-cancel flex-fill" onclick="cancelUpdate()">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                </div>
             </form>
 
             <div class="metadata">
@@ -375,18 +699,18 @@
 
             <div class="image-grid">
                 {% for image in activity.imagesMindanao.all %}
-                <div class="image-card">
-                    <img src="{{ image.image.url }}" alt="Activity image" class="img-fluid" onclick="openModal(this.src)">
+                <div class="image-card" data-bs-toggle="modal" data-bs-target="#imageModal" data-image-src="{{ image.image.url }}" data-image-date="{{ image.uploaded_at|date:'Y-m-d H:i' }}">
+                    <img src="{{ image.image.url }}" alt="Activity image" class="img-fluid">
                     <div class="image-info">
                         <small class="text-muted">
-                            <i class="fas fa-clock me-1"></i>
+                            <i class="fas fa-calendar-alt me-1"></i>
                             {{ image.uploaded_at|date:"Y-m-d H:i" }}
                         </small>
                     </div>
                 </div>
                 {% empty %}
-                <div class="alert alert-info w-100">
-                    <i class="fas fa-info-circle me-2"></i>No images available for this activity.
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>No images uploaded for this activity.
                 </div>
                 {% endfor %}
             </div>
@@ -395,19 +719,49 @@
 </div>
 
 <!-- Image Modal -->
-<div id="imageModal" class="image-modal">
-    <span class="close" onclick="closeModal()">&times;</span>
-    <img class="modal-content" id="modalImage">
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">
+                    <i class="fas fa-image me-2"></i>Activity Image
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="Activity image" class="img-fluid rounded">
+                <div class="mt-3">
+                    <small class="text-muted" id="modalImageDate">
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        <span id="imageDate"></span>
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Close
+                </button>
+                <a id="downloadImage" href="" download class="btn btn-primary">
+                    <i class="fas fa-download me-2"></i>Download
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 
 {% block extra_js %}
 <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize CKEditor with a simpler configuration
+        // Initialize CKEditor with mobile-friendly configuration
+        var isMobile = window.innerWidth <= 768;
         var editor = CKEDITOR.replace('id_remarks', {
-            height: '300px',
-            toolbar: [
+            height: isMobile ? '250px' : '300px',
+            toolbar: isMobile ? [
+                ['Bold', 'Italic'],
+                ['NumberedList', 'BulletedList'],
+                ['Source']
+            ] : [
                 ['Bold', 'Italic', 'Underline'],
                 ['NumberedList', 'BulletedList'],
                 ['Link', 'Unlink'],
@@ -422,7 +776,13 @@
             ],
             allowedContent: true,
             enterMode: CKEDITOR.ENTER_BR,
-            width: '100%'
+            width: '100%',
+            // Mobile-specific settings
+            startupFocus: !isMobile,
+            disableNativeSpellChecker: false,
+            scayt_autoStartup: false,
+            // Touch-friendly settings
+            touchAction: 'manipulation'
         });
 
         // Handle editor ready event
@@ -439,163 +799,187 @@
             }
         });
 
-        // HTML Entity Decoder
-        function decodeHTMLEntities(text) {
-            const entities = {
-                'amp': '&',
-                'apos': "'",
-                'lt': '<',
-                'gt': '>',
-                'quot': '"',
-                'nbsp': ' ',
-                'ndash': '-',
-                'mdash': '--',
-                'lsquo': "'",
-                'rsquo': "'",
-                'sbquo': "'",
-                'ldquo': '"',
-                'rdquo': '"',
-                'bdquo': '"',
-                'prime': "'",
-                'Prime': '"',
-                'euro': '€',
-                'pound': '£',
-                'reg': '®',
-                'copy': '©',
-                'trade': '™',
-                'bull': '•',
-                'middot': '·',
-                'deg': '°',
-                '#39': "'",      // Add explicit mapping for &#39;
-                '#x27': "'",     // Add hex mapping for apostrophe
-                '#x2019': "'",   // Add hex mapping for right single quotation mark
-                '#x2018': "'",   // Add hex mapping for left single quotation mark
-                'percnt': '%'    // Add percent sign mapping
-            };
-
-            // Create a temporary textarea for robust HTML entity decoding
-            const textarea = document.createElement('textarea');
-            
-            // First pass: Handle numeric and hex entities
-            text = text.replace(/&#(x[0-9a-f]+|\d+);/gi, function(match, num) {
-                textarea.innerHTML = match;
-                return textarea.value;
-            });
-
-            // Second pass: Handle named entities
-            text = text.replace(/&([a-z]+|#[0-9]+|#x[0-9a-f]+);/gi, function(match, entity) {
-                if (entities[entity]) {
-                    return entities[entity];
-                }
-                textarea.innerHTML = match;
-                return textarea.value;
-            });
-
-            // Cleanup
-            textarea.remove();
-            return text;
-        }
-
-        // Clean HTML content
-        function cleanHtmlContent(html) {
-            // Step 1: Initial HTML entity decoding with double pass
-            let content = decodeHTMLEntities(decodeHTMLEntities(html));
-
-            // Step 2: Create a temporary div for HTML parsing
-            let temp = document.createElement('div');
-            temp.innerHTML = content;
-
-            // Step 3: Handle HTML structure
-            // Process paragraphs
-            let paragraphs = temp.getElementsByTagName('p');
-            for (let p of paragraphs) {
-                // Ensure proper spacing within paragraphs
-                p.innerHTML = p.innerHTML.trim().replace(/\s+/g, ' ');
-                p.innerHTML += '\n\n';  // Double newline after paragraphs
-            }
-
-            // Process lists
-            let lists = temp.querySelectorAll('ul, ol');
-            for (let list of lists) {
-                let items = list.getElementsByTagName('li');
-                for (let i = 0; i < items.length; i++) {
-                    let item = items[i];
-                    // Clean the list item content
-                    let itemContent = decodeHTMLEntities(item.innerHTML).trim();
-                    item.innerHTML = '• ' + itemContent + (i < items.length - 1 ? '\n' : '\n\n');
-                }
-            }
-
-            // Step 4: Get text content
-            content = temp.textContent || temp.innerText;
-
-            // Step 5: Text normalization
-            content = content
-                // Normalize quotes and apostrophes
-                .replace(/[''′]/g, "'")
-                .replace(/[""″]/g, '"')
-                .replace(/\u2019/g, "'")  // Handle Unicode right single quotation mark
-                .replace(/\u2018/g, "'")  // Handle Unicode left single quotation mark
-                
-                // Clean up whitespace
-                .replace(/\s*\n\s*/g, '\n')     // Clean up spaces around newlines
-                .replace(/\n{3,}/g, '\n\n')     // Max 2 consecutive newlines
-                .replace(/[ \t]+/g, ' ')        // Normalize spaces and tabs
-                
-                // Keep only desired characters and ensure proper spacing
-                .replace(/([.,!?:])([A-Za-z0-9])/g, '$1 $2')  // Add space after punctuation
-                .replace(/\s+/g, ' ')                         // Clean up any double spaces
-                .split('\n')
-                .map(line => {
-                    // Capitalize first letter of each sentence
-                    return line.trim().replace(/^[a-z]/, c => c.toUpperCase());
-                })
-                .filter(line => line)
-                .join('\n')
-                .trim();
-
-            // Step 6: Final cleanup
-            content = content
-                // Preserve contractions and possessives
-                .replace(/([A-Za-z0-9])'([A-Za-z])/g, '$1\'$2')
-                // Convert double apostrophes to quotes
-                .replace(/''/g, '"')
-                // Final space normalization
-                .replace(/\s+/g, ' ')
-                .trim();
-
-            return content;
-        }
-
-        // Ensure form submission includes cleaned editor content
-        document.querySelector('form').addEventListener('submit', function(e) {
+        // Ensure form submission includes editor content
+        document.querySelector('form').addEventListener('submit', function() {
             var editorContent = editor.getData();
-            // Clean the content before submission
-            var cleanedContent = cleanHtmlContent(editorContent);
-            document.getElementById('id_remarks').value = cleanedContent;
+            document.getElementById('id_remarks').value = editorContent;
         });
+
+        // Store original editor content for change detection
+        var originalEditorContent = editor.getData();
     });
-
-    // Image modal functionality
-    function openModal(src) {
-        document.getElementById('imageModal').style.display = "block";
-        document.getElementById('modalImage').src = src;
-    }
-
-    function closeModal() {
-        document.getElementById('imageModal').style.display = "none";
-    }
-
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        if (event.target == document.getElementById('imageModal')) {
-            closeModal();
-        }
-    }
 
     // Add Bootstrap classes to form inputs
     document.querySelectorAll('input[type="text"]').forEach(input => {
         input.classList.add('form-control');
+    });
+
+    // Image Modal Functionality
+    var imageModal = document.getElementById('imageModal');
+    var modalImage = document.getElementById('modalImage');
+    var imageDate = document.getElementById('imageDate');
+    var downloadImage = document.getElementById('downloadImage');
+
+    // Handle image card clicks
+    document.querySelectorAll('.image-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+            var imageSrc = this.getAttribute('data-image-src');
+            var imageDateValue = this.getAttribute('data-image-date');
+            
+            // Set modal content
+            modalImage.src = imageSrc;
+            imageDate.textContent = imageDateValue;
+            downloadImage.href = imageSrc;
+            
+            // Set download filename
+            var filename = imageSrc.split('/').pop();
+            downloadImage.download = filename || 'activity-image.jpg';
+        });
+    });
+
+    // Handle modal events
+    imageModal.addEventListener('show.bs.modal', function() {
+        // Add loading state
+        modalImage.style.opacity = '0.5';
+    });
+
+    imageModal.addEventListener('shown.bs.modal', function() {
+        // Remove loading state
+        modalImage.style.opacity = '1';
+    });
+
+    // Handle image load errors
+    modalImage.addEventListener('error', function() {
+        this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=';
+        this.alt = 'Image not found';
+    });
+
+    // Cancel button functionality
+    window.cancelUpdate = function() {
+        // Check if form has been modified
+        var form = document.querySelector('form');
+        var formData = new FormData(form);
+        var hasChanges = false;
+        
+        // Check if any form fields have been modified
+        var nameField = document.getElementById('{{ form.name.id_for_label }}');
+        var locationField = document.getElementById('{{ form.location.id_for_label }}');
+        var remarksField = document.getElementById('id_remarks');
+        
+        // Get original values (you might want to store these in data attributes)
+        var originalName = '{{ form.name.value|default:""|escapejs }}';
+        var originalLocation = '{{ form.location.value|default:""|escapejs }}';
+        var originalRemarks = '{{ form.remarks.value|default:""|escapejs }}';
+        
+        // Check for changes
+        if (nameField && nameField.value !== originalName) hasChanges = true;
+        if (locationField && locationField.value !== originalLocation) hasChanges = true;
+        
+        // Check CKEditor changes if available
+        if (typeof editor !== 'undefined' && editor.status === 'ready') {
+            var currentEditorContent = editor.getData();
+            if (currentEditorContent !== originalEditorContent) hasChanges = true;
+        } else if (remarksField && remarksField.value !== originalRemarks) {
+            hasChanges = true;
+        }
+        
+        // If there are changes, show confirmation dialog
+        if (hasChanges) {
+            if (confirm('You have unsaved changes. Are you sure you want to cancel? Your changes will be lost.')) {
+                goBack();
+            }
+        } else {
+            goBack();
+        }
+    };
+    
+    function goBack() {
+        // Try to go back in browser history, fallback to a default URL
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            // Fallback - you might want to customize this URL
+            window.location.href = '{% url "activity_list" %}';
+        }
+    }
+
+    // Mobile-specific enhancements
+    if (isMobile) {
+        // Prevent zoom on input focus for iOS
+        document.querySelectorAll('input, textarea, select').forEach(function(element) {
+            element.addEventListener('focus', function() {
+                if (this.style.fontSize !== '16px') {
+                    this.style.fontSize = '16px';
+                }
+            });
+        });
+
+        // Add touch-friendly class to buttons
+        document.querySelectorAll('button, .btn').forEach(function(button) {
+            button.style.minHeight = '44px'; // iOS recommended touch target size
+            button.style.minWidth = '44px';
+        });
+
+        // Improve image card touch interaction
+        document.querySelectorAll('.image-card').forEach(function(card) {
+            card.style.cursor = 'pointer';
+            card.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            card.addEventListener('touchend', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+
+        // Add mobile-specific modal enhancements
+        imageModal.addEventListener('shown.bs.modal', function() {
+            // Prevent body scroll on mobile when modal is open
+            document.body.style.overflow = 'hidden';
+        });
+
+        imageModal.addEventListener('hidden.bs.modal', function() {
+            // Restore body scroll when modal is closed
+            document.body.style.overflow = '';
+        });
+    }
+
+    // Handle window resize for responsive editor
+    window.addEventListener('resize', function() {
+        if (editor && editor.status === 'ready') {
+            var newIsMobile = window.innerWidth <= 768;
+            if (newIsMobile !== isMobile) {
+                // Reinitialize editor with new mobile settings
+                editor.destroy();
+                isMobile = newIsMobile;
+                editor = CKEDITOR.replace('id_remarks', {
+                    height: isMobile ? '250px' : '300px',
+                    toolbar: isMobile ? [
+                        ['Bold', 'Italic'],
+                        ['NumberedList', 'BulletedList'],
+                        ['Source']
+                    ] : [
+                        ['Bold', 'Italic', 'Underline'],
+                        ['NumberedList', 'BulletedList'],
+                        ['Link', 'Unlink'],
+                        ['JustifyLeft', 'JustifyCenter', 'JustifyRight'],
+                        ['Source']
+                    ],
+                    removeButtons: '',
+                    removePlugins: 'elementspath,resize,maximize',
+                    contentsCss: [
+                        'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css',
+                        'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap'
+                    ],
+                    allowedContent: true,
+                    enterMode: CKEDITOR.ENTER_BR,
+                    width: '100%',
+                    startupFocus: !isMobile,
+                    disableNativeSpellChecker: false,
+                    scayt_autoStartup: false,
+                    touchAction: 'manipulation'
+                });
+            }
+        }
     });
 </script>
 {% endblock %}

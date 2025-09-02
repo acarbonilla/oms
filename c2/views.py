@@ -1003,7 +1003,7 @@ def activity_list(request):
         activities = activities.filter(name__icontains=search_query)  # Search by activity name
 
     # Add pagination
-    paginator = Paginator(activities, 5)  # Show 5 activities per page
+    paginator = Paginator(activities, 10)  # Show 5 activities per page
     activities_page = paginator.get_page(page_number)
 
     return render(
