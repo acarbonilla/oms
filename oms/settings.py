@@ -171,3 +171,33 @@ IMAGE_ENV = env("IMAGE_ENV", default="production")
 
 # This is for qr code path
 BASE_URL = env("BASE_URL")
+
+import logging
+
+# Filter out Chrome DevTools requests
+class DevToolsFilter(logging.Filter):
+    def filter(self, record):
+        return '/.well-known/appspecific/com.chrome.devtools.json' not in record.getMessage()
+
+# Apply filter to Django's request logger
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'devtools_filter': {
+            '()': DevToolsFilter,
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'filters': ['devtools_filter'],
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    },
+}
