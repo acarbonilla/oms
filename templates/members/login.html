@@ -5,43 +5,106 @@
 <style>
   /* Base Styles */
   body {
-    background: linear-gradient(-45deg, #c33764, #1d2671, #3a1c71, #d76d77);
+    background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c, #4facfe, #00f2fe);
     background-size: 400% 400%;
-    animation: gradientBG 12s ease infinite;
+    animation: gradientBG 15s ease infinite;
     min-height: 100vh;
     margin: 0;
     padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* Floating particles animation */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent),
+      radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.3), transparent),
+      radial-gradient(2px 2px at 160px 30px, rgba(255,255,255,0.2), transparent);
+    background-repeat: repeat;
+    background-size: 200px 100px;
+    animation: float 20s linear infinite;
+    pointer-events: none;
+    z-index: 1;
   }
 
   #loginTitle {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: white;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    font-weight: 600;
+    letter-spacing: 1px;
+    animation: titleGlow 3s ease-in-out infinite alternate;
   }
 
   #login {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 15px 50px;
-    padding: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    animation: fadeIn 0.8s ease-out;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    padding: 30px;
+    box-shadow: 
+      0 20px 40px rgba(0, 0, 0, 0.1),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: slideInUp 1s ease-out, float 6s ease-in-out infinite;
     will-change: transform, opacity;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+  }
+
+  #login:hover {
+    transform: translateY(-5px);
+    box-shadow: 
+      0 25px 50px rgba(0, 0, 0, 0.15),
+      0 0 0 1px rgba(255, 255, 255, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+
+  .form-group {
+    position: relative;
+    margin-bottom: 25px;
   }
 
   #loginInputs, #passwordInput {
     border-radius: 50px;
     border: none;
-    padding: 12px 20px;
-    background: rgba(255, 255, 255, 0.9);
-    transition: all 0.3s ease;
+    padding: 15px 25px;
+    background: rgba(255, 255, 255, 0.95);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 16px;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
   }
 
   #loginInputs:focus, #passwordInput:focus {
-    transform: scale(1.02);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 
+      0 8px 25px rgba(0, 0, 0, 0.15),
+      0 0 0 3px rgba(102, 126, 234, 0.3);
     outline: none;
+    background: rgba(255, 255, 255, 1);
+  }
+
+  #loginInputs::placeholder, #passwordInput::placeholder {
+    color: #999;
+    transition: all 0.3s ease;
+  }
+
+  #loginInputs:focus::placeholder, #passwordInput:focus::placeholder {
+    transform: translateY(-10px);
+    font-size: 12px;
+    color: #667eea;
   }
 
   .password-container {
@@ -50,90 +113,240 @@
 
   .password-toggle {
     position: absolute;
-    right: 20px;
+    right: 25px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
     cursor: pointer;
     color: #666;
-    font-size: 18px;
-    padding: 0;
-    width: 24px;
-    height: 24px;
+    font-size: 20px;
+    padding: 8px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    z-index: 3;
   }
 
   .password-toggle:hover {
-    color: #333;
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  .password-toggle:active {
+    transform: translateY(-50%) scale(0.95);
   }
 
   .password-toggle:focus {
     outline: none;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
   }
 
   #submitButton {
     border-radius: 50px;
-    padding: 10px 25px;
-    font-weight: bold;
+    padding: 15px 40px;
+    font-weight: 600;
     letter-spacing: 1px;
-    transition: all 0.3s;
-    background: linear-gradient(to right, #ff6b6b, #4ecdc4);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border: none;
+    color: white;
+    font-size: 16px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  }
+
+  #submitButton::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s;
   }
 
   #submitButton:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  }
+
+  #submitButton:hover::before {
+    left: 100%;
   }
 
   #submitButton:active {
-    transform: translateY(0);
+    transform: translateY(-1px);
   }
 
-  /* Animations */
+  /* Enhanced Animations */
   @keyframes gradientBG {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
   }
 
-  /* Responsive Adjustments */
+  @keyframes slideInUp {
+    from { 
+      opacity: 0; 
+      transform: translateY(50px) scale(0.9); 
+    }
+    to { 
+      opacity: 1; 
+      transform: translateY(0) scale(1); 
+    }
+  }
+
+  @keyframes titleGlow {
+    from { text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); }
+    to { text-shadow: 0 4px 20px rgba(255, 255, 255, 0.3), 0 0 30px rgba(102, 126, 234, 0.3); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  /* Loading animation for button */
+  .loading {
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  /* Error animation */
+  .error-shake {
+    animation: shake 0.5s ease-in-out;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+  }
+
+  /* Mobile-first responsive design */
   @media (max-width: 768px) {
+    body {
+      padding: 10px;
+    }
+    
     #login {
-      padding: 12px;
-      border-radius: 10px 30px;
+      padding: 25px 20px;
+      border-radius: 20px;
+      margin: 20px 0;
     }
-    #loginInputs {
-      border-radius: 30px;
-      padding: 10px 15px;
+    
+    #loginInputs, #passwordInput {
+      padding: 12px 20px;
+      font-size: 16px; /* Prevents zoom on iOS */
     }
+    
     #loginTitle {
       font-size: 24px;
+      margin-bottom: 20px;
+    }
+    
+    #submitButton {
+      padding: 12px 30px;
+      font-size: 16px;
+      width: 100%;
+    }
+    
+    .password-toggle {
+      right: 20px;
+      width: 28px;
+      height: 28px;
+      font-size: 18px;
     }
   }
 
   @media (max-width: 576px) {
+    #login {
+      padding: 20px 15px;
+      border-radius: 15px;
+      margin: 10px 0;
+    }
+    
     #loginTitle {
       font-size: 20px;
+      margin-bottom: 15px;
     }
-    #login {
-      padding: 10px;
-      border-radius: 10px 20px;
+    
+    #loginInputs, #passwordInput {
+      padding: 10px 18px;
+      font-size: 16px;
     }
-    .form-control {
-      font-size: 14px;
-    }
+    
     #submitButton {
-      padding: 8px 20px;
-      font-size: 14px;
+      padding: 12px 25px;
+      font-size: 15px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    #login {
+      padding: 15px 10px;
+    }
+    
+    #loginTitle {
+      font-size: 18px;
+    }
+  }
+
+  /* Touch device optimizations */
+  @media (hover: none) and (pointer: coarse) {
+    #login:hover {
+      transform: none;
+    }
+    
+    #loginInputs:focus, #passwordInput:focus {
+      transform: scale(1.01);
+    }
+    
+    .password-toggle:hover {
+      transform: translateY(-50%) scale(1.05);
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    #login {
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid #000;
+    }
+    
+    #loginInputs, #passwordInput {
+      background: #fff;
+      border: 2px solid #000;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    
+    body::before {
+      animation: none;
     }
   }
 </style>
@@ -142,9 +355,9 @@
   <div class="row mt-5 justify-content-center">
     <div class="col-12 col-sm-8 col-md-6 col-lg-4 p-4" id="login">
       <h5 class="text-center p-3 formTitle" id="loginTitle">NAB Workplace Intelligence</h5>
-      <form action="" method="POST">
+      <form action="" method="POST" id="loginForm">
         {% csrf_token %}
-        <div class="mb-3 p-2">
+        <div class="form-group">
           <input
             aria-describedby="emailHelp"
             class="form-control"
@@ -153,18 +366,22 @@
             type="text"
             id="loginInputs"
             value="{{ username|default:'' }}"
+            required
+            autocomplete="username"
           />
         </div>
-        <div class="mb-3 p-2">
+        <div class="form-group">
           <div class="password-container">
             <input
               class="form-control"
               name="password"
-              placeholder="********"
+              placeholder="Password"
               type="password"
               id="passwordInput"
+              required
+              autocomplete="current-password"
             />
-            <button type="button" class="password-toggle" onclick="togglePassword()">
+            <button type="button" class="password-toggle" onclick="togglePassword()" aria-label="Toggle password visibility">
               <span id="toggleIcon">👁️</span>
             </button>
           </div>
@@ -175,7 +392,8 @@
             type="submit"
             id="submitButton"
           >
-            Sign In
+            <span id="buttonText">Sign In</span>
+            <span id="loadingSpinner" style="display: none;">⏳</span>
           </button>
         </div>
       </form>
@@ -183,8 +401,9 @@
   </div>
 </div>
 
-<!-- Password toggle and error handling script -->
+<!-- Enhanced login form script -->
 <script>
+  // Password toggle functionality
   function togglePassword() {
     const passwordInput = document.getElementById('passwordInput');
     const toggleIcon = document.getElementById('toggleIcon');
@@ -192,35 +411,151 @@
     if (passwordInput.type === 'password') {
       passwordInput.type = 'text';
       toggleIcon.textContent = '🙈';
+      toggleIcon.style.transform = 'translateY(-50%) scale(1.2)';
     } else {
       passwordInput.type = 'password';
       toggleIcon.textContent = '👁️';
-    }
-  }
-
-  // Example: Add shake animation on error (call this function if login fails)
-  function triggerErrorAnimation() {
-    const loginBox = document.getElementById('login');
-    loginBox.classList.add('error-animation');
-    setTimeout(() => {
-      loginBox.classList.remove('error-animation');
-    }, 400);
-  }
-
-  // Add error animation styles
-  const style = document.createElement('style');
-  style.textContent = `
-    .error-animation {
-      animation: shake 0.4s ease-in-out;
+      toggleIcon.style.transform = 'translateY(-50%) scale(1.2)';
     }
     
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
+    // Reset scale after animation
+    setTimeout(() => {
+      toggleIcon.style.transform = 'translateY(-50%) scale(1)';
+    }, 200);
+  }
+
+  // Form submission with loading animation
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const submitButton = document.getElementById('submitButton');
+    const buttonText = document.getElementById('buttonText');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    
+    // Show loading state
+    submitButton.classList.add('loading');
+    submitButton.disabled = true;
+    buttonText.style.display = 'none';
+    loadingSpinner.style.display = 'inline';
+    
+    // Re-enable button after 3 seconds (fallback)
+    setTimeout(() => {
+      submitButton.classList.remove('loading');
+      submitButton.disabled = false;
+      buttonText.style.display = 'inline';
+      loadingSpinner.style.display = 'none';
+    }, 3000);
+  });
+
+  // Enhanced input focus animations
+  const inputs = document.querySelectorAll('#loginInputs, #passwordInput');
+  inputs.forEach(input => {
+    input.addEventListener('focus', function() {
+      this.parentElement.style.transform = 'translateY(-2px)';
+    });
+    
+    input.addEventListener('blur', function() {
+      this.parentElement.style.transform = 'translateY(0)';
+    });
+  });
+
+  // Error animation function
+  function triggerErrorAnimation() {
+    const loginBox = document.getElementById('login');
+    loginBox.classList.add('error-shake');
+    setTimeout(() => {
+      loginBox.classList.remove('error-shake');
+    }, 500);
+  }
+
+  // Add floating animation to login box on mouse move
+  document.addEventListener('mousemove', function(e) {
+    const loginBox = document.getElementById('login');
+    const rect = loginBox.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const deltaX = (e.clientX - centerX) / 50;
+    const deltaY = (e.clientY - centerY) / 50;
+    
+    loginBox.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+  });
+
+  // Reset transform on mouse leave
+  document.addEventListener('mouseleave', function() {
+    const loginBox = document.getElementById('login');
+    loginBox.style.transform = 'translate(0, 0)';
+  });
+
+  // Touch device optimizations
+  if ('ontouchstart' in window) {
+    // Add touch feedback
+    const touchElements = document.querySelectorAll('#loginInputs, #passwordInput, #submitButton, .password-toggle');
+    touchElements.forEach(element => {
+      element.addEventListener('touchstart', function() {
+        this.style.transform = 'scale(0.98)';
+      });
+      
+      element.addEventListener('touchend', function() {
+        this.style.transform = 'scale(1)';
+      });
+    });
+  }
+
+  // Keyboard navigation improvements
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && e.target.id === 'loginInputs') {
+      document.getElementById('passwordInput').focus();
+    }
+  });
+
+  // Auto-focus on page load (with delay for animation)
+  window.addEventListener('load', function() {
+    setTimeout(() => {
+      document.getElementById('loginInputs').focus();
+    }, 1000);
+  });
+
+  // Add ripple effect to button
+  function createRipple(event) {
+    const button = event.currentTarget;
+    const circle = document.createElement('span');
+    const diameter = Math.max(button.clientWidth, button.clientHeight);
+    const radius = diameter / 2;
+
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+    circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+    circle.classList.add('ripple');
+
+    const ripple = button.getElementsByClassName('ripple')[0];
+    if (ripple) {
+      ripple.remove();
+    }
+
+    button.appendChild(circle);
+  }
+
+  document.getElementById('submitButton').addEventListener('click', createRipple);
+
+  // Add ripple CSS
+  const rippleStyle = document.createElement('style');
+  rippleStyle.textContent = `
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(0);
+      animation: ripple 600ms linear;
+      pointer-events: none;
+    }
+    
+    @keyframes ripple {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
     }
   `;
-  document.head.appendChild(style);
+  document.head.appendChild(rippleStyle);
 </script>
 
 {% endblock %}
