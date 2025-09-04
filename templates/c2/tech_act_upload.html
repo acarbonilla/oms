@@ -997,6 +997,31 @@
         jpegQuality: 0.8  // Medium quality JPEG compression
     };
 
+    // Camera shutter sound function
+    function playCameraSound() {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Create a short "click" sound
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        } catch (error) {
+            // Fallback: silent if audio context fails
+            console.log('Audio not available');
+        }
+    }
+
     // Event Listeners
     uploadRadio.addEventListener('change', toggleInputMethod);
     cameraRadio.addEventListener('change', toggleInputMethod);
@@ -1114,6 +1139,9 @@
             showModalError(`Maximum ${MAX_IMAGES} images allowed`);
             return;
         }
+
+        // Play camera shutter sound
+        playCameraSound();
 
         const canvas = document.createElement('canvas');
         
