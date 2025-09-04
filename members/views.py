@@ -19,9 +19,9 @@ def omsLogin(request):
                 return redirect('group_based_redirect')
 
         else:
-            # Return an 'invalid login' error message.
+            # Return an 'invalid login' error message and preserve username
             messages.error(request, "Username and Password didn't match. Try Again")
-            return redirect('omsLogin')
+            return render(request, 'members/login.html', {'title': 'OMS Login', 'username': username})
 
     else:
         return render(request, 'members/login.html', {'title': 'OMS Login'})
