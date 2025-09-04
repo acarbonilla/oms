@@ -465,12 +465,23 @@
         background: white;
         border-radius: 20px;
         padding: 0;
-        max-width: 90vw;
-        max-height: 90vh;
+        max-width: 95vw;
+        max-height: 95vh;
         width: 800px;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         animation: slideInUp 0.4s ease-out;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    @media (max-width: 768px) {
+        .modal-content {
+            max-width: 98vw;
+            max-height: 98vh;
+            width: 100%;
+            margin: 10px;
+        }
     }
 
     .modal-header {
@@ -541,6 +552,16 @@
 
     .modal-body {
         padding: 30px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    @media (max-width: 768px) {
+        .modal-body {
+            padding: 20px 15px;
+        }
     }
 
     .picture-counter {
@@ -643,6 +664,22 @@
         border: 3px solid rgba(255, 255, 255, 0.3);
         position: relative;
         animation: float 4s ease-in-out infinite;
+        flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+        .modal-camera-preview {
+            max-width: 100%;
+            margin: 0 auto 15px;
+            max-height: 40vh;
+        }
+        
+        .modal-camera-preview video {
+            width: 100%;
+            height: auto;
+            max-height: 40vh;
+            object-fit: cover;
+        }
     }
 
     .modal-camera-preview::before {
@@ -699,6 +736,21 @@
         gap: 15px;
         justify-content: center;
         margin-top: 20px;
+        flex-shrink: 0;
+        padding-top: 15px;
+    }
+
+    @media (max-width: 768px) {
+        .modal-actions {
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 10px;
+        }
+        
+        .btn-modal {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
     }
 
     .btn-modal {
