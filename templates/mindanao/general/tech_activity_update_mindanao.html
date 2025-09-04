@@ -537,6 +537,66 @@
         border-radius: 0 0 12px 12px;
     }
 
+    /* Navigation Button Styles */
+    .nav-button {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        cursor: pointer;
+    }
+
+    .nav-button:hover {
+        background: rgba(0, 0, 0, 0.9);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .nav-button:disabled {
+        background: rgba(0, 0, 0, 0.3);
+        cursor: not-allowed;
+        transform: translateY(-50%);
+    }
+
+    .nav-button:disabled:hover {
+        background: rgba(0, 0, 0, 0.3);
+        transform: translateY(-50%);
+    }
+
+    .nav-prev {
+        left: 15px;
+    }
+
+    .nav-next {
+        right: 15px;
+    }
+
+    .image-counter {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.9rem;
+        z-index: 1000;
+    }
+
+    .modal-body {
+        position: relative;
+    }
+
     /* Mobile Modal Adjustments */
     @media (max-width: 768px) {
         .modal-dialog {
@@ -573,6 +633,27 @@
         .modal-footer .btn {
             padding: 0.5rem 1rem;
             font-size: 0.9rem;
+        }
+
+        .nav-button {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+        }
+
+        .nav-prev {
+            left: 10px;
+        }
+
+        .nav-next {
+            right: 10px;
+        }
+
+        .image-counter {
+            top: 10px;
+            right: 10px;
+            padding: 3px 8px;
+            font-size: 0.8rem;
         }
     }
 
@@ -729,6 +810,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center">
+                <div class="image-counter" id="imageCounter">1 / 1</div>
+                <button class="nav-button nav-prev" id="prevButton" onclick="navigateImage(-1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="nav-button nav-next" id="nextButton" onclick="navigateImage(1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
                 <img id="modalImage" src="" alt="Activity image" class="img-fluid rounded">
                 <div class="mt-3">
                     <small class="text-muted" id="modalImageDate">
@@ -819,21 +907,69 @@
     var modalImage = document.getElementById('modalImage');
     var imageDate = document.getElementById('imageDate');
     var downloadImage = document.getElementById('downloadImage');
+    var imageCounter = document.getElementById('imageCounter');
+    var prevButton = document.getElementById('prevButton');
+    var nextButton = document.getElementById('nextButton');
+    
+    // Store all images and current index
+    var allImages = [];
+    var currentImageIndex = 0;
+
+    // Initialize images array from all image cards
+    function initializeImages() {
+        allImages = [];
+        document.querySelectorAll('.image-card').forEach(function(card) {
+            allImages.push({
+                src: card.getAttribute('data-image-src'),
+                date: card.getAttribute('data-image-date')
+            });
+        });
+    }
+
+    // Update modal content
+    function updateModalContent(index) {
+        if (allImages.length === 0) return;
+        
+        var image = allImages[index];
+        modalImage.src = image.src;
+        imageDate.textContent = image.date;
+        downloadImage.href = image.src;
+        
+        // Set download filename
+        var filename = image.src.split('/').pop();
+        downloadImage.download = filename || 'activity-image.jpg';
+        
+        // Update counter
+        imageCounter.textContent = (index + 1) + ' / ' + allImages.length;
+        
+        // Update navigation buttons
+        prevButton.disabled = (index === 0);
+        nextButton.disabled = (index === allImages.length - 1);
+    }
+
+    // Navigate to previous/next image
+    window.navigateImage = function(direction) {
+        if (allImages.length === 0) return;
+        
+        var newIndex = currentImageIndex + direction;
+        
+        // Handle wrapping
+        if (newIndex < 0) {
+            newIndex = allImages.length - 1;
+        } else if (newIndex >= allImages.length) {
+            newIndex = 0;
+        }
+        
+        currentImageIndex = newIndex;
+        updateModalContent(currentImageIndex);
+    };
 
     // Handle image card clicks
-    document.querySelectorAll('.image-card').forEach(function(card) {
+    document.querySelectorAll('.image-card').forEach(function(card, index) {
         card.addEventListener('click', function() {
-            var imageSrc = this.getAttribute('data-image-src');
-            var imageDateValue = this.getAttribute('data-image-date');
-            
-            // Set modal content
-            modalImage.src = imageSrc;
-            imageDate.textContent = imageDateValue;
-            downloadImage.href = imageSrc;
-            
-            // Set download filename
-            var filename = imageSrc.split('/').pop();
-            downloadImage.download = filename || 'activity-image.jpg';
+            initializeImages();
+            currentImageIndex = index;
+            updateModalContent(currentImageIndex);
         });
     });
 
@@ -841,11 +977,34 @@
     imageModal.addEventListener('show.bs.modal', function() {
         // Add loading state
         modalImage.style.opacity = '0.5';
+        // Initialize images when modal opens
+        initializeImages();
     });
 
     imageModal.addEventListener('shown.bs.modal', function() {
         // Remove loading state
         modalImage.style.opacity = '1';
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        // Only handle keyboard navigation when modal is open
+        if (imageModal.classList.contains('show')) {
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                navigateImage(-1);
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                navigateImage(1);
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                // Close modal with Bootstrap method
+                var modal = bootstrap.Modal.getInstance(imageModal);
+                if (modal) {
+                    modal.hide();
+                }
+            }
+        }
     });
 
     // Handle image load errors
