@@ -484,6 +484,12 @@
             width: 100%;
             margin: 10px;
         }
+        
+        .warning-message {
+            padding: 15px 12px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
     }
 
     .modal-header {
@@ -629,7 +635,11 @@
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
+        width: 100%;
+        word-wrap: break-word;
+        white-space: normal;
+        text-align: center;
     }
 
     .warning-message::before {
@@ -924,11 +934,6 @@
                 <span id="counterText">0 / 10 photos taken</span>
             </div>
 
-            <!-- Warning Messages -->
-            <div class="warning-message" id="warningMessage">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                <span id="warningText">You are approaching the limit of 10 photos.</span>
-            </div>
 
             <!-- Camera Controls -->
             <div class="modal-controls">
@@ -936,9 +941,9 @@
                     <option value="">Loading cameras...</option>
                 </select>
                 <select id="modalResolutionSelect">
-                    <option value="high">High Quality</option>
-                    <option value="medium" selected>Medium Quality</option>
-                    <option value="low">Low Quality</option>
+                    <option value="high">High Quality (1920x1440)</option>
+                    <option value="medium" selected>Medium Quality (1280x960)</option>
+                    <option value="low">Low Quality (640x480)</option>
                 </select>
             </div>
 
@@ -984,8 +989,6 @@
     const modalCaptureBtn = document.getElementById('modalCaptureBtn');
     const pictureCounter = document.getElementById('pictureCounter');
     const counterText = document.getElementById('counterText');
-    const warningMessage = document.getElementById('warningMessage');
-    const warningText = document.getElementById('warningText');
 
     // Global Variables
     let stream;
@@ -993,11 +996,23 @@
     const MAX_IMAGES = 10;
     const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 
-    // Resolution presets
-    const resolutionPresets = {
-        high: { width: 1920, height: 1440 },  // 4:3 ratio
-        medium: { width: 1280, height: 960 },  // 4:3 ratio
-        low: { width: 640, height: 480 }  // 4:3 ratio
+    // Quality presets - includes both resolution and JPEG compression quality
+    const qualityPresets = {
+        high: { 
+            width: 1920, 
+            height: 1440, 
+            jpegQuality: 0.9  // Higher quality JPEG compression
+        },
+        medium: { 
+            width: 1280, 
+            height: 960, 
+            jpegQuality: 0.8  // Medium quality JPEG compression
+        },
+        low: { 
+            width: 640, 
+            height: 480, 
+            jpegQuality: 0.7  // Lower quality JPEG compression for smaller files
+        }
     };
 
     // Event Listeners
@@ -1066,14 +1081,14 @@
         stopCamera();
         hideModalError();
 
-        const resolution = resolutionPresets[modalResolutionSelect.value];
+        const quality = qualityPresets[modalResolutionSelect.value];
         
         try {
             const constraints = {
                 video: {
                     deviceId: modalCameraSelect.value ? { exact: modalCameraSelect.value } : undefined,
-                    width: { ideal: resolution.width },
-                    height: { ideal: resolution.height },
+                    width: { ideal: quality.width },
+                    height: { ideal: quality.height },
                     facingMode: { ideal: "environment" }
                 }
             };
@@ -1099,22 +1114,15 @@
         
         // Update counter styling based on count
         pictureCounter.classList.remove('counter-warning', 'counter-danger');
-        warningMessage.classList.remove('show', 'danger');
         
         if (count >= MAX_IMAGES) {
             pictureCounter.classList.add('counter-danger');
-            warningMessage.classList.add('show', 'danger');
-            warningText.textContent = 'Maximum limit reached! You cannot take more photos.';
             modalCaptureBtn.disabled = true;
         } else if (count >= 8) {
             pictureCounter.classList.add('counter-warning');
-            warningMessage.classList.add('show');
-            warningText.textContent = 'Warning: You are approaching the limit of 10 photos.';
             modalCaptureBtn.disabled = false;
         } else if (count >= 5) {
             pictureCounter.classList.add('counter-warning');
-            warningMessage.classList.add('show');
-            warningText.textContent = 'You are approaching the limit of 10 photos.';
             modalCaptureBtn.disabled = false;
         } else {
             modalCaptureBtn.disabled = false;
@@ -1143,8 +1151,9 @@
         const sourceY = (modalCameraPreview.videoHeight - targetHeight) / 2;
         context.drawImage(modalCameraPreview, sourceX, sourceY, targetWidth, targetHeight, 0, 0, targetWidth, targetHeight);
 
-        let quality = 0.8;
-        let base64Image = canvas.toDataURL('image/jpeg', quality);
+        // Use the selected quality setting for JPEG compression
+        const quality = qualityPresets[modalResolutionSelect.value];
+        let base64Image = canvas.toDataURL('image/jpeg', quality.jpegQuality);
         
         const container = document.createElement('div');
         container.className = 'preview-item';
