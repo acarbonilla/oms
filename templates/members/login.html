@@ -30,7 +30,7 @@
     will-change: transform, opacity;
   }
 
-  #loginInputs {
+  #loginInputs, #passwordInput {
     border-radius: 50px;
     border: none;
     padding: 12px 20px;
@@ -38,7 +38,7 @@
     transition: all 0.3s ease;
   }
 
-  #loginInputs:focus {
+  #loginInputs:focus, #passwordInput:focus {
     transform: scale(1.02);
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
     outline: none;
@@ -50,7 +50,7 @@
 
   .password-toggle {
     position: absolute;
-    right: 15px;
+    right: 20px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
@@ -163,7 +163,6 @@
               placeholder="********"
               type="password"
               id="passwordInput"
-              style="padding-right: 50px;"
             />
             <button type="button" class="password-toggle" onclick="togglePassword()">
               <span id="toggleIcon">👁️</span>
