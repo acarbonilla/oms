@@ -940,11 +940,6 @@
                 <select id="modalCameraSelect">
                     <option value="">Loading cameras...</option>
                 </select>
-                <select id="modalResolutionSelect">
-                    <option value="high">High Quality (1920x1440)</option>
-                    <option value="medium" selected>Medium Quality (1280x960)</option>
-                    <option value="low">Low Quality (640x480)</option>
-                </select>
             </div>
 
             <!-- Camera Preview -->
@@ -983,7 +978,6 @@
     const closeModal = document.getElementById('closeModal');
     const modalCloseBtn = document.getElementById('modalCloseBtn');
     const modalCameraSelect = document.getElementById('modalCameraSelect');
-    const modalResolutionSelect = document.getElementById('modalResolutionSelect');
     const modalCameraPreview = document.getElementById('modalCameraPreview');
     const modalCameraError = document.getElementById('modalCameraError');
     const modalCaptureBtn = document.getElementById('modalCaptureBtn');
@@ -996,23 +990,11 @@
     const MAX_IMAGES = 10;
     const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 
-    // Quality presets - includes both resolution and JPEG compression quality
-    const qualityPresets = {
-        high: { 
-            width: 1920, 
-            height: 1440, 
-            jpegQuality: 0.9  // Higher quality JPEG compression
-        },
-        medium: { 
-            width: 1280, 
-            height: 960, 
-            jpegQuality: 0.8  // Medium quality JPEG compression
-        },
-        low: { 
-            width: 640, 
-            height: 480, 
-            jpegQuality: 0.7  // Lower quality JPEG compression for smaller files
-        }
+    // Fixed medium quality settings for optimal file size management
+    const CAMERA_QUALITY = {
+        width: 1280, 
+        height: 960, 
+        jpegQuality: 0.8  // Medium quality JPEG compression
     };
 
     // Event Listeners
@@ -1022,7 +1004,6 @@
     closeModal.addEventListener('click', closeModalHandler);
     modalCloseBtn.addEventListener('click', closeModalHandler);
     modalCameraSelect.addEventListener('change', startModalCamera);
-    modalResolutionSelect.addEventListener('change', startModalCamera);
     modalCaptureBtn.addEventListener('click', capturePhoto);
 
     // Modal Functions
@@ -1080,15 +1061,13 @@
     async function startModalCamera() {
         stopCamera();
         hideModalError();
-
-        const quality = qualityPresets[modalResolutionSelect.value];
         
         try {
             const constraints = {
                 video: {
                     deviceId: modalCameraSelect.value ? { exact: modalCameraSelect.value } : undefined,
-                    width: { ideal: quality.width },
-                    height: { ideal: quality.height },
+                    width: { ideal: CAMERA_QUALITY.width },
+                    height: { ideal: CAMERA_QUALITY.height },
                     facingMode: { ideal: "environment" }
                 }
             };
@@ -1151,9 +1130,8 @@
         const sourceY = (modalCameraPreview.videoHeight - targetHeight) / 2;
         context.drawImage(modalCameraPreview, sourceX, sourceY, targetWidth, targetHeight, 0, 0, targetWidth, targetHeight);
 
-        // Use the selected quality setting for JPEG compression
-        const quality = qualityPresets[modalResolutionSelect.value];
-        let base64Image = canvas.toDataURL('image/jpeg', quality.jpegQuality);
+        // Use fixed medium quality for JPEG compression
+        let base64Image = canvas.toDataURL('image/jpeg', CAMERA_QUALITY.jpegQuality);
         
         const container = document.createElement('div');
         container.className = 'preview-item';
