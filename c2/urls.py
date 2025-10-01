@@ -3,7 +3,8 @@ from .views import (empMember, amMember, amAssessment, upload_recent_image_qr, u
                     recent_image_detail, evMember, standard_image_ev, failed_list, generate_pdf,
                     generate_selected_pdf, standard_image_ev_details, pass_list, not_visited_facilities_list,
                     access_denied, trigger_500, tech_act_upload, activity_list, activity_detail, facility_list,
-                    generate_qr_code, tech_activity_download, tech_activity_pdf, tech_activity_update, update_image_label)
+                    generate_qr_code, tech_activity_download, tech_activity_pdf, tech_activity_update, update_image_label,
+                    delete_activity_c2)
 
 # app_name = 'c2'
 
@@ -29,6 +30,7 @@ urlpatterns = [
     path('tech-activity/download/', tech_activity_download, name='tech_activity_download'),
     path('tech-activity/pdf/', tech_activity_pdf, name='tech_activity_pdf'),
     path('tech-activity/<int:pk>/update/', tech_activity_update, name='tech_activity_update'),
+    path('tech-activity/<int:activity_id>/delete/', delete_activity_c2, name='delete_activity_c2'),
     path('update-image-label/', update_image_label, name='update_image_label'),
 
     # Failed List

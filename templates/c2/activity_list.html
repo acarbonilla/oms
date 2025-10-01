@@ -353,6 +353,81 @@
     .btn-group .btn:last-child {
         margin-right: 0;
     }
+
+    /* Yellow Sticky Note Delete Button */
+    .sticky-note-delete {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+        box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        transform: rotate(-3deg);
+    }
+
+    .sticky-note-delete:hover {
+        transform: rotate(0deg) scale(1.1);
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5);
+        background: linear-gradient(135deg, #ffed4e, #ffd700);
+    }
+
+    .sticky-note-delete i {
+        color: #333;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .sticky-note-delete:hover i {
+        color: #dc3545;
+        transform: scale(1.2);
+    }
+
+    .delete-tooltip {
+        position: absolute;
+        bottom: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        pointer-events: none;
+    }
+
+    .delete-tooltip:before {
+        content: '';
+        position: absolute;
+        top: -4px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-bottom: 4px solid #333;
+    }
+
+    .sticky-note-delete:hover .delete-tooltip {
+        opacity: 1;
+        visibility: visible;
+        bottom: -30px;
+    }
+
+    /* Ensure card has relative positioning for absolute sticky note */
+    .card {
+        position: relative;
+    }
 </style>
 
 <div class="container mt-4">
@@ -395,6 +470,13 @@
         {% for activity in activities %}
         <div class="col-md-6 mb-4">
             <div class="card h-100 shadow-sm">
+                <!-- Yellow Sticky Note with Delete -->
+                <div class="sticky-note-delete" 
+                     onclick="confirmDelete({{ activity.id }}, '{{ activity.name|escapejs }}')"
+                     title="Click to delete this activity">
+                    <i class="fas fa-sticky-note"></i>
+                    <div class="delete-tooltip">Delete</div>
+                </div>
                 <div class="card-body">
                     <h5 class="card-title mb-3">{{ activity.name }}</h5>
                     <div class="btn-group mb-3">
@@ -490,6 +572,41 @@
     {% endif %}
 </div>
 
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+                    <h6 class="text-danger">Are you sure you want to delete this activity?</h6>
+                </div>
+                <div class="alert alert-warning">
+                    <strong>Activity:</strong> <span id="activityNameToDelete"></span>
+                </div>
+                <p class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    This action cannot be undone. All associated images and data will be permanently deleted.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="fas fa-trash me-1"></i>Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     // Add scroll animation to cards
     document.addEventListener('DOMContentLoaded', function() {
@@ -518,6 +635,37 @@
                 }, 300);
             });
         });
+    });
+
+    // Delete confirmation functionality
+    let activityIdToDelete = null;
+
+    function confirmDelete(activityId, activityName) {
+        activityIdToDelete = activityId;
+        document.getElementById('activityNameToDelete').textContent = activityName;
+        
+        // Show the modal
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        deleteModal.show();
+    }
+
+    // Handle confirm delete button click
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        if (activityIdToDelete) {
+            // Show loading state
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Deleting...';
+            this.disabled = true;
+            
+            // Redirect to delete URL
+            window.location.href = `/c2/tech-activity/${activityIdToDelete}/delete/`;
+        }
+    });
+
+    // Reset modal state when hidden
+    document.getElementById('deleteModal').addEventListener('hidden.bs.modal', function() {
+        document.getElementById('confirmDeleteBtn').innerHTML = '<i class="fas fa-trash me-1"></i>Yes, Delete';
+        document.getElementById('confirmDeleteBtn').disabled = false;
+        activityIdToDelete = null;
     });
 </script>
 

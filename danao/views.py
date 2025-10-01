@@ -19,6 +19,7 @@ from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.shortcuts import render
+from django.http import Http404
 # This is for QR
 from django.urls import reverse
 from django.utils.html import strip_tags
@@ -1551,3 +1552,35 @@ def update_image_label(request):
     except Exception as e:
         print(f"General error: {e}")
         return JsonResponse({'success': False, 'error': str(e)})
+
+
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
+@restrict_emp_group(redirect_url="access_denied")
+@login_required(login_url='omsLogin')
+def delete_activity_danao(request, activity_id):
+    """
+    Delete a technical activity with confirmation
+    """
+    try:
+        # Get the activity object
+        activity = get_object_or_404(DanaoTechActivities, id=activity_id)
+        
+        # Check if user has permission to delete this activity
+        # Only allow deletion if user is the uploader or is in EV_D group
+        if not (activity.uploaded_by == request.user.usersDanao or 
+                request.user.groups.filter(name="EV_D").exists()):
+            messages.error(request, "🚫 You don't have permission to delete this activity.")
+            return redirect('activity_listDanao')
+        
+        # Delete the activity (this will cascade delete all related images)
+        activity_name = activity.name
+        activity.delete()
+        
+        messages.success(request, f"✅ Activity '{activity_name}' has been successfully deleted.")
+        
+    except Http404:
+        messages.error(request, "❌ Activity not found.")
+    except Exception as e:
+        messages.error(request, f"❌ An error occurred while deleting the activity: {str(e)}")
+    
+    return redirect('activity_listDanao')
