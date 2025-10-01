@@ -9,7 +9,7 @@ from .views import (empMemberMindanao, amMemberMindanao, amAssessmentMindanao, u
                     access_denied, tech_act_uploadMindanao, activity_listMindanao, activity_detailMindanao,
                     facility_listMindanao,
                     generate_qr_codeMindanao, mindanao_tech_activity_download,
-                    mindanao_tech_activity_pdf, tech_activity_update_mindanao
+                    mindanao_tech_activity_pdf, tech_activity_update_mindanao, update_image_label
                     )
 
 # app_name = 'mindanao'
@@ -42,6 +42,7 @@ urlpatterns = [
     path('tech-activity/download/', mindanao_tech_activity_download, name='mindanao_tech_activity_download'),
     path('tech-activity/pdf/', mindanao_tech_activity_pdf, name='mindanao_tech_activity_pdf'),
     path('tech-activity/<int:pk>/update/', tech_activity_update_mindanao, name='tech_activity_update_mindanao'),
+    path('update-image-label/', update_image_label, name='update_image_label'),
 
     # Failed List
     path("failed-list/", failed_listMindanao, name="failed_listMindanao"),

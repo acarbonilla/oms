@@ -199,10 +199,11 @@ class MindanaoTechActivities(models.Model):
 class MindanaoTechActivityImage(models.Model):
     activity = models.ForeignKey(MindanaoTechActivities, on_delete=models.CASCADE, related_name="imagesMindanao")
     image = models.ImageField(upload_to=upload_to_technical)
+    label = models.CharField(max_length=200, blank=True, null=True, verbose_name="Image Label/Context")
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Image for {self.activity.name}"
+        return f"Image for {self.activity.name}" + (f" - {self.label}" if self.label else "")
 
 # Need to change when. This is for Production
 # image = models.ImageField(upload_to="img/production/technical_images")

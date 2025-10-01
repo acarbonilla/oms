@@ -85,4 +85,11 @@ class DanaoTechnicalActivitiesForm(forms.ModelForm):
 class DanaoTechActivityImageForm(forms.ModelForm):
     class Meta:
         model = DanaoTechActivityImage
-        fields = ['image']
+        fields = ['image', 'label']
+        widgets = {
+            'label': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter image label/context (optional)',
+                'maxlength': '200'
+            }),
+        }

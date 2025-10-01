@@ -8,7 +8,7 @@ from danao.views import (empMemberDanao, amMemberDanao, amAssessmentDanao, uploa
                          access_denied, tech_act_uploadDanao, activity_listDanao, activity_detailDanao,
                          facility_listDanao,
                          generate_qr_codeDanao, danao_tech_activity_download,
-                         danao_tech_activity_pdf, tech_activity_update_danao
+                         danao_tech_activity_pdf, tech_activity_update_danao, update_image_label
                          )
 
 
@@ -41,6 +41,7 @@ urlpatterns = [
     path('tech-activity/download/', danao_tech_activity_download, name='danao_tech_activity_download'),
     path('tech-activity/pdf/', danao_tech_activity_pdf, name='danao_tech_activity_pdf'),
     path('tech-activity/<int:pk>/update/', tech_activity_update_danao, name='tech_activity_update_danao'),
+    path('update-image-label/', update_image_label, name='update_image_label'),
 
     # Failed List
     path("failed-list/", failed_listDanao, name="failed_listDanao"),

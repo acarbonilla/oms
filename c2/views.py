@@ -1494,3 +1494,49 @@ def tech_activity_update(request, pk):
         "activity": activity,
         "title": f"Update Activity: {activity.name}"
     })
+
+
+@restrict_for_c2group_only(allowed_groups=['EV', 'AM', 'EMP'])
+@login_required(login_url='omsLogin')
+def update_image_label(request):
+    """AJAX view to update image label"""
+    print(f"update_image_label called with method: {request.method}")
+    print(f"Request body: {request.body}")
+    
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'})
+    
+    try:
+        data = json.loads(request.body)
+        image_id = data.get('image_id')
+        label = data.get('label', '').strip()
+        
+        print(f"Parsed data: image_id={image_id}, label='{label}'")
+        
+        if not image_id:
+            return JsonResponse({'success': False, 'error': 'Image ID is required'})
+        
+        # Get the image object
+        image = get_object_or_404(C2TechActivityImage, id=image_id)
+        print(f"Found image: {image}")
+        
+        # Check if user has permission to edit this image
+        # (You can add more specific permission checks here if needed)
+        
+        # Update the label
+        image.label = label if label else None
+        image.save()
+        print(f"Updated image label to: '{image.label}'")
+        
+        return JsonResponse({
+            'success': True, 
+            'message': 'Label updated successfully',
+            'label': image.label or ''
+        })
+        
+    except json.JSONDecodeError as e:
+        print(f"JSON decode error: {e}")
+        return JsonResponse({'success': False, 'error': 'Invalid JSON data'})
+    except Exception as e:
+        print(f"General error: {e}")
+        return JsonResponse({'success': False, 'error': str(e)})

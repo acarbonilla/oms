@@ -16,7 +16,7 @@ from django.core.paginator import Paginator  # ✅ Import Paginator
 from django.db.models import Count
 from django.db.models import OuterRef, Subquery
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.shortcuts import render
 # This is for QR
@@ -868,13 +868,14 @@ def tech_act_uploadDanao(request, pk=None):
                                 errors.append(f'File {file.name} dimensions too large (maximum 4096x4096)')
                                 continue
 
-                            # Check aspect ratio (4:3)
+                            # Check aspect ratio (4:3) - More flexible validation
                             aspect_ratio = img.width / img.height
                             target_ratio = 4/3
-                            tolerance = 0.1  # Allow 10% deviation from perfect 4:3 ratio
+                            tolerance = 0.5  # Allow 50% deviation from perfect 4:3 ratio (more flexible)
                             
-                            if abs(aspect_ratio - target_ratio) > tolerance:
-                                errors.append(f'File {file.name} must have a 4:3 aspect ratio (current ratio: {aspect_ratio:.2f})')
+                            # Only warn for extremely wide or tall images
+                            if aspect_ratio < 0.5 or aspect_ratio > 3.0:
+                                errors.append(f'File {file.name} has extreme aspect ratio (current ratio: {aspect_ratio:.2f}). Please use a more standard image format.')
                                 continue
 
                         except Exception as e:
@@ -940,13 +941,14 @@ def tech_act_uploadDanao(request, pk=None):
                                             f'Captured image {idx + 1} dimensions too large (maximum 4096x4096)')
                                         continue
 
-                                    # Check aspect ratio (4:3)
+                                    # Check aspect ratio (4:3) - More flexible validation
                                     aspect_ratio = img.width / img.height
                                     target_ratio = 4/3
-                                    tolerance = 0.1  # Allow 10% deviation from perfect 4:3 ratio
+                                    tolerance = 0.5  # Allow 50% deviation from perfect 4:3 ratio (more flexible)
                                     
-                                    if abs(aspect_ratio - target_ratio) > tolerance:
-                                        errors.append(f'Captured image {idx + 1} must have a 4:3 aspect ratio (current ratio: {aspect_ratio:.2f})')
+                                    # Only warn for extremely wide or tall images
+                                    if aspect_ratio < 0.5 or aspect_ratio > 3.0:
+                                        errors.append(f'Captured image {idx + 1} has extreme aspect ratio (current ratio: {aspect_ratio:.2f}). Please use a more standard image format.')
                                         continue
 
                                 except Exception as e:
@@ -1503,3 +1505,49 @@ def tech_activity_update_danao(request, pk):
         "activity": activity,
         "title": f"Update Activity: {activity.name}"
     })
+
+
+@restrict_for_danaogroup_only(allowed_groups=['EV_D', 'AM_D', 'EMP_D'])
+@login_required(login_url='omsLogin')
+def update_image_label(request):
+    """AJAX view to update image label"""
+    print(f"update_image_label called with method: {request.method}")
+    print(f"Request body: {request.body}")
+    
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'})
+    
+    try:
+        data = json.loads(request.body)
+        image_id = data.get('image_id')
+        label = data.get('label', '').strip()
+        
+        print(f"Parsed data: image_id={image_id}, label='{label}'")
+        
+        if not image_id:
+            return JsonResponse({'success': False, 'error': 'Image ID is required'})
+        
+        # Get the image object
+        image = get_object_or_404(DanaoTechActivityImage, id=image_id)
+        print(f"Found image: {image}")
+        
+        # Check if user has permission to edit this image
+        # (You can add more specific permission checks here if needed)
+        
+        # Update the label
+        image.label = label if label else None
+        image.save()
+        print(f"Updated image label to: '{image.label}'")
+        
+        return JsonResponse({
+            'success': True, 
+            'message': 'Label updated successfully',
+            'label': image.label or ''
+        })
+        
+    except json.JSONDecodeError as e:
+        print(f"JSON decode error: {e}")
+        return JsonResponse({'success': False, 'error': 'Invalid JSON data'})
+    except Exception as e:
+        print(f"General error: {e}")
+        return JsonResponse({'success': False, 'error': str(e)})
