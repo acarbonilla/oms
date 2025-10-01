@@ -99,6 +99,67 @@
         color: #555;
     }
 
+    /* Risk Assessment Section Styles */
+    .risk-assessment-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 2px solid #dee2e6;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .risk-assessment-section h5 {
+        color: #495057;
+        font-weight: 600;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    .radio-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 8px;
+    }
+
+    .form-check-inline {
+        margin-right: 0;
+    }
+
+    .form-check-input {
+        margin-right: 8px;
+    }
+
+    .form-check-label {
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .form-select-lg {
+        font-size: 1rem;
+        padding: 12px 16px;
+    }
+
+    .priority-p1 { color: #dc3545; font-weight: bold; }
+    .priority-p2 { color: #fd7e14; font-weight: bold; }
+    .priority-p3 { color: #ffc107; font-weight: bold; }
+    .priority-p4 { color: #28a745; font-weight: bold; }
+    .priority-p5 { color: #6c757d; font-weight: bold; }
+
+    @media (max-width: 768px) {
+        .radio-group {
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-check-inline {
+            display: block;
+            margin-bottom: 8px;
+        }
+    }
+
     .form-control {
         border-radius: 8px;
         border: 2px solid #e9ecef;
@@ -747,6 +808,113 @@
                     <label for="{{ form.location.id_for_label }}">
                         <i class="fas fa-map-marker-alt me-2"></i>Location
                     </label>
+                </div>
+
+                <!-- Risk Assessment Fields -->
+                <div class="risk-assessment-section mb-4">
+                    <h5 class="mb-3 text-primary">
+                        <i class="fas fa-shield-alt me-2"></i>Risk Assessment
+                    </h5>
+                    
+                    <!-- Potential Risk Field -->
+                    <div class="form-group mb-3">
+                        <label class="form-label" for="{{ form.potential_risk.id_for_label }}">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Potential Risk / Safety / and GMP Issues
+                        </label>
+                        <select class="form-select form-select-lg" id="{{ form.potential_risk.id_for_label }}" 
+                                name="{{ form.potential_risk.html_name }}">
+                            <option value="">Select a risk type...</option>
+                            <option value="operational" {% if form.potential_risk.value == 'operational' %}selected{% endif %}>Operational Risk</option>
+                            <option value="strategic" {% if form.potential_risk.value == 'strategic' %}selected{% endif %}>Strategic Risk</option>
+                            <option value="financial" {% if form.potential_risk.value == 'financial' %}selected{% endif %}>Financial</option>
+                            <option value="compliance" {% if form.potential_risk.value == 'compliance' %}selected{% endif %}>Compliance Risk</option>
+                            <option value="reputational" {% if form.potential_risk.value == 'reputational' %}selected{% endif %}>Reputational Risk</option>
+                            <option value="environmental" {% if form.potential_risk.value == 'environmental' %}selected{% endif %}>Environmental Risk</option>
+                            <option value="employee" {% if form.potential_risk.value == 'employee' %}selected{% endif %}>Employee Risk</option>
+                        </select>
+                    </div>
+
+                    <!-- Probability of Occurrence Field -->
+                    <div class="form-group mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-chart-line me-2"></i>Probability of Occurrence
+                        </label>
+                        <div class="radio-group">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="{{ form.probability_of_occurrence.html_name }}" 
+                                       id="prob_low" value="low" {% if form.probability_of_occurrence.value == 'low' %}checked{% endif %}>
+                                <label class="form-check-label" for="prob_low">Low</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="{{ form.probability_of_occurrence.html_name }}" 
+                                       id="prob_medium" value="medium" {% if form.probability_of_occurrence.value == 'medium' %}checked{% endif %}>
+                                <label class="form-check-label" for="prob_medium">Medium</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="{{ form.probability_of_occurrence.html_name }}" 
+                                       id="prob_high" value="high" {% if form.probability_of_occurrence.value == 'high' %}checked{% endif %}>
+                                <label class="form-check-label" for="prob_high">High</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Impact Field -->
+                    <div class="form-group mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-bullseye me-2"></i>Impact
+                        </label>
+                        <div class="radio-group">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="{{ form.impact.html_name }}" 
+                                       id="impact_low" value="low" {% if form.impact.value == 'low' %}checked{% endif %}>
+                                <label class="form-check-label" for="impact_low">Low</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="{{ form.impact.html_name }}" 
+                                       id="impact_medium" value="medium" {% if form.impact.value == 'medium' %}checked{% endif %}>
+                                <label class="form-check-label" for="impact_medium">Medium</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="{{ form.impact.html_name }}" 
+                                       id="impact_high" value="high" {% if form.impact.value == 'high' %}checked{% endif %}>
+                                <label class="form-check-label" for="impact_high">High</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Levels of Priority Field -->
+                    <div class="form-group mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-flag me-2"></i>Levels of Priority
+                        </label>
+                        <div class="radio-group">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="{{ form.levels_of_priority.html_name }}" 
+                                       id="priority_p1" value="p1" {% if form.levels_of_priority.value == 'p1' %}checked{% endif %}>
+                                <label class="form-check-label" for="priority_p1">P1 (Critical)</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="{{ form.levels_of_priority.html_name }}" 
+                                       id="priority_p2" value="p2" {% if form.levels_of_priority.value == 'p2' %}checked{% endif %}>
+                                <label class="form-check-label" for="priority_p2">P2 (High)</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="{{ form.levels_of_priority.html_name }}" 
+                                       id="priority_p3" value="p3" {% if form.levels_of_priority.value == 'p3' %}checked{% endif %}>
+                                <label class="form-check-label" for="priority_p3">P3 (Medium)</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="{{ form.levels_of_priority.html_name }}" 
+                                       id="priority_p4" value="p4" {% if form.levels_of_priority.value == 'p4' %}checked{% endif %}>
+                                <label class="form-check-label" for="priority_p4">P4 (Low)</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="{{ form.levels_of_priority.html_name }}" 
+                                       id="priority_p5" value="p5" {% if form.levels_of_priority.value == 'p5' %}checked{% endif %}>
+                                <label class="form-check-label" for="priority_p5">P5 (Lowest)</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="remarks-section mb-4">

@@ -60,14 +60,30 @@ class DanaoRecentImageFormUpdate(forms.ModelForm):
 class DanaoTechnicalActivitiesForm(forms.ModelForm):
     class Meta:
         model = DanaoTechActivities
-        fields = ['name', 'location', 'remarks']
+        fields = ['name', 'location', 'remarks', 'potential_risk', 'probability_of_occurrence', 'impact', 'levels_of_priority']
         widgets = {
             'remarks': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+            'potential_risk': forms.Select(attrs={'class': 'form-select form-select-lg'}),
+            'probability_of_occurrence': forms.RadioSelect(attrs={'class': 'form-check-input'}),
+            'impact': forms.RadioSelect(attrs={'class': 'form-check-input'}),
+            'levels_of_priority': forms.RadioSelect(attrs={'class': 'form-check-input'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # No need to modify 'uploaded_by' here; handled in the view
+        
+        # Add custom styling and attributes for risk assessment fields
+        self.fields['potential_risk'].required = False
+        self.fields['potential_risk'].empty_label = "Select a risk type..."
+        
+        self.fields['probability_of_occurrence'].required = False
+        self.fields['impact'].required = False
+        self.fields['levels_of_priority'].required = False
+        
+        # Add custom CSS classes for better styling
+        self.fields['name'].widget.attrs.update({'class': 'form-control form-control-lg'})
+        self.fields['location'].widget.attrs.update({'class': 'form-control form-control-lg'})
 
     def clean_remarks(self):
         """Clean and decode HTML entities in remarks field."""

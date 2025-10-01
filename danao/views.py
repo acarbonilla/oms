@@ -1023,7 +1023,7 @@ def activity_listDanao(request):
     else:
         start_date = None  # Show all records
 
-    # Apply filters
+    # Apply filters - fetch all activities (avoiding only() to prevent field issues)
     activities = DanaoTechActivities.objects.all().prefetch_related("imagesDanao")
     if start_date:
         activities = activities.filter(created__gte=start_date)

@@ -181,11 +181,69 @@ class MindanaoFacility(models.Model):
 
 
 class MindanaoTechActivities(models.Model):
+    RISK_CHOICES = [
+        ('operational', 'Operational Risk'),
+        ('strategic', 'Strategic Risk'),
+        ('financial', 'Financial'),
+        ('compliance', 'Compliance Risk'),
+        ('reputational', 'Reputational Risk'),
+        ('environmental', 'Environmental Risk'),
+        ('employee', 'Employee Risk'),
+    ]
+    
+    PROBABILITY_CHOICES = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+    ]
+    
+    IMPACT_CHOICES = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+    ]
+    
+    PRIORITY_CHOICES = [
+        ('p1', 'P1 (Critical)'),
+        ('p2', 'P2 (High)'),
+        ('p3', 'P3 (Medium)'),
+        ('p4', 'P4 (Low)'),
+        ('p5', 'P5 (Lowest)'),
+    ]
+    
     name = models.CharField(max_length=100, verbose_name="Activity")
     location = models.CharField(max_length=100)
     uploaded_by = models.ForeignKey(MindanaoUser, on_delete=models.CASCADE, related_name="uploaded_images_byMindanao")
     remarks = models.TextField(blank=True, null=True)
     remark_by = models.ForeignKey(MindanaoUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="mindanao_tech_remarks")
+    potential_risk = models.CharField(
+        max_length=20, 
+        choices=RISK_CHOICES, 
+        blank=True, 
+        null=True,
+        verbose_name="Potential Risk / Safety / and GMP Issues"
+    )
+    probability_of_occurrence = models.CharField(
+        max_length=10,
+        choices=PROBABILITY_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Probability of Occurrence"
+    )
+    impact = models.CharField(
+        max_length=10,
+        choices=IMPACT_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Impact"
+    )
+    levels_of_priority = models.CharField(
+        max_length=10,
+        choices=PRIORITY_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Levels of Priority"
+    )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
