@@ -31,6 +31,10 @@
         margin-top: 1rem;
     }
 
+    .image-card-container {
+        position: relative;
+    }
+
     .image-card {
         position: relative;
         border-radius: 8px;
@@ -41,6 +45,30 @@
 
     .image-card:hover {
         transform: translateY(-5px);
+    }
+
+    .image-actions {
+        text-align: center;
+    }
+
+    .label-edit-form {
+        background: #f8f9fa;
+        padding: 0.75rem;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+    }
+
+    .label-form .input-group {
+        width: 100%;
+    }
+
+    .label-form .form-control-sm {
+        font-size: 0.875rem;
+    }
+
+    .label-form .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
     }
 
     .image-card img {
@@ -780,13 +808,51 @@
 
             <div class="image-grid">
                 {% for image in activity.images.all %}
-                <div class="image-card" data-bs-toggle="modal" data-bs-target="#imageModal" data-image-src="{{ image.image.url }}" data-image-date="{{ image.uploaded_at|date:'Y-m-d H:i' }}">
-                    <img src="{{ image.image.url }}" alt="Activity image" class="img-fluid">
-                    <div class="image-info">
-                        <small class="text-muted">
-                            <i class="fas fa-calendar-alt me-1"></i>
-                            {{ image.uploaded_at|date:"Y-m-d H:i" }}
-                        </small>
+                <div class="image-card-container">
+                    <div class="image-card" data-bs-toggle="modal" data-bs-target="#imageModal" data-image-src="{{ image.image.url }}" data-image-date="{{ image.uploaded_at|date:'Y-m-d H:i' }}" data-image-label="{{ image.label|default:'No label' }}">
+                        <img src="{{ image.image.url }}" alt="Activity image" class="img-fluid">
+                        <div class="image-info">
+                            <div class="image-label-display mb-1" id="label-display-{{ image.id }}">
+                                {% if image.label %}
+                                <small class="text-primary fw-bold">
+                                    <i class="fas fa-tag me-1"></i>
+                                    <span id="label-text-{{ image.id }}">{{ image.label }}</span>
+                                </small>
+                                {% else %}
+                                <small class="text-muted">
+                                    <i class="fas fa-tag me-1"></i>
+                                    <span id="label-text-{{ image.id }}">No label</span>
+                                </small>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">
+                                <i class="fas fa-calendar-alt me-1"></i>
+                                {{ image.uploaded_at|date:"Y-m-d H:i" }}
+                            </small>
+                        </div>
+                    </div>
+                    <div class="image-actions mt-2">
+                        <button class="btn btn-sm btn-outline-primary" onclick="toggleLabelEdit({{ image.id }})" id="edit-btn-{{ image.id }}">
+                            <i class="fas fa-edit me-1"></i>Edit Label
+                        </button>
+                        <div class="label-edit-form mt-2" id="label-form-{{ image.id }}" style="display: none;">
+                            <form class="label-form" data-image-id="{{ image.id }}">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" 
+                                           id="label-input-{{ image.id }}" 
+                                           value="{{ image.label|default:'' }}" 
+                                           placeholder="Enter image label/context" 
+                                           maxlength="200">
+                                    <button class="btn btn-success btn-sm" type="submit" onclick="saveLabel({{ image.id }})">
+                                        <i class="fas fa-save"></i>
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm" type="button" onclick="cancelLabelEdit({{ image.id }})">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
                 {% empty %}
@@ -819,6 +885,12 @@
                 </button>
                 <img id="modalImage" src="" alt="Activity image" class="img-fluid rounded">
                 <div class="mt-3">
+                    <div id="modalImageLabel" class="mb-2" style="display: none;">
+                        <small class="text-primary fw-bold">
+                            <i class="fas fa-tag me-1"></i>
+                            <span id="imageLabel"></span>
+                        </small>
+                    </div>
                     <small class="text-muted" id="modalImageDate">
                         <i class="fas fa-calendar-alt me-1"></i>
                         <span id="imageDate"></span>
@@ -921,7 +993,8 @@
         document.querySelectorAll('.image-card').forEach(function(card) {
             allImages.push({
                 src: card.getAttribute('data-image-src'),
-                date: card.getAttribute('data-image-date')
+                date: card.getAttribute('data-image-date'),
+                label: card.getAttribute('data-image-label')
             });
         });
     }
@@ -934,6 +1007,17 @@
         modalImage.src = image.src;
         imageDate.textContent = image.date;
         downloadImage.href = image.src;
+        
+        // Update label display
+        var modalImageLabel = document.getElementById('modalImageLabel');
+        var imageLabel = document.getElementById('imageLabel');
+        
+        if (image.label && image.label !== 'No label') {
+            imageLabel.textContent = image.label;
+            modalImageLabel.style.display = 'block';
+        } else {
+            modalImageLabel.style.display = 'none';
+        }
         
         // Set download filename
         var filename = image.src.split('/').pop();
@@ -1140,6 +1224,135 @@
             }
         }
     });
+
+    // Global variables for label editing
+    var isMobile = window.innerWidth <= 768;
+    var images = [];
+
+
+    // Label editing functions
+    function toggleLabelEdit(imageId) {
+        console.log('toggleLabelEdit called for image:', imageId);
+        var form = document.getElementById('label-form-' + imageId);
+        var button = document.getElementById('edit-btn-' + imageId);
+        
+        if (form.style.display === 'none' || form.style.display === '') {
+            form.style.display = 'block';
+            button.innerHTML = '<i class="fas fa-times me-1"></i>Cancel';
+            button.classList.remove('btn-outline-primary');
+            button.classList.add('btn-outline-secondary');
+            
+            // Focus the input field
+            var input = document.getElementById('label-input-' + imageId);
+            if (input) {
+                input.focus();
+                input.select();
+            }
+        } else {
+            cancelLabelEdit(imageId);
+        }
+    }
+
+    function cancelLabelEdit(imageId) {
+        console.log('cancelLabelEdit called for image:', imageId);
+        var form = document.getElementById('label-form-' + imageId);
+        var button = document.getElementById('edit-btn-' + imageId);
+        var input = document.getElementById('label-input-' + imageId);
+        
+        // Reset form
+        form.style.display = 'none';
+        button.innerHTML = '<i class="fas fa-edit me-1"></i>Edit Label';
+        button.classList.remove('btn-outline-secondary');
+        button.classList.add('btn-outline-primary');
+        
+        // Reset input value to original
+        if (input) {
+            var originalLabel = document.getElementById('label-text-' + imageId).textContent;
+            input.value = originalLabel === 'No label' ? '' : originalLabel;
+        }
+    }
+
+    function saveLabel(imageId) {
+        console.log('saveLabel called for image:', imageId);
+        var input = document.getElementById('label-input-' + imageId);
+        var label = input.value.trim();
+        
+        console.log('Saving label:', label);
+        
+        // Get CSRF token
+        var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        console.log('CSRF token:', csrfToken);
+        
+        // Send AJAX request
+        fetch('/c2/update-image-label/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                image_id: imageId,
+                label: label
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Response:', data);
+            if (data.success) {
+                // Update the display
+                var labelText = document.getElementById('label-text-' + imageId);
+                var labelDisplay = document.getElementById('label-display-' + imageId);
+                
+                if (label) {
+                    labelText.textContent = label;
+                    labelDisplay.innerHTML = '<small class="text-primary fw-bold"><i class="fas fa-tag me-1"></i><span id="label-text-' + imageId + '">' + label + '</span></small>';
+                } else {
+                    labelText.textContent = 'No label';
+                    labelDisplay.innerHTML = '<small class="text-muted"><i class="fas fa-tag me-1"></i><span id="label-text-' + imageId + '">No label</span></small>';
+                }
+                
+                // Update the image card data attribute
+                var imageCard = input.closest('.image-card-container').querySelector('.image-card');
+                imageCard.setAttribute('data-image-label', label || 'No label');
+                
+                // Reinitialize images for modal
+                initializeImages();
+                
+                // Hide the form
+                cancelLabelEdit(imageId);
+                
+                // Show success message
+                showMessage('Label updated successfully!', 'success');
+            } else {
+                showMessage('Error updating label: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Error uploading the label. Please try again.', 'error');
+        });
+    }
+
+    // Message display function
+    function showMessage(message, type) {
+        var alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        var messageDiv = document.createElement('div');
+        messageDiv.className = 'alert ' + alertClass + ' alert-dismissible fade show position-fixed';
+        messageDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        
+        document.body.appendChild(messageDiv);
+        
+        // Auto-remove after 3 seconds
+        setTimeout(function() {
+            if (messageDiv.parentNode) {
+                messageDiv.parentNode.removeChild(messageDiv);
+            }
+        }, 3000);
+    }
+
+    // Initialize images on page load
+    initializeImages();
 </script>
 {% endblock %}
 {% endblock %} 

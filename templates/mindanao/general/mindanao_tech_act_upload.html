@@ -881,7 +881,7 @@
                                multiple accept="image/*">
                         <div class="helper-text">
                             <i class="fas fa-info-circle"></i>
-                            Maximum 10 images, each up to 5MB. Images must have a 4:3 aspect ratio.
+                            Maximum 10 images, each up to 5MB. Standard image formats recommended.
                         </div>
                     </div>
 
@@ -898,7 +898,7 @@
                         
                         <div class="helper-text">
                             <i class="fas fa-info-circle"></i>
-                            Maximum 10 photos allowed. Photos must have a 4:3 aspect ratio.
+                            Maximum 10 photos allowed. Standard image formats recommended.
                         </div>
                     </div>
 
@@ -1242,11 +1242,10 @@
                 img.onload = function() {
                     // Check aspect ratio
                     const aspectRatio = img.width / img.height;
-                    const targetRatio = 4/3;
-                    const tolerance = 0.1;
                     
-                    if (Math.abs(aspectRatio - targetRatio) > tolerance) {
-                        alert(`Image "${file.name}" must have a 4:3 aspect ratio (current ratio: ${aspectRatio.toFixed(2)})`);
+                    // Only warn for extremely wide or tall images
+                    if (aspectRatio < 0.5 || aspectRatio > 3.0) {
+                        alert(`Image "${file.name}" has extreme aspect ratio (current ratio: ${aspectRatio.toFixed(2)}). Please use a more standard image format.`);
                         return;
                     }
 
