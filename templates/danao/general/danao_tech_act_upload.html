@@ -34,6 +34,17 @@
             opacity: 1; 
         }
     }
+    
+    @keyframes slideOutRight {
+        from { 
+            transform: translateX(0); 
+            opacity: 1; 
+        }
+        to { 
+            transform: translateX(30px); 
+            opacity: 0; 
+        }
+    }
 
     @keyframes pulse {
         0% { transform: scale(1); }
@@ -437,10 +448,129 @@
         animation: pulse 2s infinite;
     }
 
-    /* Error Messages */
-    .error-message {
-        animation: fadeInUp 0.4s ease-out;
-        border-radius: 10px;
+    /* Toast Messages - Bottom Right Corner */
+    .toast-message {
+        position: fixed;
+        right: 20px;
+        z-index: 9999;
+        max-width: 400px;
+        min-width: 300px;
+        animation: slideInRight 0.4s ease-out;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .toast-message.error-message {
+        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        border: 2px solid #dc3545;
+        color: #721c24;
+    }
+    
+    .toast-message.success-message {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        border: 2px solid #28a745;
+        color: #155724;
+    }
+    
+    .toast-message.warning-message {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        border: 2px solid #ffc107;
+        color: #856404;
+    }
+    
+    .toast-message .alert {
+        margin: 0;
+        border: none;
+        border-radius: 0;
+        padding: 15px 20px;
+        font-weight: 600;
+        position: relative;
+    }
+    
+    .toast-message .alert::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+        animation: shimmer 2s infinite;
+    }
+    
+    .toast-message .alert > * {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .toast-message i {
+        font-size: 1.2rem;
+        margin-right: 10px;
+    }
+    
+    .toast-message.success-message i {
+        color: #28a745;
+        animation: bounce 1s infinite;
+    }
+    
+    .toast-message.error-message i {
+        color: #dc3545;
+        animation: pulse 1s infinite;
+    }
+    
+    /* Close button for toast messages */
+    .toast-close {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: inherit;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        z-index: 3;
+    }
+    
+    .toast-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+    }
+    
+    /* Progress Message Styling */
+    .toast-message.progress-message {
+        bottom: 80px; /* Above toast messages */
+        z-index: 9998;
+        background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+        border: 2px solid #17a2b8;
+    }
+    
+    .toast-message.progress-message .alert {
+        background: transparent;
+        border: none;
+        color: #0c5460;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .toast-message {
+            bottom: 10px;
+            right: 10px;
+            left: 10px;
+            max-width: none;
+            min-width: auto;
+        }
+        
+        .toast-message.progress-message {
+            bottom: 70px;
+        }
     }
 
     /* Modal Styles */
@@ -836,7 +966,7 @@
                     <i class="fas fa-tasks me-2"></i>Upload Technical Activity
                 </h2>
 
-                <form enctype="multipart/form-data" method="post">
+                <form enctype="multipart/form-data" method="post" id="uploadForm">
                     {% csrf_token %}
 
                     <div class="mb-4">
@@ -881,7 +1011,7 @@
                                multiple accept="image/*">
                         <div class="helper-text">
                             <i class="fas fa-info-circle"></i>
-                            Maximum 10 images, each up to 5MB. Standard image formats recommended.
+                            Maximum 20 images, each up to 15MB. Standard image formats recommended.
                         </div>
                     </div>
 
@@ -898,7 +1028,7 @@
                         
                         <div class="helper-text">
                             <i class="fas fa-info-circle"></i>
-                            Maximum 10 photos allowed. Standard photo formats recommended.
+                            Maximum 20 photos allowed. Standard photo formats recommended.
                         </div>
                     </div>
 
@@ -931,7 +1061,7 @@
             <!-- Picture Counter -->
             <div class="picture-counter" id="pictureCounter">
                 <i class="fas fa-images me-2"></i>
-                <span id="counterText">0 / 10 photos taken</span>
+                <span id="counterText">0 / 20 photos taken</span>
             </div>
 
 
@@ -972,6 +1102,30 @@
     const capturedImagesInput = document.getElementById('captured-images');
     const capturedImagesPreview = document.getElementById('captured-images-preview');
     
+    // Function to close toast message (global function)
+    window.closeToast = function(closeBtn) {
+        const toast = closeBtn.closest('.toast-message');
+        if (toast) {
+            toast.style.animation = 'slideOutRight 0.3s ease-out';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 300);
+        }
+    }
+    
+    // Function to clear all toast messages
+    function clearToastMessages() {
+        const existingToasts = document.querySelectorAll('.toast-message');
+        existingToasts.forEach(toast => {
+            const closeBtn = toast.querySelector('.toast-close');
+            if (closeBtn) {
+                closeToast(closeBtn);
+            }
+        });
+    }
+    
     // Modal Elements
     const cameraModal = document.getElementById('cameraModal');
     const openCameraModal = document.getElementById('openCameraModal');
@@ -987,8 +1141,8 @@
     // Global Variables
     let stream;
     let capturedImages = [];
-    const MAX_IMAGES = 10;
-    const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+    const MAX_IMAGES = 20;
+    const MAX_IMAGE_SIZE = 15 * 1024 * 1024; // 15MB
 
     // Fixed medium quality settings for optimal file size management
     const CAMERA_QUALITY = {
@@ -1122,10 +1276,10 @@
         if (count >= MAX_IMAGES) {
             pictureCounter.classList.add('counter-danger');
             modalCaptureBtn.disabled = true;
-        } else if (count >= 8) {
+        } else if (count >= 16) {
             pictureCounter.classList.add('counter-warning');
             modalCaptureBtn.disabled = false;
-        } else if (count >= 5) {
+        } else if (count >= 10) {
             pictureCounter.classList.add('counter-warning');
             modalCaptureBtn.disabled = false;
         } else {
@@ -1270,6 +1424,591 @@
             };
             reader.readAsDataURL(file);
         });
+    });
+
+    // Form submission with error handling
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const submitBtn = document.querySelector('.btn-submit');
+        const originalText = submitBtn.innerHTML;
+        
+        // Show loading state
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+        submitBtn.disabled = true;
+        
+        // Add progress indicator
+        const progressContainer = document.getElementById('progressContainer') || createProgressContainer();
+        progressContainer.style.display = 'block';
+        
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (!csrfToken) {
+            showUploadError('CSRF token not found. Please refresh the page.');
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            return;
+        }
+        
+        // Get form action URL
+        const formAction = this.action || window.location.href;
+        console.log('Submitting to:', formAction);
+        
+        fetch(formAction, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken.value,
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            updateProgress(50, 'Processing upload...');
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers.get('content-type'));
+            console.log('Response URL:', response.url);
+            
+            if (response.ok) {
+                updateProgress(75, 'Finalizing...');
+                
+                // Check if response is JSON (AJAX success)
+                const contentType = response.headers.get('content-type');
+                console.log('Content type:', contentType);
+                
+                if (contentType && contentType.includes('application/json')) {
+                    console.log('Processing JSON response');
+                    return response.json();
+                } else {
+                    console.log('Processing HTML response');
+                    // Handle HTML response (traditional form submission)
+                    return response.text();
+                }
+            } else {
+                console.log('Response not OK:', response.status);
+                // Handle error responses
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Upload failed');
+                    });
+                } else {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+            }
+        })
+        .then(data => {
+            updateProgress(100, 'Complete!');
+            console.log('Response data:', data);
+            console.log('Data type:', typeof data);
+            console.log('Data success:', data?.success);
+            
+            // Handle JSON response (AJAX success)
+            if (typeof data === 'object' && data.success) {
+                console.log('JSON success response detected');
+                showSuccessMessage(data.message, data.uploaded_count);
+                
+                // Show warnings if any
+                if (data.warnings && data.warnings.length > 0) {
+                    console.log('Warnings detected:', data.warnings);
+                    setTimeout(() => {
+                        data.warnings.forEach(warning => {
+                            showToastMessage(warning, 'warning');
+                        });
+                    }, 1000); // Show warnings after success message
+                }
+                
+                // Clear form data and images
+                clearFormAfterSuccess();
+                
+                // Immediate redirect
+                console.log('Attempting immediate redirect...');
+                setTimeout(() => {
+                    console.log('Force redirecting...');
+                    window.location.href = '/danao/activities/';
+                }, 500);
+                
+                // Backup: if still on upload page after 3 seconds, force reload
+                setTimeout(() => {
+                    if (window.location.pathname.includes('upload')) {
+                        console.log('Force reloading page...');
+                        window.location.reload();
+                    }
+                }, 3000);
+                return;
+            }
+            
+            // Handle HTML response (fallback)
+            if (typeof data === 'string') {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(data, 'text/html');
+                const errorMessages = doc.querySelectorAll('.alert-danger, .error-message');
+                
+                if (errorMessages.length > 0) {
+                    // Show errors without refreshing page
+                    showUploadErrors(errorMessages);
+                } else {
+                    // Success - show message and redirect
+                    console.log('HTML success response detected');
+                    showSuccessMessage();
+                    
+                    // Clear form data and images
+                    clearFormAfterSuccess();
+                    
+                    // Immediate redirect
+                    console.log('Attempting immediate redirect...');
+                    setTimeout(() => {
+                        console.log('Force redirecting...');
+                        window.location.href = '/danao/activities/';
+                    }, 500);
+                    
+                    // Backup: if still on upload page after 3 seconds, force reload
+                    setTimeout(() => {
+                        if (window.location.pathname.includes('upload')) {
+                            console.log('Force reloading page...');
+                            window.location.reload();
+                        }
+                    }, 3000);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Upload error:', error);
+            
+            // Handle different types of errors
+            let errorMessage = 'Upload failed. Please try again.';
+            
+            if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                errorMessage = 'Network error: Unable to connect to server. Please check your internet connection and try again.';
+            } else if (error.message.includes('CSRF')) {
+                errorMessage = 'Security error: Please refresh the page and try again.';
+            } else if (error.message.includes('413')) {
+                errorMessage = 'File too large: Please reduce file sizes and try again.';
+            } else if (error.message.includes('timeout')) {
+                errorMessage = 'Upload timeout: Please try again with smaller files.';
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            
+            showUploadError(errorMessage);
+        })
+        .finally(() => {
+            // Clear timeout
+            if (uploadTimeout) {
+                clearTimeout(uploadTimeout);
+            }
+            
+            // Hide progress container
+            const progressContainer = document.getElementById('progressContainer');
+            if (progressContainer) {
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                }, 2000);
+            }
+            
+            // Restore button state
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+    
+    // Function to show upload errors
+    function showUploadErrors(errorElements) {
+        // Clear any existing toast messages
+        clearToastMessages();
+        
+        errorElements.forEach(error => {
+            showToastMessage(error.innerHTML, 'error');
+        });
+    }
+    
+    // Function to show single upload error
+    function showUploadError(message) {
+        showToastMessage(message, 'error');
+    }
+    
+    // Function to show success message
+    function showSuccessMessage(message = null, uploadedCount = null) {
+        const successMessage = message || 'Upload Successful!';
+        const countText = uploadedCount ? ` (${uploadedCount} images uploaded)` : '';
+        const fullMessage = `
+            <strong>${successMessage}${countText}</strong> Your technical activity has been uploaded successfully. 
+            <br><small>Redirecting to activities list...</small>
+            <br><button class="btn btn-sm btn-outline-light mt-2" onclick="goToActivitiesList()">
+                <i class="fas fa-arrow-right me-1"></i>Go to Activities List
+            </button>
+        `;
+        
+        showToastMessage(fullMessage, 'success');
+    }
+    
+    // Function to show toast message
+    function showToastMessage(message, type = 'success') {
+        // Only clear existing messages if showing success or error (not warnings)
+        if (type !== 'warning') {
+            clearToastMessages();
+        }
+        
+        const toast = document.createElement('div');
+        toast.className = `toast-message ${type}-message`;
+        
+        let icon, alertClass;
+        if (type === 'success') {
+            icon = 'fa-check-circle';
+            alertClass = 'success';
+        } else if (type === 'warning') {
+            icon = 'fa-exclamation-triangle';
+            alertClass = 'warning';
+        } else {
+            icon = 'fa-exclamation-triangle';
+            alertClass = 'danger';
+        }
+        
+        toast.innerHTML = `
+            <div class="alert alert-${alertClass}">
+                <i class="fas ${icon}"></i>
+                ${message}
+                <button class="toast-close" onclick="closeToast(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Position the toast to stack properly
+        const existingToasts = document.querySelectorAll('.toast-message');
+        const toastIndex = existingToasts.length - 1;
+        const bottomOffset = 20 + (toastIndex * 80); // 80px spacing between toasts
+        toast.style.bottom = `${bottomOffset}px`;
+        
+        // Auto-close after 5 seconds for success, 8 seconds for errors, 6 seconds for warnings
+        const autoCloseDelay = type === 'success' ? 5000 : type === 'warning' ? 6000 : 8000;
+        setTimeout(() => {
+            if (toast.parentNode) {
+                closeToast(toast.querySelector('.toast-close'));
+            }
+        }, autoCloseDelay);
+    }
+    
+    // Global redirect function
+    window.goToActivitiesList = function() {
+        console.log('Global redirect function called');
+        window.location.href = '/danao/activities/';
+    };
+    
+    // Function to redirect to activities list
+    function redirectToActivitiesList() {
+        console.log('Redirecting to activities list...');
+        
+        // Clear any existing timeouts
+        if (window.redirectTimeout) {
+            clearTimeout(window.redirectTimeout);
+        }
+        
+        // Force redirect - try multiple methods
+        setTimeout(() => {
+            console.log('Executing redirect...');
+            window.location.href = '/danao/activities/';
+        }, 100);
+        
+        // Backup redirect
+        setTimeout(() => {
+            if (window.location.pathname.includes('upload')) {
+                console.log('Backup redirect executing...');
+                window.location.replace('/danao/activities/');
+            }
+        }, 500);
+    }
+    
+    // Function to clear form after successful upload
+    function clearFormAfterSuccess() {
+        // Clear form fields
+        const form = document.getElementById('uploadForm');
+        if (form) {
+            form.reset();
+        }
+        
+        // Clear uploaded images
+        const imageInput = document.getElementById('image-input');
+        if (imageInput) {
+            imageInput.value = '';
+        }
+        
+        // Clear uploaded image previews
+        const previewContainer = document.getElementById('preview-container');
+        if (previewContainer) {
+            previewContainer.innerHTML = '';
+        }
+        
+        // Clear captured images
+        const capturedImagesInput = document.getElementById('captured-images');
+        if (capturedImagesInput) {
+            capturedImagesInput.value = '';
+        }
+        
+        // Clear captured image previews
+        const capturedImagesPreview = document.getElementById('captured-images-preview');
+        if (capturedImagesPreview) {
+            capturedImagesPreview.innerHTML = '';
+        }
+        
+        // Clear captured images array
+        capturedImages = [];
+        
+        // Clear session storage
+        sessionStorage.removeItem('danaoUploadForm');
+        
+        // Reset counter
+        updateCounter();
+        
+        console.log('Form cleared after successful upload');
+    }
+    
+    // Function to create progress container
+    function createProgressContainer() {
+        const container = document.createElement('div');
+        container.id = 'progressContainer';
+        container.className = 'toast-message progress-message';
+        container.style.display = 'none';
+        container.style.position = 'fixed';
+        container.style.bottom = '80px'; // Above the toast messages
+        container.style.right = '20px';
+        container.style.zIndex = '9998';
+        container.innerHTML = `
+            <div class="alert alert-info">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-upload me-2"></i>
+                    <div class="flex-grow-1">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" style="width: 0%" id="uploadProgress">
+                                <span id="progressText">Preparing upload...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(container);
+        
+        return container;
+    }
+    
+    // Function to update progress
+    function updateProgress(percent, text) {
+        const progressBar = document.getElementById('uploadProgress');
+        const progressText = document.getElementById('progressText');
+        
+        if (progressBar) {
+            progressBar.style.width = percent + '%';
+        }
+        if (progressText) {
+            progressText.textContent = text;
+        }
+    }
+    
+    // Function to retain form data on errors
+    function retainFormData() {
+        // Store form data in sessionStorage
+        const formData = new FormData(document.getElementById('uploadForm'));
+        const formObject = {};
+        
+        for (let [key, value] of formData.entries()) {
+            if (key !== 'image' && key !== 'csrfmiddlewaretoken') {
+                formObject[key] = value;
+            }
+        }
+        
+        // Store uploaded images
+        const imageInput = document.getElementById('image-input');
+        if (imageInput.files.length > 0) {
+            const imageFiles = Array.from(imageInput.files);
+            const imageData = [];
+            
+            imageFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imageData.push({
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        data: e.target.result
+                    });
+                    
+                    if (index === imageFiles.length - 1) {
+                        formObject.uploadedImages = imageData;
+                        sessionStorage.setItem('danaoUploadForm', JSON.stringify(formObject));
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        } else {
+            sessionStorage.setItem('danaoUploadForm', JSON.stringify(formObject));
+        }
+        
+        // Store captured images
+        const capturedImages = document.getElementById('captured-images').value;
+        if (capturedImages) {
+            formObject.capturedImages = capturedImages;
+            sessionStorage.setItem('danaoUploadForm', JSON.stringify(formObject));
+        }
+    }
+    
+    // Function to restore form data
+    function restoreFormData() {
+        const savedData = sessionStorage.getItem('danaoUploadForm');
+        if (savedData) {
+            const formObject = JSON.parse(savedData);
+            
+            // Restore form fields
+            Object.keys(formObject).forEach(key => {
+                if (key !== 'uploadedImages' && key !== 'capturedImages') {
+                    const element = document.querySelector(`[name="${key}"]`);
+                    if (element) {
+                        element.value = formObject[key];
+                    }
+                }
+            });
+            
+            // Restore uploaded images
+            if (formObject.uploadedImages && formObject.uploadedImages.length > 0) {
+                restoreUploadedImages(formObject.uploadedImages);
+            }
+            
+            // Restore captured images
+            if (formObject.capturedImages) {
+                restoreCapturedImages(formObject.capturedImages);
+            }
+            
+            // Clear saved data after restoration
+            sessionStorage.removeItem('danaoUploadForm');
+        }
+    }
+    
+    // Function to restore uploaded images
+    function restoreUploadedImages(imageData) {
+        const previewContainer = document.getElementById('preview-container');
+        previewContainer.innerHTML = '';
+        
+        imageData.forEach((imageInfo, index) => {
+            const container = document.createElement('div');
+            container.className = 'preview-item';
+            container.style.opacity = '0';
+            container.style.transform = 'scale(0.8)';
+            
+            const img = document.createElement('img');
+            img.src = imageInfo.data;
+            
+            container.appendChild(img);
+            previewContainer.appendChild(container);
+            
+            // Staggered animation
+            setTimeout(() => {
+                container.style.opacity = '1';
+                container.style.transform = 'scale(1)';
+            }, 50 * index);
+        });
+    }
+    
+    // Function to restore captured images
+    function restoreCapturedImages(capturedImagesData) {
+        try {
+            const images = JSON.parse(capturedImagesData);
+            const previewContainer = document.getElementById('captured-images-preview');
+            previewContainer.innerHTML = '';
+            
+            images.forEach((base64Image, index) => {
+                const container = document.createElement('div');
+                container.className = 'preview-item';
+                
+                const img = document.createElement('img');
+                img.src = base64Image;
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.onclick = (e) => {
+                    e.preventDefault();
+                    container.style.opacity = '0';
+                    container.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        const index = capturedImages.indexOf(base64Image);
+                        if (index > -1) {
+                            capturedImages.splice(index, 1);
+                            container.remove();
+                            document.getElementById('captured-images').value = JSON.stringify(capturedImages);
+                            updateCounter();
+                        }
+                    }, 300);
+                };
+                
+                container.appendChild(img);
+                container.appendChild(deleteBtn);
+                previewContainer.appendChild(container);
+                
+                // Animation
+                container.style.opacity = '0';
+                container.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    container.style.opacity = '1';
+                    container.style.transform = 'scale(1)';
+                }, 50 * index);
+            });
+            
+            // Update captured images array and counter
+            capturedImages = images;
+            document.getElementById('captured-images').value = capturedImagesData;
+            updateCounter();
+        } catch (error) {
+            console.error('Error restoring captured images:', error);
+        }
+    }
+    
+    // Restore form data on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        restoreFormData();
+    });
+    
+    // Store form data before submission
+    document.getElementById('uploadForm').addEventListener('submit', function() {
+        retainFormData();
+    });
+    
+    // Add fallback for traditional form submission if AJAX fails
+    function fallbackToTraditionalSubmit() {
+        console.log('Falling back to traditional form submission');
+        const form = document.getElementById('uploadForm');
+        
+        // Remove the AJAX event listener temporarily
+        form.removeEventListener('submit', arguments.callee);
+        
+        // Submit traditionally
+        form.submit();
+    }
+    
+    // Add timeout fallback
+    let uploadTimeout;
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        // Set a timeout for the upload
+        uploadTimeout = setTimeout(() => {
+            console.log('Upload timeout - falling back to traditional submission');
+            showUploadError('Upload is taking too long. Switching to traditional upload...');
+            setTimeout(fallbackToTraditionalSubmit, 2000);
+        }, 30000); // 30 second timeout
+    });
+
+    // Clear session storage on page unload
+    window.addEventListener('beforeunload', function() {
+        sessionStorage.removeItem('danaoUploadForm');
+    });
+    
+    // Clear session storage on page hide (mobile)
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            sessionStorage.removeItem('danaoUploadForm');
+        }
     });
 
     // Stop camera on unload

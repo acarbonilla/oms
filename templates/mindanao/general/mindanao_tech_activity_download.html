@@ -189,6 +189,10 @@
             <form method="get" action="{% url 'mindanao_tech_activity_pdf' %}">
                 <input type="hidden" name="search" value="{{ search_query }}">
                 <input type="hidden" name="filter" value="{{ filter_option }}">
+                <input type="hidden" name="include_images" value="on">
+                <input type="hidden" name="include_details" value="on">
+                <input type="hidden" name="page_size" value="legal">
+                <input type="hidden" name="orientation" value="landscape">
                 
                 <div class="table-responsive">
                     <table class="table table-hover">
@@ -224,53 +228,6 @@
                     </table>
                 </div>
 
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="card shadow-sm hover-scale">
-                            <div class="card-body">
-                                <h5 class="card-title text-primary">
-                                    <i class="fas fa-cog me-2"></i>PDF Options
-                                </h5>
-                                <div class="mb-4">
-                                    <label class="form-label fw-bold">Include in PDF:</label>
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input custom-checkbox" 
-                                               id="include_images" name="include_images" checked>
-                                        <label class="form-check-label" for="include_images">
-                                            <i class="fas fa-image me-2"></i>Images
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input custom-checkbox" 
-                                               id="include_details" name="include_details" checked>
-                                        <label class="form-check-label" for="include_details">
-                                            <i class="fas fa-info-circle me-2"></i>Activity Details
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="page_size" class="form-label fw-bold">
-                                        <i class="fas fa-file-alt me-2"></i>Page Size:
-                                    </label>
-                                    <select class="form-select" id="page_size" name="page_size">
-                                        <option value="letter">Letter</option>
-                                        <option value="a4">A4</option>
-                                        <option value="legal">Legal</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="orientation" class="form-label fw-bold">
-                                        <i class="fas fa-arrows-alt me-2"></i>Orientation:
-                                    </label>
-                                    <select class="form-select" id="orientation" name="orientation">
-                                        <option value="portrait">Portrait</option>
-                                        <option value="landscape">Landscape</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="mt-4">
                     <button type="submit" class="btn btn-primary me-2" id="download-btn" disabled>

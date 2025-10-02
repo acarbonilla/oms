@@ -172,6 +172,12 @@ IMAGE_ENV = env("IMAGE_ENV", default="production")
 # This is for qr code path
 BASE_URL = env("BASE_URL")
 
+# File Upload Settings
+FILE_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50MB
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
+FILE_UPLOAD_PERMISSIONS = 0o644
+
 import logging
 
 # Filter out Chrome DevTools requests

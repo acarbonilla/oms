@@ -52,6 +52,17 @@
             transform: translateY(-5px);
         }
     }
+    
+    @keyframes slideOutRight {
+        from { 
+            transform: translateX(0); 
+            opacity: 1; 
+        }
+        to { 
+            transform: translateX(30px); 
+            opacity: 0; 
+        }
+    }
 
     @keyframes shimmer {
         0% {
@@ -441,6 +452,131 @@
     .error-message {
         animation: fadeInUp 0.4s ease-out;
         border-radius: 10px;
+    }
+    
+    /* Toast Messages - Bottom Right Corner */
+    .toast-message {
+        position: fixed;
+        right: 20px;
+        z-index: 9999;
+        max-width: 400px;
+        min-width: 300px;
+        animation: slideInRight 0.4s ease-out;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .toast-message.error-message {
+        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        border: 2px solid #dc3545;
+        color: #721c24;
+    }
+    
+    .toast-message.success-message {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        border: 2px solid #28a745;
+        color: #155724;
+    }
+    
+    .toast-message.warning-message {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        border: 2px solid #ffc107;
+        color: #856404;
+    }
+    
+    .toast-message .alert {
+        margin: 0;
+        border: none;
+        border-radius: 0;
+        padding: 15px 20px;
+        font-weight: 600;
+        position: relative;
+    }
+    
+    .toast-message .alert::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+        animation: shimmer 2s infinite;
+    }
+    
+    .toast-message .alert > * {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .toast-message i {
+        font-size: 1.2rem;
+        margin-right: 10px;
+    }
+    
+    .toast-message.success-message i {
+        color: #28a745;
+        animation: bounce 1s infinite;
+    }
+    
+    .toast-message.error-message i {
+        color: #dc3545;
+        animation: pulse 1s infinite;
+    }
+    
+    /* Close button for toast messages */
+    .toast-close {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: inherit;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        z-index: 3;
+    }
+    
+    .toast-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+    }
+    
+    /* Progress Message Styling */
+    .toast-message.progress-message {
+        bottom: 80px; /* Above toast messages */
+        z-index: 9998;
+        background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+        border: 2px solid #17a2b8;
+    }
+    
+    .toast-message.progress-message .alert {
+        background: transparent;
+        border: none;
+        color: #0c5460;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .toast-message {
+            bottom: 10px;
+            right: 10px;
+            left: 10px;
+            max-width: none;
+            min-width: auto;
+        }
+        
+        .toast-message.progress-message {
+            bottom: 70px;
+        }
     }
 
     /* Modal Styles */
@@ -836,7 +972,7 @@
                     <i class="fas fa-tasks me-2"></i>Upload Technical Activity
                 </h2>
 
-                <form enctype="multipart/form-data" method="post">
+                <form enctype="multipart/form-data" method="post" id="uploadForm">
                     {% csrf_token %}
 
                     <div class="mb-4">
@@ -881,7 +1017,7 @@
                                multiple accept="image/*">
                         <div class="helper-text">
                             <i class="fas fa-info-circle"></i>
-                            Maximum 10 images, each up to 5MB. Standard image formats recommended.
+                            Maximum 20 images, each up to 15MB. Standard image formats recommended.
                         </div>
                     </div>
 
@@ -898,7 +1034,7 @@
                         
                         <div class="helper-text">
                             <i class="fas fa-info-circle"></i>
-                            Maximum 10 photos allowed. Standard image formats recommended.
+                            Maximum 20 photos allowed. Standard image formats recommended.
                         </div>
                     </div>
 
@@ -931,7 +1067,7 @@
             <!-- Picture Counter -->
             <div class="picture-counter" id="pictureCounter">
                 <i class="fas fa-images me-2"></i>
-                <span id="counterText">0 / 10 photos taken</span>
+                <span id="counterText">0 / 20 photos taken</span>
             </div>
 
 
@@ -972,6 +1108,30 @@
     const capturedImagesInput = document.getElementById('captured-images');
     const capturedImagesPreview = document.getElementById('captured-images-preview');
     
+    // Function to close toast message (global function)
+    window.closeToast = function(closeBtn) {
+        const toast = closeBtn.closest('.toast-message');
+        if (toast) {
+            toast.style.animation = 'slideOutRight 0.3s ease-out';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 300);
+        }
+    }
+    
+    // Function to clear all toast messages
+    function clearToastMessages() {
+        const existingToasts = document.querySelectorAll('.toast-message');
+        existingToasts.forEach(toast => {
+            const closeBtn = toast.querySelector('.toast-close');
+            if (closeBtn) {
+                closeToast(closeBtn);
+            }
+        });
+    }
+    
     // Modal Elements
     const cameraModal = document.getElementById('cameraModal');
     const openCameraModal = document.getElementById('openCameraModal');
@@ -987,8 +1147,8 @@
     // Global Variables
     let stream;
     let capturedImages = [];
-    const MAX_IMAGES = 10;
-    const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+    const MAX_IMAGES = 20;
+    const MAX_IMAGE_SIZE = 15 * 1024 * 1024; // 15MB
 
     // Fixed medium quality settings for optimal file size management
     const CAMERA_QUALITY = {
@@ -1122,10 +1282,10 @@
         if (count >= MAX_IMAGES) {
             pictureCounter.classList.add('counter-danger');
             modalCaptureBtn.disabled = true;
-        } else if (count >= 8) {
+        } else if (count >= 16) {
             pictureCounter.classList.add('counter-warning');
             modalCaptureBtn.disabled = false;
-        } else if (count >= 5) {
+        } else if (count >= 10) {
             pictureCounter.classList.add('counter-warning');
             modalCaptureBtn.disabled = false;
         } else {
@@ -1274,6 +1434,365 @@
 
     // Stop camera on unload
     window.addEventListener("beforeunload", stopCamera);
+    
+    // Toast Message Functions
+    function showToastMessage(message, type = 'success') {
+        // Only clear existing messages if showing success or error (not warnings)
+        if (type !== 'warning') {
+            clearToastMessages();
+        }
+        
+        const toast = document.createElement('div');
+        toast.className = `toast-message ${type}-message`;
+        
+        let icon, alertClass;
+        if (type === 'success') {
+            icon = 'fa-check-circle';
+            alertClass = 'success';
+        } else if (type === 'warning') {
+            icon = 'fa-exclamation-triangle';
+            alertClass = 'warning';
+        } else {
+            icon = 'fa-exclamation-triangle';
+            alertClass = 'danger';
+        }
+        
+        toast.innerHTML = `
+            <div class="alert alert-${alertClass}">
+                <i class="fas ${icon}"></i>
+                ${message}
+                <button class="toast-close" onclick="closeToast(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Position the toast to stack properly
+        const existingToasts = document.querySelectorAll('.toast-message');
+        const toastIndex = existingToasts.length - 1;
+        const bottomOffset = 20 + (toastIndex * 80); // 80px spacing between toasts
+        toast.style.bottom = `${bottomOffset}px`;
+        
+        // Auto-close after 5 seconds for success, 8 seconds for errors, 6 seconds for warnings
+        const autoCloseDelay = type === 'success' ? 5000 : type === 'warning' ? 6000 : 8000;
+        setTimeout(() => {
+            if (toast.parentNode) {
+                closeToast(toast.querySelector('.toast-close'));
+            }
+        }, autoCloseDelay);
+    }
+    
+    // Function to show upload errors
+    function showUploadErrors(errorElements) {
+        // Clear any existing toast messages
+        clearToastMessages();
+        
+        errorElements.forEach(error => {
+            showToastMessage(error.innerHTML, 'error');
+        });
+    }
+    
+    // Function to show single upload error
+    function showUploadError(message) {
+        showToastMessage(message, 'error');
+    }
+    
+    // Function to show success message
+    function showSuccessMessage(message = null, uploadedCount = null) {
+        const successMessage = message || 'Upload Successful!';
+        const countText = uploadedCount ? ` (${uploadedCount} images uploaded)` : '';
+        const fullMessage = `
+            <strong>${successMessage}${countText}</strong> Your technical activity has been uploaded successfully. 
+            <br><small>Redirecting to activities list...</small>
+            <br><button class="btn btn-sm btn-outline-light mt-2" onclick="goToActivitiesList()">
+                <i class="fas fa-arrow-right me-1"></i>Go to Activities List
+            </button>
+        `;
+        
+        showToastMessage(fullMessage, 'success');
+    }
+    
+    // Progress indicator functions
+    function createProgressContainer() {
+        const progressContainer = document.createElement('div');
+        progressContainer.className = 'toast-message progress-message';
+        progressContainer.innerHTML = `
+            <div class="alert">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span id="progressText">Starting upload...</span>
+                <div class="progress mt-2" style="height: 6px;">
+                    <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                         role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(progressContainer);
+        return progressContainer;
+    }
+    
+    function updateProgress(percentage, text) {
+        const progressText = document.getElementById('progressText');
+        const progressBar = document.getElementById('progressBar');
+        
+        if (progressText) progressText.textContent = text;
+        if (progressBar) {
+            progressBar.style.width = `${percentage}%`;
+            progressBar.setAttribute('aria-valuenow', percentage);
+        }
+    }
+    
+    // Global redirect function
+    window.goToActivitiesList = function() {
+        console.log('Global redirect function called');
+        window.location.href = '/mindanao/activities/';
+    };
+    
+    // Function to redirect to activities list
+    function redirectToActivitiesList() {
+        console.log('Redirecting to activities list...');
+        
+        // Clear any existing timeouts
+        if (window.redirectTimeout) {
+            clearTimeout(window.redirectTimeout);
+        }
+        
+        // Force redirect - try multiple methods
+        setTimeout(() => {
+            console.log('Executing redirect...');
+            window.location.href = '/mindanao/activities/';
+        }, 100);
+        
+        // Backup redirect
+        setTimeout(() => {
+            if (window.location.pathname.includes('upload')) {
+                console.log('Backup redirect executing...');
+                window.location.replace('/mindanao/activities/');
+            }
+        }, 500);
+    }
+    
+    // Function to clear form after success
+    function clearFormAfterSuccess() {
+        const form = document.getElementById('uploadForm');
+        if (form) form.reset();
+        
+        const imageInput = document.getElementById('image-input');
+        if (imageInput) imageInput.value = '';
+        
+        const previewContainer = document.getElementById('preview-container');
+        if (previewContainer) previewContainer.innerHTML = '';
+        
+        const capturedImagesInput = document.getElementById('captured-images');
+        if (capturedImagesInput) capturedImagesInput.value = '';
+        
+        const capturedImagesPreview = document.getElementById('captured-images-preview');
+        if (capturedImagesPreview) capturedImagesPreview.innerHTML = '';
+        
+        capturedImages = [];
+        sessionStorage.removeItem('mindanaoUploadForm');
+        updateCounter();
+        console.log('Form cleared after successful upload');
+    }
+    
+    // AJAX Form Submission
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('uploadForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                console.log('Form submission started');
+                
+                // Check CSRF token
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+                if (!csrfToken) {
+                    showUploadError('CSRF token missing. Please refresh the page and try again.');
+                    return;
+                }
+                
+                // Create progress indicator
+                const progressContainer = createProgressContainer();
+                updateProgress(10, 'Preparing upload...');
+                
+                // Create FormData
+                const formData = new FormData(form);
+                
+                // Get form action URL
+                const formAction = form.action || window.location.href;
+                
+                console.log('Submitting to:', formAction);
+                console.log('FormData entries:', Array.from(formData.entries()));
+                
+                // Submit with fetch
+                fetch(formAction, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': csrfToken.value,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    updateProgress(50, 'Processing upload...');
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers.get('content-type'));
+                    console.log('Response URL:', response.url);
+                    
+                    if (response.ok) {
+                        updateProgress(75, 'Finalizing...');
+                        const contentType = response.headers.get('content-type');
+                        console.log('Content type:', contentType);
+                        
+                        if (contentType && contentType.includes('application/json')) {
+                            console.log('Processing JSON response');
+                            return response.json();
+                        } else {
+                            console.log('Processing HTML response');
+                            return response.text();
+                        }
+                    } else {
+                        console.log('Response not OK:', response.status);
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) {
+                            return response.json().then(data => {
+                                throw new Error(data.error || 'Upload failed');
+                            });
+                        } else {
+                            throw new Error(`Server error: ${response.status}`);
+                        }
+                    }
+                })
+                .then(data => {
+                    updateProgress(100, 'Complete!');
+                    console.log('Response data:', data);
+                    console.log('Data type:', typeof data);
+                    console.log('Data success:', data?.success);
+                    
+                    if (typeof data === 'object' && data.success) {
+                        console.log('JSON success response detected');
+                        showSuccessMessage(data.message, data.uploaded_count);
+                        
+                        // Show warnings if any
+                        if (data.warnings && data.warnings.length > 0) {
+                            console.log('Warnings detected:', data.warnings);
+                            setTimeout(() => {
+                                data.warnings.forEach(warning => {
+                                    showToastMessage(warning, 'warning');
+                                });
+                            }, 1000); // Show warnings after success message
+                        }
+                        
+                        clearFormAfterSuccess();
+                        
+                        console.log('Attempting immediate redirect...');
+                        setTimeout(() => {
+                            console.log('Force redirecting...');
+                            window.location.href = '/mindanao/activities/';
+                        }, 500);
+                        
+                        setTimeout(() => {
+                            if (window.location.pathname.includes('upload')) {
+                                console.log('Backup: Force reloading page...');
+                                window.location.reload();
+                            }
+                        }, 3000);
+                        return;
+                    }
+                    
+                    // Handle HTML response (fallback)
+                    if (typeof data === 'string') {
+                        console.log('Processing HTML response');
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(data, 'text/html');
+                        
+                        // Check for error messages
+                        const errorElements = doc.querySelectorAll('.error-message, .alert-danger');
+                        if (errorElements.length > 0) {
+                            console.log('Errors found in HTML response');
+                            showUploadErrors(errorElements);
+                            return;
+                        }
+                        
+                        // Check for success messages
+                        const successElements = doc.querySelectorAll('.alert-success');
+                        if (successElements.length > 0) {
+                            console.log('Success found in HTML response');
+                            showSuccessMessage('Upload completed successfully!');
+                            clearFormAfterSuccess();
+                            redirectToActivitiesList();
+                            return;
+                        }
+                        
+                        // If no specific messages, assume success
+                        console.log('No specific messages found, assuming success');
+                        showSuccessMessage('Upload completed successfully!');
+                        clearFormAfterSuccess();
+                        redirectToActivitiesList();
+                    }
+                })
+                .catch(error => {
+                    console.error('Upload error:', error);
+                    
+                    // Remove progress indicator
+                    if (progressContainer && progressContainer.parentNode) {
+                        progressContainer.parentNode.removeChild(progressContainer);
+                    }
+                    
+                    // Handle different types of errors
+                    if (error.message.includes('Failed to fetch')) {
+                        showUploadError('Network error: Please check your internet connection and try again.');
+                    } else if (error.message.includes('CSRF')) {
+                        showUploadError('Security error: Please refresh the page and try again.');
+                    } else if (error.message.includes('413') || error.message.includes('Request Entity Too Large')) {
+                        showUploadError('File too large: Please reduce file sizes or upload fewer images.');
+                    } else if (error.message.includes('timeout')) {
+                        showUploadError('Upload timeout: Please try again with smaller files.');
+                    } else {
+                        showUploadError(`Upload failed: ${error.message}`);
+                    }
+                })
+                .finally(() => {
+                    // Clean up progress indicator
+                    setTimeout(() => {
+                        const progressContainer = document.querySelector('.progress-message');
+                        if (progressContainer && progressContainer.parentNode) {
+                            progressContainer.parentNode.removeChild(progressContainer);
+                        }
+                    }, 2000);
+                });
+                
+                // Timeout fallback
+                setTimeout(() => {
+                    const progressContainer = document.querySelector('.progress-message');
+                    if (progressContainer) {
+                        console.log('Upload timeout - falling back to traditional form submission');
+                        if (progressContainer.parentNode) {
+                            progressContainer.parentNode.removeChild(progressContainer);
+                        }
+                        showUploadError('Upload is taking longer than expected. Please wait...');
+                        
+                        // Fallback to traditional form submission
+                        setTimeout(() => {
+                            form.submit();
+                        }, 2000);
+                    }
+                }, 30000); // 30 second timeout
+            });
+        }
+        
+        // Clear session storage on page unload
+        window.addEventListener('beforeunload', function() {
+            sessionStorage.removeItem('mindanaoUploadForm');
+        });
+        
+        window.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                sessionStorage.removeItem('mindanaoUploadForm');
+            }
+        });
+    });
 </script>
 
 {% endblock %}
