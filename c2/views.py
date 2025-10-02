@@ -789,8 +789,8 @@ def not_visited_facilities_list(request):
 @login_required(login_url='omsLogin')
 def tech_act_upload(request, pk=None):
     tech = get_object_or_404(C2TechActivities, id=pk) if pk else None
-    MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
-    MAX_IMAGES = 10
+    MAX_IMAGE_SIZE = 15 * 1024 * 1024  # 15MB
+    MAX_IMAGES = 20
     ALLOWED_MIME_TYPES = {'image/jpeg', 'image/png', 'image/gif', 'image/webp'}
     MIN_IMAGE_SIZE = 10 * 1024  # 10KB
 
@@ -816,11 +816,20 @@ def tech_act_upload(request, pk=None):
 
                 uploaded_images = 0
                 errors = []
+                warnings = []
 
                 # Handle uploaded image files
                 files = request.FILES.getlist('image')
                 if len(files) > MAX_IMAGES:
                     messages.error(request, f'Maximum {MAX_IMAGES} images allowed')
+                    
+                    # Check if this is an AJAX request
+                    if request.headers.get('Accept') == 'application/json':
+                        return JsonResponse({
+                            'success': False,
+                            'error': f'Maximum {MAX_IMAGES} images allowed'
+                        }, status=400)
+                    
                     return redirect('tech_act_upload')
 
                 for file in files:
@@ -859,6 +868,16 @@ def tech_act_upload(request, pk=None):
                             # Check maximum dimensions
                             if img.width > 4096 or img.height > 4096:
                                 errors.append(f'File {file.name} dimensions too large (maximum 4096x4096)')
+                                continue
+
+                            # Check aspect ratio (4:3) - More flexible validation
+                            aspect_ratio = img.width / img.height
+                            target_ratio = 4/3
+                            tolerance = 0.5  # Allow 50% deviation from perfect 4:3 ratio (more flexible)
+                            
+                            # Only warn for extremely wide or tall images
+                            if aspect_ratio < 0.5 or aspect_ratio > 3.0:
+                                warnings.append(f'File {file.name} has extreme aspect ratio (current ratio: {aspect_ratio:.2f}). Please use a more standard image format.')
                                 continue
 
                         except Exception as e:
@@ -924,6 +943,16 @@ def tech_act_upload(request, pk=None):
                                             f'Captured image {idx + 1} dimensions too large (maximum 4096x4096)')
                                         continue
 
+                                    # Check aspect ratio (4:3) - More flexible validation
+                                    aspect_ratio = img.width / img.height
+                                    target_ratio = 4/3
+                                    tolerance = 0.5  # Allow 50% deviation from perfect 4:3 ratio (more flexible)
+                                    
+                                    # Only warn for extremely wide or tall images
+                                    if aspect_ratio < 0.5 or aspect_ratio > 3.0:
+                                        warnings.append(f'Captured image {idx + 1} has extreme aspect ratio (current ratio: {aspect_ratio:.2f}). Please use a more standard image format.')
+                                        continue
+
                                 except Exception as e:
                                     errors.append(f'Captured image {idx + 1} appears to be corrupted')
                                     continue
@@ -943,6 +972,15 @@ def tech_act_upload(request, pk=None):
                     if errors:
                         for error in errors:
                             messages.warning(request, error)
+                    
+                    # Check if this is an AJAX request
+                    if request.headers.get('Accept') == 'application/json':
+                        return JsonResponse({
+                            'success': False,
+                            'error': 'No valid images were uploaded',
+                            'errors': errors
+                        }, status=400)
+                    
                     return redirect('tech_act_upload')
 
                 messages.success(request, f'Successfully uploaded {uploaded_images} images')
@@ -950,6 +988,21 @@ def tech_act_upload(request, pk=None):
                     for error in errors:
                         messages.warning(request, error)
 
+                # Check if this is an AJAX request
+                if request.headers.get('Accept') == 'application/json':
+                    response_data = {
+                        'success': True,
+                        'message': f'Successfully uploaded {uploaded_images} images',
+                        'redirect_url': '/c2/activities/',
+                        'uploaded_count': uploaded_images
+                    }
+                    
+                    # Include warnings in the response if any
+                    if warnings:
+                        response_data['warnings'] = warnings
+                    
+                    return JsonResponse(response_data)
+                
                 return redirect('activity_list')
             else:
                 for field, error_list in form.errors.items():
@@ -1190,22 +1243,89 @@ def tech_activity_pdf(request):
         'border': colors.HexColor('#e5e7eb'),  # Border Gray
     }
 
-    def add_page_header(page_num):
-        """Add styled header to each page"""
-        # Add background rectangle
-        pdf.setFillColor(colors_dict['light'])
-        pdf.rect(0, height - 80, width, 80, fill=True)
+    def add_page_header(page_num, activity=None):
+        """Add styled header to each page matching the Danao design"""
+        # Header background
+        header_height = 100
+        pdf.setFillColor(colors.white)
+        pdf.rect(0, height - header_height, width, header_height, fill=True)
         
-        # Add title
-        pdf.setFillColor(colors_dict['dark'])
-        pdf.setFont("Helvetica-Bold", 24)
-        pdf.drawCentredString(width/2, height - 50, "Technical Activity Report")
+        # Left section - Main Title
+        title_x = 70
+        title_y = height - 40
+        pdf.setFillColor(colors.black)
+        pdf.setFont("Helvetica-Bold", 30)
         
-        # Add date and page number with Philippines time
-        ph_time = localtime(today)  # Convert to Philippines time
+        # Title with line breaks to match Danao design
+        pdf.drawString(title_x, title_y, "Facilities Inspection &")
+        pdf.drawString(title_x, title_y - 26, "Maintenance Report")
+        
+        # Activity name under the title
+        if activity and hasattr(activity, 'name') and activity.name:
+            pdf.setFont("Helvetica-Bold", 14)
+            pdf.drawString(title_x, title_y - 45, activity.name)
+        
+        # Right section - Document Metadata Table (4 rows with borders)
+        table_width = 400
+        table_x = width - 450  # Right-aligned, positioned to align with title
+        table_y = height - 8
+        table_height = 80  # Height for 4 rows
+        
+        # Table border
+        pdf.setStrokeColor(colors.HexColor('#d1d5db'))
+        pdf.setLineWidth(1)
+        pdf.rect(table_x, table_y - table_height, table_width, table_height, fill=False)
+        
+        # Table rows and columns (4 rows as shown in image)
+        row_height = table_height / 4
+        col_width = table_width / 2
+        
+        # Draw horizontal lines (3 lines to separate 4 rows)
+        for i in range(1, 4):
+            y_pos = table_y - (i * row_height)
+            pdf.line(table_x, y_pos, table_x + table_width, y_pos)
+        
+        # Draw vertical line
+        pdf.line(table_x + col_width, table_y - table_height, table_x + col_width, table_y)
+        
+        # Table content
+        pdf.setFont("Helvetica", 9)
+        pdf.setFillColor(colors.black)
+        
+        # Document Code (with space as shown in image)
+        pdf.drawString(table_x + 5, table_y - 12, "Document Code:")
+        pdf.drawString(table_x + col_width + 5, table_y - 12, "FM-MP-VM- 01.01")
+        
+        # Revision No.
+        pdf.drawString(table_x + 5, table_y - 12 - row_height, "Revision No.:")
+        pdf.drawString(table_x + col_width + 5, table_y - 12 - row_height, "0")
+        
+        # Effectivity Date
+        pdf.drawString(table_x + 5, table_y - 12 - (2 * row_height), "Effectivity Date:")
+        pdf.drawString(table_x + col_width + 5, table_y - 12 - (2 * row_height), "September 01, 2025")
+        
+        # Retention Period
+        pdf.drawString(table_x + 5, table_y - 12 - (3 * row_height), "Retention Period:")
+        pdf.drawString(table_x + col_width + 5, table_y - 12 - (3 * row_height), "5 Years")
+        
+        # Page number at bottom right
         pdf.setFont("Helvetica", 10)
-        pdf.drawString(50, height - 70, f"Generated on: {ph_time.strftime('%Y-%m-%d %I:%M %p')} (PHT)")
-        pdf.drawRightString(width - 50, height - 70, f"Page {page_num}")
+        pdf.drawRightString(width - 50, height - header_height + 5, f"Page {page_num}")
+
+    def add_footer():
+        """Add footer with generated date to each page"""
+        from datetime import datetime
+        generated_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Footer line
+        pdf.setStrokeColor(colors_dict['border'])
+        pdf.setLineWidth(0.5)
+        pdf.line(50, 50, width - 50, 50)
+        
+        # Generated date at bottom left
+        pdf.setFont("Helvetica", 8)
+        pdf.setFillColor(colors_dict['secondary'])
+        pdf.drawString(60, 30, f"Generated: {generated_date}")
 
     def add_activity_header(y_position, activity):
         """Add styled activity header"""
@@ -1225,7 +1345,14 @@ def tech_activity_pdf(request):
         pdf.setFont("Helvetica", 10)
         pdf.setFillColor(colors_dict['secondary'])
         
+        # Activity name
+        pdf.drawString(60, y_position, "📋 Activity:")
+        pdf.setFillColor(colors_dict['dark'])
+        pdf.drawString(140, y_position, activity.name)
+        
         # Location
+        y_position -= 20
+        pdf.setFillColor(colors_dict['secondary'])
         pdf.drawString(60, y_position, "📍 Location:")
         pdf.setFillColor(colors_dict['dark'])
         pdf.drawString(140, y_position, activity.location)
@@ -1273,6 +1400,12 @@ def tech_activity_pdf(request):
     def add_remarks_section(y_position, activity):
         """Add styled remarks section with preserved formatting"""
         if activity.remarks:
+            # Check if we have enough space for remarks header
+            if y_position < 150:  # Very low threshold to ensure remarks stays on same page
+                pdf.showPage()
+                y_position = height - 120
+                add_page_header(pdf._pageNumber)
+            
             # Remarks header
             pdf.setFillColor(colors_dict['primary'])
             pdf.setFont("Helvetica-Bold", 12)
@@ -1307,6 +1440,12 @@ def tech_activity_pdf(request):
             current_number = 1  # Counter for numbered lists
             
             for line in lines:
+                # Check if we need a new page before adding content
+                if y_position < 120:  # Reduced threshold to allow more content on same page
+                    pdf.showPage()
+                    y_position = height - 120
+                    add_page_header(pdf._pageNumber)
+                
                 # Skip empty lines
                 if not line.strip():
                     y_position -= 15
@@ -1375,9 +1514,9 @@ def tech_activity_pdf(request):
             image_height = 160  # Adjusted height for better proportions
 
             for i, image in enumerate(images):
-                if y_position < 100:  # Check if we need a new page
+                if y_position < 200:  # Increased threshold to prevent footer overlap
                     pdf.showPage()
-                    y_position = height - 100
+                    y_position = height - 120  # Start higher to leave room for footer
                     add_page_header(pdf._pageNumber)
 
                 row = i // images_per_row
@@ -1397,21 +1536,22 @@ def tech_activity_pdf(request):
                     print(f"Error adding image: {e}")
 
                 if (i + 1) % images_per_row == 0:
-                    y_position -= (image_height + 30)  # Increased spacing between rows
+                    y_position -= (image_height + 40)  # Increased spacing between rows
 
             if len(images) % images_per_row != 0:
-                y_position -= (image_height + 30)
+                y_position -= (image_height + 40)
 
         return y_position
 
     # Generate PDF content
-    page_num = 1
+    page_num = 2  # Start from page 2 (cover page is page 1)
     for activity in activities:
-        if page_num > 1:
+        if page_num > 2:
             pdf.showPage()
         
-        add_page_header(page_num)
-        y_position = height - 100
+        add_page_header(pdf._pageNumber, activity)
+        add_footer()
+        y_position = height - 130
         
         # Add activity content
         y_position = add_activity_header(y_position, activity)
@@ -1422,6 +1562,12 @@ def tech_activity_pdf(request):
         pdf.line(60, y_position, width - 60, y_position)
         y_position -= 20
         
+        # Check if we have enough space for remarks section before calling it
+        if y_position < 100:  # Very low threshold to ensure remarks stays on same page
+            pdf.showPage()
+            y_position = height - 120
+            add_page_header(pdf._pageNumber)
+        
         y_position = add_remarks_section(y_position, activity)
         
         # Another separator before images
@@ -1430,6 +1576,24 @@ def tech_activity_pdf(request):
         y_position -= 20
         
         y_position = add_images_section(y_position, activity)
+        
+        # Add end of report text
+        # Add end of report text
+        # Check if we have enough space for end text
+        if y_position < 150:  # Need space for end text + footer
+            pdf.showPage()
+            y_position = height - 120
+            add_page_header(pdf._pageNumber)
+        
+        y_position -= 30
+        pdf.setFont("Helvetica-Bold", 14)
+        pdf.setFillColor(colors_dict['primary'])
+        pdf.drawString(60, y_position, "End of the Report")
+        
+        y_position -= 20
+        pdf.setFont("Helvetica", 12)
+        pdf.setFillColor(colors_dict['dark'])
+        pdf.drawString(60, y_position, "Thank you!")
         
         page_num += 1
 

@@ -577,22 +577,22 @@ def generate_selected_pdfDanao(request):
     search_query = request.GET.get("search", "")
     current_year = now().year
     images = DanaoRecentImage.objects.filter(created__year=current_year).exclude(status="Pending")
+    
     if search_query:
         images = images.filter(Q(title__icontains=search_query) | Q(s_image__facility__name__icontains=search_query)
                                | Q(status__icontains=search_query)
                                | Q(uploaded_by__name__first_name__icontains=search_query)
-                               | Q(id__icontains=search_query)
-                               )
+                               | Q(id__icontains=search_query))
 
     if not images.exists():
         return render(request, "danao/general/danao_report_selection.html", {
-            "error_message": "? No available records to download (Pending records are excluded).",
+            "error_message": "No available records to download (Pending records are excluded).",
             "search_query": search_query
         })
 
     if not selected_ids:
         return render(request, "danao/general/danao_report_selection.html", {
-            "error_message": "? Please select at least one item before downloading.",
+            "error_message": "Please select at least one item before downloading.",
             "search_query": search_query,
             "page_obj": images
         })
@@ -607,25 +607,26 @@ def generate_selected_pdfDanao(request):
             watermark_path = finders.find("report_logo/fm_2.png")
             if watermark_path:
                 pdf.saveState()
-                pdf.setFillAlpha(0.1)  # Transparency
+                pdf.setFillAlpha(0.1)
                 pdf.drawImage(ImageReader(watermark_path), width / 3, height / 3, width=300, height=150, mask='auto')
                 pdf.restoreState()
         except Exception as e:
             print(f"Error adding watermark: {e}")
 
-    for index, img in enumerate(images):  # Added index to track the first page
-        if index > 0:  # Only add a new page after the first iteration
-            pdf.showPage()  # ? Now it correctly starts a new page for each report
+    for index, img in enumerate(images):
+        if index > 0:
+            pdf.showPage()
 
-        # add_watermark(pdf, width, height)  # Add watermark
-        add_watermark(pdf, width, height)  # Add watermark
+        add_watermark(pdf, width, height)
+        
         # Border
         pdf.setStrokeColor(colors.black)
         pdf.setLineWidth(2)
         pdf.rect(20, 20, width - 40, height - 40)
 
+        # Header
         pdf.setFont("Helvetica-Bold", 16)
-        pdf.drawString(250, height - 50, "Facility Management Inspection Report")
+        pdf.drawString(250, height - 50, "Facilities Inspection & Maintenance Report")
         pdf.setFont("Helvetica", 12)
 
         col1_x, col2_x, col3_x = 50, 300, 550
@@ -640,15 +641,11 @@ def generate_selected_pdfDanao(request):
 
         y_position -= 80
         pdf.drawString(col1_x, y_position - 10, f"Re-Schedule: {img.re_schedule if img.re_schedule else 'N/A'}")
-        pdf.drawString(
-            col1_x, y_position - 30,
-            f"Evaluated By: {img.remark_by.first_name} {img.remark_by.last_name}" if img.remark_by else "Evaluated "
-                                                                                                        "By: N/A"
-        )
-
-        pdf.drawString(col1_x, y_position - 50,
+        pdf.drawString(col1_x, y_position - 30, 
+                       f"Evaluated By: {img.remark_by.first_name} {img.remark_by.last_name}" if img.remark_by else "Evaluated By: N/A")
+        pdf.drawString(col1_x, y_position - 50, 
                        f"Updated: {localtime(img.updated).strftime('%Y-%m-%d %H:%M:%S') if img.updated else 'N/A'}")
-        pdf.drawString(col1_x, y_position - 70,
+        pdf.drawString(col1_x, y_position - 70, 
                        f"Created: {localtime(img.created).strftime('%Y-%m-%d %H:%M:%S') if img.created else 'N/A'}")
         y_position -= 90
 
@@ -656,8 +653,7 @@ def generate_selected_pdfDanao(request):
         if img.s_image and img.s_image.standard_image:
             try:
                 pdf.drawString(col2_x, y_position, "Standard Image")
-                pdf.drawImage(ImageReader(img.s_image.standard_image.path), col2_x, height - 230, width=img_width,
-                              height=img_height)
+                pdf.drawImage(ImageReader(img.s_image.standard_image.path), col2_x, height - 230, width=img_width, height=img_height)
             except Exception as e:
                 print(f"Error loading standard image: {e}")
 
@@ -665,34 +661,29 @@ def generate_selected_pdfDanao(request):
         if img.recent_image:
             try:
                 pdf.drawString(col3_x, y_position, "Latest Image")
-                pdf.drawImage(ImageReader(img.recent_image.path), col3_x, height - 230, width=img_width,
-                              height=img_height)
+                pdf.drawImage(ImageReader(img.recent_image.path), col3_x, height - 230, width=img_width, height=img_height)
             except Exception as e:
                 print(f"Error loading latest image: {e}")
 
-        # Remove HTML tags and prepare remarks text
+        # Remarks section
         remarks_text = strip_tags(img.remarks) if img.remarks else 'N/A'
-
-        # Wrap text for proper formatting in PDF
         wrapped_remarks = textwrap.wrap(" ".join(remarks_text.split()[:150]), width=120)
 
         pdf.drawString(col1_x, y_position, "Remarks:")
-
-        # Indented text
         y_position -= 50
-        indentation = 20  # Adjust this value for indentation
+        indentation = 20
 
         for line in wrapped_remarks:
-            pdf.drawString(col1_x + indentation, y_position, line)  # Apply indentation
-            y_position -= 25  # Line spacing
+            pdf.drawString(col1_x + indentation, y_position, line)
+            y_position -= 25
 
         # End of Report
         pdf.setFont("Helvetica-Bold", 14)
         pdf.drawString(280, y_position - 20, "-----End of Report-----")
 
+        # Logo
         try:
             logo2_path = finders.find("report_logo/zfc-logo.png")
-
             if logo2_path:
                 pdf.drawImage(ImageReader(logo2_path), 30, height - 75, width=100, height=50)
         except Exception as e:
@@ -701,7 +692,7 @@ def generate_selected_pdfDanao(request):
     pdf.save()
     buffer.seek(0)
     response = HttpResponse(buffer, content_type="application/pdf")
-    response["Content-Disposition"] = 'attachment; filename="Facility Mgt Inspection Report.pdf"'
+    response["Content-Disposition"] = 'attachment; filename="Facilities Inspection & Maintenance Report.pdf"'
     return response
 
 
@@ -808,8 +799,8 @@ def not_visited_facilities_listDanao(request):
 @login_required(login_url='omsLogin')
 def tech_act_uploadDanao(request, pk=None):
     tech = get_object_or_404(DanaoTechActivities, id=pk) if pk else None
-    MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
-    MAX_IMAGES = 10
+    MAX_IMAGE_SIZE = 15 * 1024 * 1024  # 15MB
+    MAX_IMAGES = 20
     ALLOWED_MIME_TYPES = {'image/jpeg', 'image/png', 'image/gif', 'image/webp'}
     MIN_IMAGE_SIZE = 10 * 1024  # 10KB
 
@@ -824,11 +815,14 @@ def tech_act_uploadDanao(request, pk=None):
 
                 uploaded_images = 0
                 errors = []
+                warnings = []
 
                 # Handle uploaded image files
                 files = request.FILES.getlist('image')
                 if len(files) > MAX_IMAGES:
                     messages.error(request, f'Maximum {MAX_IMAGES} images allowed')
+                    if request.headers.get('Content-Type') == 'application/json' or request.headers.get('Accept') == 'application/json':
+                        return JsonResponse({'error': f'Maximum {MAX_IMAGES} images allowed'}, status=400)
                     return redirect('tech_act_uploadDanao')
 
                 for file in files:
@@ -876,7 +870,7 @@ def tech_act_uploadDanao(request, pk=None):
                             
                             # Only warn for extremely wide or tall images
                             if aspect_ratio < 0.5 or aspect_ratio > 3.0:
-                                errors.append(f'File {file.name} has extreme aspect ratio (current ratio: {aspect_ratio:.2f}). Please use a more standard image format.')
+                                warnings.append(f'File {file.name} has extreme aspect ratio (current ratio: {aspect_ratio:.2f}). Please use a more standard image format.')
                                 continue
 
                         except Exception as e:
@@ -949,7 +943,7 @@ def tech_act_uploadDanao(request, pk=None):
                                     
                                     # Only warn for extremely wide or tall images
                                     if aspect_ratio < 0.5 or aspect_ratio > 3.0:
-                                        errors.append(f'Captured image {idx + 1} has extreme aspect ratio (current ratio: {aspect_ratio:.2f}). Please use a more standard image format.')
+                                        warnings.append(f'Captured image {idx + 1} has extreme aspect ratio (current ratio: {aspect_ratio:.2f}). Please use a more standard image format.')
                                         continue
 
                                 except Exception as e:
@@ -971,6 +965,15 @@ def tech_act_uploadDanao(request, pk=None):
                     if errors:
                         for error in errors:
                             messages.warning(request, error)
+                    
+                    # Check if this is an AJAX request
+                    if request.headers.get('Accept') == 'application/json':
+                        return JsonResponse({
+                            'success': False,
+                            'error': 'No valid images were uploaded',
+                            'errors': errors
+                        }, status=400)
+                    
                     return redirect('tech_act_uploadDanao')
 
                 messages.success(request, f'Successfully uploaded {uploaded_images} images')
@@ -978,6 +981,21 @@ def tech_act_uploadDanao(request, pk=None):
                     for error in errors:
                         messages.warning(request, error)
 
+                # Check if this is an AJAX request
+                if request.headers.get('Accept') == 'application/json':
+                    response_data = {
+                        'success': True,
+                        'message': f'Successfully uploaded {uploaded_images} images',
+                        'redirect_url': '/danao/activities/',
+                        'uploaded_count': uploaded_images
+                    }
+                    
+                    # Include warnings in the response if any
+                    if warnings:
+                        response_data['warnings'] = warnings
+                    
+                    return JsonResponse(response_data)
+                
                 return redirect('activity_listDanao')
             else:
                 for field, error_list in form.errors.items():
@@ -1218,22 +1236,91 @@ def danao_tech_activity_pdf(request):
         'border': colors.HexColor('#e5e7eb'),  # Border Gray
     }
 
-    def add_page_header(page_num):
-        """Add styled header to each page"""
-        # Add background rectangle
-        pdf.setFillColor(colors_dict['light'])
-        pdf.rect(0, height - 80, width, 80, fill=True)
+    def add_page_header(page_num, activity=None):
+        """Add styled header to each page matching the image design exactly"""
+        # Header background
+        header_height = 100
+        pdf.setFillColor(colors.white)
+        pdf.rect(0, height - header_height, width, header_height, fill=True)
         
-        # Add title
-        pdf.setFillColor(colors_dict['dark'])
-        pdf.setFont("Helvetica-Bold", 24)
-        pdf.drawCentredString(width/2, height - 50, "Facility Management Inspection Report")
         
-        # Add date and page number with Philippines time
-        ph_time = localtime(today)  # Convert to Philippines time
+        # Left section - Main Title
+        title_x = 70
+        title_y = height - 40
+        pdf.setFillColor(colors.black)
+        pdf.setFont("Helvetica-Bold", 30)
+        
+        # Title with line breaks to match image
+        pdf.drawString(title_x, title_y, "Facilities Inspection &")
+        pdf.drawString(title_x, title_y - 26, "Maintenance Report")
+        
+        # Activity name under the title
+        if activity and hasattr(activity, 'name') and activity.name:
+            pdf.setFont("Helvetica-Bold", 14)
+            pdf.drawString(title_x, title_y - 45, activity.name)
+        
+        
+        # Right section - Document Metadata Table (4 rows with borders)
+        table_width = 400
+        table_x = width - 450  # Right-aligned, positioned to align with title
+        table_y = height - 8
+        table_height = 80  # Height for 4 rows
+        
+        # Table border
+        pdf.setStrokeColor(colors.HexColor('#d1d5db'))
+        pdf.setLineWidth(1)
+        pdf.rect(table_x, table_y - table_height, table_width, table_height, fill=False)
+        
+        # Table rows and columns (4 rows as shown in image)
+        row_height = table_height / 4
+        col_width = table_width / 2
+        
+        # Draw horizontal lines (3 lines to separate 4 rows)
+        for i in range(1, 4):
+            y_pos = table_y - (i * row_height)
+            pdf.line(table_x, y_pos, table_x + table_width, y_pos)
+        
+        # Draw vertical line
+        pdf.line(table_x + col_width, table_y - table_height, table_x + col_width, table_y)
+        
+        # Table content
+        pdf.setFont("Helvetica", 9)
+        pdf.setFillColor(colors.black)
+        
+        # Document Code (with space as shown in image)
+        pdf.drawString(table_x + 5, table_y - 12, "Document Code:")
+        pdf.drawString(table_x + col_width + 5, table_y - 12, "FM-MP-VM- 01.01")
+        
+        # Revision No.
+        pdf.drawString(table_x + 5, table_y - 12 - row_height, "Revision No.:")
+        pdf.drawString(table_x + col_width + 5, table_y - 12 - row_height, "0")
+        
+        # Effectivity Date
+        pdf.drawString(table_x + 5, table_y - 12 - (2 * row_height), "Effectivity Date:")
+        pdf.drawString(table_x + col_width + 5, table_y - 12 - (2 * row_height), "September 01, 2025")
+        
+        # Retention Period
+        pdf.drawString(table_x + 5, table_y - 12 - (3 * row_height), "Retention Period:")
+        pdf.drawString(table_x + col_width + 5, table_y - 12 - (3 * row_height), "5 Years")
+        
+        # Page number at bottom right
         pdf.setFont("Helvetica", 10)
-        pdf.drawString(50, height - 70, f"Generated on: {ph_time.strftime('%Y-%m-%d %I:%M %p')} (PHT)")
-        pdf.drawRightString(width - 50, height - 70, f"Page {page_num}")
+        pdf.drawRightString(width - 50, height - header_height + 5, f"Page {page_num}")
+
+    def add_footer():
+        """Add footer with generated date to each page"""
+        from datetime import datetime
+        generated_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Footer line
+        pdf.setStrokeColor(colors_dict['border'])
+        pdf.setLineWidth(0.5)
+        pdf.line(50, 50, width - 50, 50)
+        
+        # Generated date at bottom left
+        pdf.setFont("Helvetica", 8)
+        pdf.setFillColor(colors_dict['secondary'])
+        pdf.drawString(60, 30, f"Generated: {generated_date}")
 
     def add_activity_header(y_position, activity):
         """Add styled activity header"""
@@ -1246,14 +1333,21 @@ def danao_tech_activity_pdf(request):
         pdf.setFont("Helvetica-Bold", 14)
         pdf.drawString(60, y_position + 2, f"Activity: {activity.name}")
         
-        return y_position - 40  # Increased spacing after header
+        return y_position - 60  # Increased spacing after header
 
     def add_metadata_section(y_position, activity):
         """Add metadata section with icons and styled layout"""
         pdf.setFont("Helvetica", 10)
         pdf.setFillColor(colors_dict['secondary'])
         
+        # Activity name
+        pdf.drawString(60, y_position, "📋 Activity:")
+        pdf.setFillColor(colors_dict['dark'])
+        pdf.drawString(140, y_position, activity.name)
+        
         # Location
+        y_position -= 20
+        pdf.setFillColor(colors_dict['secondary'])
         pdf.drawString(60, y_position, "📍 Location:")
         pdf.setFillColor(colors_dict['dark'])
         pdf.drawString(140, y_position, activity.location)
@@ -1298,9 +1392,68 @@ def danao_tech_activity_pdf(request):
         
         return y_position - 30
 
+    def add_risk_assessment_section(y_position, activity):
+        """Add risk assessment fields section"""
+        # Check if any risk assessment fields have values
+        if any([activity.potential_risk, activity.probability_of_occurrence, 
+                activity.impact, activity.levels_of_priority]):
+            
+            # Risk Assessment header
+            pdf.setFillColor(colors_dict['primary'])
+            pdf.setFont("Helvetica-Bold", 12)
+            pdf.drawString(60, y_position, "Risk Assessment")
+            y_position -= 25
+            
+            pdf.setFont("Helvetica", 10)
+            
+            # Potential Risk
+            if activity.potential_risk:
+                pdf.setFillColor(colors_dict['secondary'])
+                pdf.drawString(60, y_position, "📊 Potential Risk / Safety / GMP Issues:")
+                pdf.setFillColor(colors_dict['dark'])
+                risk_display = dict(activity.RISK_CHOICES).get(activity.potential_risk, activity.potential_risk)
+                pdf.drawString(280, y_position, risk_display)
+                y_position -= 18
+            
+            # Probability of Occurrence
+            if activity.probability_of_occurrence:
+                pdf.setFillColor(colors_dict['secondary'])
+                pdf.drawString(60, y_position, "📊 Probability of Occurrence:")
+                pdf.setFillColor(colors_dict['dark'])
+                prob_display = dict(activity.PROBABILITY_CHOICES).get(activity.probability_of_occurrence, activity.probability_of_occurrence)
+                pdf.drawString(280, y_position, prob_display.title())
+                y_position -= 18
+            
+            # Impact
+            if activity.impact:
+                pdf.setFillColor(colors_dict['secondary'])
+                pdf.drawString(60, y_position, "💥 Impact:")
+                pdf.setFillColor(colors_dict['dark'])
+                impact_display = dict(activity.IMPACT_CHOICES).get(activity.impact, activity.impact)
+                pdf.drawString(280, y_position, impact_display.title())
+                y_position -= 18
+            
+            # Levels of Priority
+            if activity.levels_of_priority:
+                pdf.setFillColor(colors_dict['secondary'])
+                pdf.drawString(60, y_position, "🎯 Levels of Priority:")
+                pdf.setFillColor(colors_dict['dark'])
+                priority_display = dict(activity.PRIORITY_CHOICES).get(activity.levels_of_priority, activity.levels_of_priority)
+                pdf.drawString(280, y_position, priority_display)
+                y_position -= 25
+        
+        return y_position
+
     def add_remarks_section(y_position, activity):
         """Add styled remarks section with preserved formatting"""
         if activity.remarks:
+            # Check if we have enough space for remarks header
+            if y_position < 150:  # Very low threshold to ensure remarks stays on same page
+                pdf.showPage()
+                y_position = height - 120
+                add_page_header(pdf._pageNumber, activity)
+                add_footer()
+            
             # Remarks header
             pdf.setFillColor(colors_dict['primary'])
             pdf.setFont("Helvetica-Bold", 12)
@@ -1335,6 +1488,13 @@ def danao_tech_activity_pdf(request):
             current_number = 1  # Counter for numbered lists
             
             for line in lines:
+                # Check if we need a new page before adding content
+                if y_position < 120:  # Reduced threshold to allow more content on same page
+                    pdf.showPage()
+                    y_position = height - 120
+                    add_page_header(pdf._pageNumber, activity)
+                    add_footer()
+                
                 # Skip empty lines
                 if not line.strip():
                     y_position -= 15
@@ -1346,12 +1506,12 @@ def danao_tech_activity_pdf(request):
                     pdf.drawString(70, y_position, '•')
                     # Draw text after bullet with proper indentation
                     text = line.strip()[1:].strip()
-                    wrapped_text = textwrap.wrap(text, width=85)
+                    wrapped_text = textwrap.wrap(text, width=120)
                     for i, wrapped_line in enumerate(wrapped_text):
                         if i == 0:
-                            pdf.drawString(85, y_position, wrapped_line)
+                            pdf.drawString(90, y_position, wrapped_line)
                         else:
-                            pdf.drawString(85, y_position - (i * 15), wrapped_line)
+                            pdf.drawString(90, y_position - (i * 15), wrapped_line)
                     y_position -= (len(wrapped_text) * 15) + 5
                 # Handle numbered lists
                 elif line.strip().startswith(str(current_number) + '.'):
@@ -1360,17 +1520,17 @@ def danao_tech_activity_pdf(request):
                     pdf.drawString(70, y_position, number_text)
                     # Draw text after number with proper indentation
                     text = line.strip()[len(number_text):].strip()
-                    wrapped_text = textwrap.wrap(text, width=85)
+                    wrapped_text = textwrap.wrap(text, width=120)
                     for i, wrapped_line in enumerate(wrapped_text):
                         if i == 0:
-                            pdf.drawString(85, y_position, wrapped_line)
+                            pdf.drawString(90, y_position, wrapped_line)
                         else:
-                            pdf.drawString(85, y_position - (i * 15), wrapped_line)
+                            pdf.drawString(90, y_position - (i * 15), wrapped_line)
                     y_position -= (len(wrapped_text) * 15) + 5
                     current_number += 1
                 else:
                     # Regular text without bullet or number
-                    wrapped_text = textwrap.wrap(line, width=90)
+                    wrapped_text = textwrap.wrap(line, width=130)
                     for wrapped_line in wrapped_text:
                         pdf.drawString(70, y_position, wrapped_line)
                         y_position -= 15
@@ -1403,10 +1563,11 @@ def danao_tech_activity_pdf(request):
             image_height = 160  # Adjusted height for better proportions
 
             for i, image in enumerate(images):
-                if y_position < 100:  # Check if we need a new page
+                if y_position < 200:  # Increased threshold to prevent footer overlap
                     pdf.showPage()
-                    y_position = height - 100
-                    add_page_header(pdf._pageNumber)
+                    y_position = height - 120  # Start higher to leave room for footer
+                    add_page_header(pdf._pageNumber, activity)
+                    add_footer()
 
                 row = i // images_per_row
                 col = i % images_per_row
@@ -1421,28 +1582,74 @@ def danao_tech_activity_pdf(request):
                         height=image_height,
                         preserveAspectRatio=True
                     )
+                    
+                    # Add image label if it exists
+                    if image.label:
+                        pdf.setFillColor(colors_dict['dark'])
+                        pdf.setFont("Helvetica", 8)
+                        # Wrap long labels
+                        label_text = image.label
+                        if len(label_text) > 25:  # Adjust based on image width
+                            label_text = label_text[:22] + "..."
+                        pdf.drawCentredString(x_position + (image_width/2), y_position - image_height - 15, label_text)
+                    
                 except Exception as e:
                     print(f"Error adding image: {e}")
 
                 if (i + 1) % images_per_row == 0:
-                    y_position -= (image_height + 30)  # Increased spacing between rows
+                    y_position -= (image_height + 40)  # Increased spacing between rows
 
             if len(images) % images_per_row != 0:
-                y_position -= (image_height + 30)
+                y_position -= (image_height + 40)
 
         return y_position
 
-    # Generate PDF content
-    page_num = 1
-    for activity in activities:
-        if page_num > 1:
-            pdf.showPage()
+    def add_cover_page():
+        """Add simple cover page without styling"""
         
-        add_page_header(page_num)
-        y_position = height - 100
+        # Simple white background
+        pdf.setFillColor(colors.white)
+        pdf.rect(0, 0, width, height, fill=True)
+        
+        # Main Title - "Facilities Inspection & Maintenance Report"
+        title_y = height - 200
+        pdf.setFillColor(colors.HexColor('#1e40af'))  # Dark blue color
+        pdf.setFont("Helvetica-Bold", 34)
+        pdf.drawString(40, title_y, "Facilities Inspection & Maintenance Report")
+        
+        # Subtitle 1 - "JWS Facilities Management"
+        subtitle1_y = title_y - 60
+        pdf.setFillColor(colors.HexColor('#1e40af'))  # Dark blue color
+        pdf.setFont("Helvetica-Bold", 20)
+        pdf.drawString(40, subtitle1_y, "JWS Facilities Management")
+        
+        # Subtitle 2 - "VisMin"
+        subtitle2_y = subtitle1_y - 50
+        pdf.setFillColor(colors.HexColor('#1e40af'))  # Dark blue color
+        pdf.setFont("Helvetica-Bold", 16)
+        pdf.drawString(40, subtitle2_y, "VisMin")
+        
+        # Add footer to cover page
+        add_footer()
+
+    # Generate PDF content
+    # Add cover page first (no showPage() here - it will be called after)
+    add_cover_page()
+    
+    # Move to next page after cover page to preserve it
+    pdf.showPage()
+    
+    # Start report page numbering (cover page is not numbered)
+    report_page_num = 2
+    
+    for activity in activities:
+        # PAGE 2: Report Details, Remarks, and Risk Assessment (No Images)
+        # Add page header for content page
+        add_page_header(report_page_num, activity)
+        add_footer()
+        y_position = height - 130
         
         # Add activity content
-        y_position = add_activity_header(y_position, activity)
         y_position = add_metadata_section(y_position, activity)
         
         # Add separator line
@@ -1450,16 +1657,70 @@ def danao_tech_activity_pdf(request):
         pdf.line(60, y_position, width - 60, y_position)
         y_position -= 20
         
-        y_position = add_remarks_section(y_position, activity)
+        # Add risk assessment section
+        y_position = add_risk_assessment_section(y_position, activity)
         
-        # Another separator before images
+        # Add separator line before remarks
         pdf.setStrokeColor(colors_dict['border'])
         pdf.line(60, y_position, width - 60, y_position)
         y_position -= 20
         
-        y_position = add_images_section(y_position, activity)
+        # Check if we have enough space for remarks section before calling it
+        if y_position < 100:  # Very low threshold to ensure remarks stays on same page
+            pdf.showPage()
+            y_position = height - 120
+            add_page_header(pdf._pageNumber, activity)
+            add_footer()
         
-        page_num += 1
+        y_position = add_remarks_section(y_position, activity)
+        
+        # Only create images page if there are images to display
+        if include_images and activity.imagesDanao.exists():
+            # Move to next page for images
+            pdf.showPage()
+            
+            # PAGE 3: Dedicated Images and Labels Page
+            # Add page header for images page
+            add_page_header(pdf._pageNumber, activity)
+            add_footer()
+            y_position = height - 120
+            
+            # Add activity header for images page (removed activity header)
+            
+            # Add images section (dedicated page for images only)
+            y_position = add_images_section(y_position, activity)
+            
+            # Add end of report text
+            # Check if we have enough space for end text
+            if y_position < 150:  # Need space for end text + footer
+                pdf.showPage()
+                y_position = height - 120
+                add_page_header(pdf._pageNumber, activity)
+                add_footer()
+            
+            y_position -= 30
+            pdf.setFont("Helvetica-Bold", 14)
+            pdf.setFillColor(colors_dict['primary'])
+            pdf.drawString(60, y_position, "End of the Report")
+            
+            y_position -= 20
+            pdf.setFont("Helvetica", 12)
+            pdf.setFillColor(colors_dict['dark'])
+            pdf.drawString(60, y_position, "Thank you!")
+        else:
+            # No images, add end text to current page
+            y_position -= 30
+            pdf.setFont("Helvetica-Bold", 14)
+            pdf.setFillColor(colors_dict['primary'])
+            pdf.drawString(60, y_position, "End of the Report")
+            
+            y_position -= 20
+            pdf.setFont("Helvetica", 12)
+            pdf.setFillColor(colors_dict['dark'])
+            pdf.drawString(60, y_position, "Thank you!")
+        
+        # Move to next page for next activity (if any)
+        pdf.showPage()
 
     # Save PDF
     pdf.save()
@@ -1467,7 +1728,7 @@ def danao_tech_activity_pdf(request):
 
     # Create response
     response = HttpResponse(buffer, content_type="application/pdf")
-    filename = f"technical_activities_report_{today.strftime('%Y%m%d')}.pdf"
+    filename = f"Facilities Inspection & Maintenance Report_{today.strftime('%Y%m%d')}.pdf"
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
     return response
