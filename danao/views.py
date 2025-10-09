@@ -1649,12 +1649,12 @@ def danao_tech_activity_pdf(request):
     def add_cover_page():
         """Add simple cover page without styling"""
         
-        # Add watermark to cover page
-        add_watermark(pdf, width, height)
-        
         # Simple white background
         pdf.setFillColor(colors.white)
         pdf.rect(0, 0, width, height, fill=True)
+        
+        # Add watermark to cover page (after background)
+        add_watermark(pdf, width, height)
         
         # Main Title - "Facilities Inspection & Maintenance Report"
         title_y = height - 200

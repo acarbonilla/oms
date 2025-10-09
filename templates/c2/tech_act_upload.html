@@ -1561,14 +1561,14 @@
         // Force redirect - try multiple methods
         setTimeout(() => {
             console.log('Executing redirect...');
-            window.location.href = '/c2/activities/';
+            window.location.href = '/c2/tech-activity/list/';
         }, 100);
         
         // Backup redirect
         setTimeout(() => {
             if (window.location.pathname.includes('upload')) {
                 console.log('Backup redirect executing...');
-                window.location.replace('/c2/activities/');
+                window.location.replace('/c2/tech-activity/list/');
             }
         }, 500);
     }
@@ -1689,7 +1689,7 @@
                         console.log('Attempting immediate redirect...');
                         setTimeout(() => {
                             console.log('Force redirecting...');
-                            window.location.href = '/c2/activities/';
+                            window.location.href = '/c2/tech-activity/list/';
                         }, 500);
                         
                         setTimeout(() => {

@@ -1291,7 +1291,7 @@ def mindanao_tech_activity_pdf(request):
     }
 
     def add_page_header(page_num, activity=None):
-        """Add styled header to each page matching the Danao design"""
+        """Add styled header to each page matching the image design exactly"""
         # Add watermark to every page
         add_watermark(pdf, width, height)
         
@@ -1300,24 +1300,26 @@ def mindanao_tech_activity_pdf(request):
         pdf.setFillColor(colors.white)
         pdf.rect(0, height - header_height, width, header_height, fill=True)
         
+        
         # Left section - Main Title
-        title_x = 70
+        title_x = 50
         title_y = height - 40
         pdf.setFillColor(colors.black)
         pdf.setFont("Helvetica-Bold", 30)
         
-        # Title with line breaks to match Danao design
-        pdf.drawString(title_x, title_y, "Facilities Inspection &")
-        pdf.drawString(title_x, title_y - 26, "Maintenance Report")
+        # Title with line breaks to match image
+        pdf.drawString(title_x, title_y, "Facilities Inspection & Maintenance Report")
+        # pdf.drawString(title_x, title_y - 26, "Maintenance Report")
         
         # Activity name under the title
         if activity and hasattr(activity, 'name') and activity.name:
             pdf.setFont("Helvetica-Bold", 14)
             pdf.drawString(title_x, title_y - 45, activity.name)
         
+        
         # Right section - Document Metadata Table (4 rows with borders)
-        table_width = 400
-        table_x = width - 450  # Right-aligned, positioned to align with title
+        table_width = 300
+        table_x = width - 320  # Right-aligned, positioned to avoid overlapping with title
         table_y = height - 8
         table_height = 80  # Height for 4 rows
         
@@ -1388,7 +1390,7 @@ def mindanao_tech_activity_pdf(request):
         pdf.setFont("Helvetica-Bold", 14)
         pdf.drawString(60, y_position + 2, f"Activity: {activity.name}")
 
-        return y_position - 40  # Increased spacing after header
+        return y_position - 60  # Increased spacing after header
 
     def add_metadata_section(y_position, activity):
         """Add metadata section with icons and styled layout"""
@@ -1446,6 +1448,58 @@ def mindanao_tech_activity_pdf(request):
             pdf.drawString(140, y_position, full_name or "N/A")
 
         return y_position - 30
+
+    def add_risk_assessment_section(y_position, activity):
+        """Add risk assessment fields section"""
+        # Check if any risk assessment fields have values
+        if any([activity.potential_risk, activity.probability_of_occurrence, 
+                activity.impact, activity.levels_of_priority]):
+            
+            # Risk Assessment header
+            pdf.setFillColor(colors_dict['primary'])
+            pdf.setFont("Helvetica-Bold", 12)
+            pdf.drawString(60, y_position, "Risk Assessment")
+            y_position -= 25
+            
+            pdf.setFont("Helvetica", 10)
+            
+            # Potential Risk
+            if activity.potential_risk:
+                pdf.setFillColor(colors_dict['secondary'])
+                pdf.drawString(60, y_position, "📊 Potential Risk / Safety / GMP Issues:")
+                pdf.setFillColor(colors_dict['dark'])
+                risk_display = dict(activity.RISK_CHOICES).get(activity.potential_risk, activity.potential_risk)
+                pdf.drawString(280, y_position, risk_display)
+                y_position -= 18
+            
+            # Probability of Occurrence
+            if activity.probability_of_occurrence:
+                pdf.setFillColor(colors_dict['secondary'])
+                pdf.drawString(60, y_position, "📊 Probability of Occurrence:")
+                pdf.setFillColor(colors_dict['dark'])
+                prob_display = dict(activity.PROBABILITY_CHOICES).get(activity.probability_of_occurrence, activity.probability_of_occurrence)
+                pdf.drawString(280, y_position, prob_display.title())
+                y_position -= 18
+            
+            # Impact
+            if activity.impact:
+                pdf.setFillColor(colors_dict['secondary'])
+                pdf.drawString(60, y_position, "💥 Impact:")
+                pdf.setFillColor(colors_dict['dark'])
+                impact_display = dict(activity.IMPACT_CHOICES).get(activity.impact, activity.impact)
+                pdf.drawString(280, y_position, impact_display.title())
+                y_position -= 18
+            
+            # Levels of Priority
+            if activity.levels_of_priority:
+                pdf.setFillColor(colors_dict['secondary'])
+                pdf.drawString(60, y_position, "🎯 Levels of Priority:")
+                pdf.setFillColor(colors_dict['dark'])
+                priority_display = dict(activity.PRIORITY_CHOICES).get(activity.levels_of_priority, activity.levels_of_priority)
+                pdf.drawString(280, y_position, priority_display)
+                y_position -= 25
+        
+        return y_position
 
     def add_remarks_section(y_position, activity):
         """Add styled remarks section with preserved formatting"""
@@ -1507,12 +1561,12 @@ def mindanao_tech_activity_pdf(request):
                     pdf.drawString(70, y_position, '•')
                     # Draw text after bullet with proper indentation
                     text = line.strip()[1:].strip()
-                    wrapped_text = textwrap.wrap(text, width=85)
+                    wrapped_text = textwrap.wrap(text, width=120)
                     for i, wrapped_line in enumerate(wrapped_text):
                         if i == 0:
-                            pdf.drawString(85, y_position, wrapped_line)
+                            pdf.drawString(90, y_position, wrapped_line)
                         else:
-                            pdf.drawString(85, y_position - (i * 15), wrapped_line)
+                            pdf.drawString(90, y_position - (i * 15), wrapped_line)
                     y_position -= (len(wrapped_text) * 15) + 5
                 # Handle numbered lists
                 elif line.strip().startswith(str(current_number) + '.'):
@@ -1521,17 +1575,17 @@ def mindanao_tech_activity_pdf(request):
                     pdf.drawString(70, y_position, number_text)
                     # Draw text after number with proper indentation
                     text = line.strip()[len(number_text):].strip()
-                    wrapped_text = textwrap.wrap(text, width=85)
+                    wrapped_text = textwrap.wrap(text, width=120)
                     for i, wrapped_line in enumerate(wrapped_text):
                         if i == 0:
-                            pdf.drawString(85, y_position, wrapped_line)
+                            pdf.drawString(90, y_position, wrapped_line)
                         else:
-                            pdf.drawString(85, y_position - (i * 15), wrapped_line)
+                            pdf.drawString(90, y_position - (i * 15), wrapped_line)
                     y_position -= (len(wrapped_text) * 15) + 5
                     current_number += 1
                 else:
                     # Regular text without bullet or number
-                    wrapped_text = textwrap.wrap(line, width=90)
+                    wrapped_text = textwrap.wrap(line, width=130)
                     for wrapped_line in wrapped_text:
                         pdf.drawString(70, y_position, wrapped_line)
                         y_position -= 15
@@ -1582,6 +1636,17 @@ def mindanao_tech_activity_pdf(request):
                         height=image_height,
                         preserveAspectRatio=True
                     )
+                    
+                    # Add image label if it exists
+                    if image.label:
+                        pdf.setFillColor(colors_dict['dark'])
+                        pdf.setFont("Helvetica", 8)
+                        # Wrap long labels
+                        label_text = image.label
+                        if len(label_text) > 25:  # Adjust based on image width
+                            label_text = label_text[:22] + "..."
+                        pdf.drawCentredString(x_position + (image_width/2), y_position - image_height - 15, label_text)
+                    
                 except Exception as e:
                     print(f"Error adding image: {e}")
 
@@ -1593,59 +1658,126 @@ def mindanao_tech_activity_pdf(request):
 
         return y_position
 
-    # Generate PDF content
-    page_num = 2  # Start from page 2 (cover page is page 1)
-    for activity in activities:
-        if page_num > 2:
-            pdf.showPage()
+    def add_cover_page():
+        """Add simple cover page without styling"""
+        
+        # Simple white background
+        pdf.setFillColor(colors.white)
+        pdf.rect(0, 0, width, height, fill=True)
+        
+        # Add watermark to cover page (after background)
+        add_watermark(pdf, width, height)
+        
+        # Main Title - "Facilities Inspection & Maintenance Report"
+        title_y = height - 200
+        pdf.setFillColor(colors.black)  # Dark blue color
+        pdf.setFont("Helvetica-Bold", 34)
+        pdf.drawString(40, title_y, "Facilities Inspection & Maintenance Report")
+        
+        # Subtitle 1 - "JWS Facilities Management"
+        subtitle1_y = title_y - 60
+        pdf.setFillColor(colors.black)  # Dark blue color
+        pdf.setFont("Helvetica-Bold", 20)
+        pdf.drawString(40, subtitle1_y, "JWS Facilities Management")
+        
+        # Subtitle 2 - "VisMin"
+        subtitle2_y = subtitle1_y - 50
+        pdf.setFillColor(colors.black)  # Dark blue color
+        pdf.setFont("Helvetica-Bold", 16)
+        pdf.drawString(40, subtitle2_y, "VisMin")
+        
+        # Add footer to cover page
+        add_footer()
 
-        add_page_header(pdf._pageNumber, activity)
+    # Generate PDF content
+    # Add cover page first (no showPage() here - it will be called after)
+    add_cover_page()
+    
+    # Move to next page after cover page to preserve it
+    pdf.showPage()
+    
+    # Start report page numbering (cover page is not numbered)
+    report_page_num = 2
+    
+    for activity in activities:
+        # PAGE 2: Report Details, Remarks, and Risk Assessment (No Images)
+        # Add page header for content page
+        add_page_header(report_page_num, activity)
         add_footer()
         y_position = height - 130
-
+        
         # Add activity content
-        y_position = add_activity_header(y_position, activity)
         y_position = add_metadata_section(y_position, activity)
-
+        
         # Add separator line
         pdf.setStrokeColor(colors_dict['border'])
         pdf.line(60, y_position, width - 60, y_position)
         y_position -= 20
-
+        
+        # Add risk assessment section
+        y_position = add_risk_assessment_section(y_position, activity)
+        
+        # Add separator line before remarks
+        pdf.setStrokeColor(colors_dict['border'])
+        pdf.line(60, y_position, width - 60, y_position)
+        y_position -= 20
+        
         # Check if we have enough space for remarks section before calling it
         if y_position < 100:  # Very low threshold to ensure remarks stays on same page
             pdf.showPage()
             y_position = height - 120
-            add_page_header(pdf._pageNumber)
-
+            add_page_header(pdf._pageNumber, activity)
+            add_footer()
+        
         y_position = add_remarks_section(y_position, activity)
-
-        # Another separator before images
-        pdf.setStrokeColor(colors_dict['border'])
-        pdf.line(60, y_position, width - 60, y_position)
-        y_position -= 20
-
-        y_position = add_images_section(y_position, activity)
-
-        # Add end of report text
-        # Add end of report text
-        # Check if we have enough space for end text
-        if y_position < 150:  # Need space for end text + footer
+        
+        # Only create images page if there are images to display
+        if include_images and activity.imagesMindanao.exists():
+            # Move to next page for images
             pdf.showPage()
+            
+            # PAGE 3: Dedicated Images and Labels Page
+            # Add page header for images page
+            add_page_header(pdf._pageNumber, activity)
+            add_footer()
             y_position = height - 120
-            add_page_header(pdf._pageNumber)
+            
+            # Add activity header for images page (removed activity header)
+            
+            # Add images section (dedicated page for images only)
+            y_position = add_images_section(y_position, activity)
+            
+            # Add end of report text
+            # Check if we have enough space for end text
+            if y_position < 150:  # Need space for end text + footer
+                pdf.showPage()
+                y_position = height - 120
+                add_page_header(pdf._pageNumber, activity)
+                add_footer()
+            
+            y_position -= 30
+            pdf.setFont("Helvetica-Bold", 14)
+            pdf.setFillColor(colors_dict['primary'])
+            pdf.drawString(60, y_position, "End of the Report")
+            
+            y_position -= 20
+            pdf.setFont("Helvetica", 12)
+            pdf.setFillColor(colors_dict['dark'])
+            pdf.drawString(60, y_position, "Thank you!")
+        else:
+            # No images, add end text to current page
+            y_position -= 30
+            pdf.setFont("Helvetica-Bold", 14)
+            pdf.setFillColor(colors_dict['primary'])
+            pdf.drawString(60, y_position, "End of the Report")
+            
+            y_position -= 20
+            pdf.setFont("Helvetica", 12)
+            pdf.setFillColor(colors_dict['dark'])
+            pdf.drawString(60, y_position, "Thank you!")
         
-        y_position -= 30
-        pdf.setFont("Helvetica-Bold", 14)
-        pdf.setFillColor(colors_dict['primary'])
-        pdf.drawString(60, y_position, "End of the Report")
-        
-        y_position -= 20
-        pdf.setFont("Helvetica", 12)
-        pdf.setFillColor(colors_dict['dark'])
-        pdf.drawString(60, y_position, "Thank you!")
-
-        page_num += 1
+        # Move to next page for next activity (if any)
+        pdf.showPage()
 
     # Save PDF
     pdf.save()
@@ -1653,7 +1785,7 @@ def mindanao_tech_activity_pdf(request):
 
     # Create response
     response = HttpResponse(buffer, content_type="application/pdf")
-    filename = f"technical_activities_report_{today.strftime('%Y%m%d')}.pdf"
+    filename = f"Facilities Inspection & Maintenance Report_{today.strftime('%Y%m%d')}.pdf"
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
     return response
