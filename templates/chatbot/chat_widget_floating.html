@@ -1,0 +1,859 @@
+<!-- Floating Chat Widget -->
+<div id="floatingChatWidget" class="floating-chat-widget">
+    <!-- Chat Button -->
+    <div id="chatButton" class="chat-button">
+        <i class="fas fa-comments"></i>
+        <span class="notification-badge d-none">1</span>
+    </div>
+    
+    <!-- Chat Window -->
+    <div id="chatWindow" class="chat-window d-none">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="ms-2">
+                        <h6 class="mb-0">OMS Assistant</h6>
+                        <small class="text-muted">Online</small>
+                    </div>
+                </div>
+                <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-outline-light" id="minimizeChat">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-light" id="closeChat">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Messages Container -->
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+                <div class="message-bubble bot-message">
+                    <div class="message-content">
+                        <i class="fas fa-robot me-2 text-primary"></i>
+                        Hello! I'm your OMS Assistant. How can I help you with operations management today?
+                    </div>
+                    <div class="message-time">
+                        <i class="fas fa-clock me-1"></i>
+                        <span id="welcomeTime"></span>
+                    </div>
+                </div>
+                
+                <!-- Initial Suggested Questions (will be shown after first bot response) -->
+                <div class="suggested-questions" style="display: none;">
+                    <div class="suggested-question" data-question="Show me facility statistics">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Show me facility statistics
+                    </div>
+                    <div class="suggested-question" data-question="How many activities this month?">
+                        <i class="fas fa-calendar me-2"></i>
+                        How many activities this month?
+                    </div>
+                    <div class="suggested-question" data-question="Search for facility">
+                        <i class="fas fa-search me-2"></i>
+                        Search for facility
+                    </div>
+                    <div class="suggested-question" data-question="Show my activities">
+                        <i class="fas fa-user me-2"></i>
+                        Show my activities
+                    </div>
+                    
+                    <!-- More Questions Button -->
+                    <div class="more-questions-btn" onclick="toggleMoreQuestions()">
+                        <i class="fas fa-ellipsis-h me-2"></i>
+                        More questions...
+                    </div>
+                    
+                    <!-- Additional Questions (Hidden by default) -->
+                    <div class="additional-questions" style="display: none;">
+                        <div class="suggested-question" data-question="What's the risk distribution?">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            What's the risk distribution?
+                        </div>
+                        <div class="suggested-question" data-question="Show me high priority activities">
+                            <i class="fas fa-flag me-2"></i>
+                            Show me high priority activities
+                        </div>
+                        <div class="suggested-question" data-question="How many facilities need QR codes?">
+                            <i class="fas fa-qrcode me-2"></i>
+                            How many facilities need QR codes?
+                        </div>
+                        <div class="suggested-question" data-question="What can you help me with?">
+                            <i class="fas fa-question-circle me-2"></i>
+                            What can you help me with?
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Input Area -->
+        <div class="chat-input">
+            <div class="input-group">
+                <input type="text" 
+                       class="form-control form-control-sm" 
+                       id="messageInput" 
+                       placeholder="Type your message..."
+                       autocomplete="off">
+                <button class="btn btn-primary btn-sm" type="button" id="sendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Typing Indicator Template -->
+<div id="typingIndicatorTemplate" class="d-none">
+    <div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+    </div>
+</div>
+
+<style>
+/* Floating Chat Widget Styles */
+.floating-chat-widget {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    top: auto !important;
+    z-index: 9999 !important;
+    font-family: 'Poppins', sans-serif;
+    width: auto !important;
+    height: auto !important;
+    margin-top: 0 !important;
+}
+
+.chat-button {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 123, 255, 0.4);
+    transition: all 0.3s ease;
+    position: relative;
+    color: white;
+    font-size: 24px;
+}
+
+.chat-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(0, 123, 255, 0.6);
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.chat-window {
+    position: absolute !important;
+    bottom: 80px !important;
+    right: 0 !important;
+    width: 350px !important;
+    height: 500px !important;
+    max-height: calc(100vh - 120px) !important; /* Ensure it doesn't exceed viewport */
+    background: white !important;
+    border-radius: 15px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    display: none !important; /* Hidden by default */
+    flex-direction: column !important;
+    overflow: hidden !important;
+    animation: slideUp 0.3s ease-out !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    top: auto !important;
+}
+
+.chat-window.show {
+    display: flex !important;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chat-header {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 15px;
+    flex-shrink: 0;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chat-input {
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #e9ecef;
+    flex-shrink: 0;
+}
+
+.message-bubble {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.4;
+    animation: fadeInUp 0.3s ease-out;
+}
+
+.user-message {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    margin-left: auto;
+    text-align: right;
+}
+
+.bot-message {
+    background: white;
+    color: #333;
+    margin-right: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.message-time {
+    font-size: 11px;
+    margin-top: 4px;
+    opacity: 0.7;
+    color: #6c757d;
+}
+
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 14px;
+    background: white;
+    border-radius: 18px;
+    max-width: 60px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.typing-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #007bff;
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Suggested Questions Styles */
+.suggested-questions {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.suggested-question {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 12px;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.suggested-question:hover {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border-color: #007bff;
+    transform: translateX(-2px);
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.suggested-question i {
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+.suggested-question:hover i {
+    opacity: 1;
+}
+
+.more-questions-btn {
+    background: linear-gradient(135deg, #6c757d, #495057);
+    border: 1px solid #6c757d;
+    border-radius: 12px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 11px;
+    color: white;
+    display: flex;
+    align-items: center;
+    max-width: 150px;
+    margin-left: auto;
+    margin-right: 0;
+    margin-top: 5px;
+}
+
+.more-questions-btn:hover {
+    background: linear-gradient(135deg, #495057, #343a40);
+    transform: translateX(-2px);
+    box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+}
+
+.additional-questions {
+    margin-top: 8px;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scrollbar Styling */
+.chat-messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: rgba(0, 123, 255, 0.3);
+    border-radius: 2px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 123, 255, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .chat-window {
+        width: 300px !important;
+        height: 450px !important;
+        max-height: calc(100vh - 100px) !important;
+        right: -10px !important;
+        bottom: 80px !important;
+    }
+    
+    .floating-chat-widget {
+        bottom: 15px !important;
+        right: 15px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-window {
+        width: calc(100vw - 30px) !important;
+        height: 400px !important;
+        max-height: calc(100vh - 80px) !important;
+        right: -15px !important;
+        bottom: 80px !important;
+    }
+}
+
+/* Override any container styles that might affect the chat widget */
+.floating-chat-widget * {
+    box-sizing: border-box !important;
+}
+
+.floating-chat-widget {
+    /* Ensure it's not affected by any parent container styles */
+    float: none !important;
+    clear: none !important;
+    display: block !important;
+}
+
+/* Ensure chat widget doesn't overlap with fixed navigation */
+body {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* Additional positioning safety */
+.floating-chat-widget {
+    /* Force positioning relative to viewport, not any parent */
+    transform: none !important;
+    will-change: auto !important;
+}
+</style>
+
+<script>
+class FloatingChatWidget {
+    constructor() {
+        this.isOpen = false;
+        this.currentSessionId = null;
+        this.isLoading = false;
+        this.init();
+    }
+
+    init() {
+        this.bindEvents();
+        this.updateWelcomeTime();
+        // Ensure chat starts closed
+        this.closeChat();
+    }
+
+    bindEvents() {
+        const chatButton = document.getElementById('chatButton');
+        const closeChat = document.getElementById('closeChat');
+        const minimizeChat = document.getElementById('minimizeChat');
+        const sendBtn = document.getElementById('sendBtn');
+        const messageInput = document.getElementById('messageInput');
+
+        if (chatButton) {
+            chatButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.toggleChat();
+            });
+        }
+
+        if (closeChat) {
+            closeChat.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.closeChat();
+            });
+        }
+
+        if (minimizeChat) {
+            minimizeChat.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.minimizeChat();
+            });
+        }
+
+        if (sendBtn) {
+            sendBtn.addEventListener('click', () => this.sendMessage());
+        }
+        
+        if (messageInput) {
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendMessage();
+                }
+            });
+        }
+
+        // Add event listeners for suggested questions (including additional ones)
+        this.setupSuggestedQuestions();
+    }
+
+    toggleChat() {
+        if (this.isOpen) {
+            this.closeChat();
+        } else {
+            this.openChat();
+        }
+    }
+
+    openChat() {
+        const chatWindow = document.getElementById('chatWindow');
+        if (chatWindow) {
+            chatWindow.classList.remove('d-none');
+            chatWindow.classList.add('show');
+            this.isOpen = true;
+            
+            // Focus on input
+            setTimeout(() => {
+                const messageInput = document.getElementById('messageInput');
+                if (messageInput) {
+                    messageInput.focus();
+                }
+            }, 300);
+        }
+    }
+
+    closeChat() {
+        const chatWindow = document.getElementById('chatWindow');
+        if (chatWindow) {
+            chatWindow.classList.add('d-none');
+            chatWindow.classList.remove('show');
+        }
+        this.isOpen = false;
+    }
+
+    minimizeChat() {
+        this.closeChat();
+    }
+
+    async sendMessage() {
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value.trim();
+
+        if (!message || this.isLoading) return;
+
+        // Add user message to chat
+        this.addMessage(message, 'user');
+        messageInput.value = '';
+
+        // Show typing indicator
+        this.showTypingIndicator();
+
+        try {
+            this.isLoading = true;
+            this.updateSendButton(false);
+
+            const response = await fetch('/chatbot/send-message/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': this.getCSRFToken()
+                },
+                body: JSON.stringify({
+                    message: message,
+                    session_id: this.currentSessionId
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Update session ID if it's a new session
+                if (!this.currentSessionId) {
+                    this.currentSessionId = data.session_id;
+                }
+
+                // Remove typing indicator and add bot response
+                this.hideTypingIndicator();
+                this.addMessage(data.bot_response, 'bot');
+            } else {
+                this.hideTypingIndicator();
+                this.addMessage('Sorry, I encountered an error. Please try again.', 'bot');
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            this.hideTypingIndicator();
+            this.addMessage('Sorry, I\'m having trouble connecting. Please try again.', 'bot');
+        } finally {
+            this.isLoading = false;
+            this.updateSendButton(true);
+        }
+    }
+
+    addMessage(content, type) {
+        const chatMessages = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message-bubble ${type}-message`;
+
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                ${type === 'bot' ? '<i class="fas fa-robot me-2 text-primary"></i>' : ''}
+                ${this.escapeHtml(content)}
+            </div>
+            <div class="message-time">
+                <i class="fas fa-clock me-1"></i>
+                ${timeString}
+            </div>
+        `;
+
+        chatMessages.appendChild(messageDiv);
+        
+        // Hide existing suggestions and show new ones after bot responses
+        if (type === 'bot') {
+            this.hideSuggestedQuestions();
+            setTimeout(() => {
+                this.showSuggestedQuestions();
+            }, 500); // Small delay for better UX
+        } else {
+            this.hideSuggestedQuestions(); // Hide suggestions after user messages
+        }
+        
+        this.scrollToBottom();
+    }
+
+    showTypingIndicator() {
+        const chatMessages = document.getElementById('chatMessages');
+        const typingDiv = document.createElement('div');
+        typingDiv.id = 'typingIndicator';
+        typingDiv.className = 'typing-indicator';
+        typingDiv.innerHTML = `
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        `;
+
+        chatMessages.appendChild(typingDiv);
+        this.scrollToBottom();
+    }
+
+    hideTypingIndicator() {
+        const typingIndicator = document.getElementById('typingIndicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+    }
+
+    scrollToBottom() {
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    updateSendButton(enabled) {
+        const sendBtn = document.getElementById('sendBtn');
+        sendBtn.disabled = !enabled;
+        sendBtn.innerHTML = enabled ? '<i class="fas fa-paper-plane"></i>' : '<i class="fas fa-spinner fa-spin"></i>';
+    }
+
+    updateWelcomeTime() {
+        const welcomeTime = document.getElementById('welcomeTime');
+        if (welcomeTime) {
+            welcomeTime.textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    setupSuggestedQuestions() {
+        // This will be called whenever new questions are added (including additional ones)
+        const suggestedQuestions = document.querySelectorAll('.suggested-question');
+        suggestedQuestions.forEach(question => {
+            // Remove existing listeners to avoid duplicates
+            question.removeEventListener('click', this.handleSuggestedQuestionClick);
+            // Add new listener
+            question.addEventListener('click', this.handleSuggestedQuestionClick.bind(this));
+        });
+    }
+
+    handleSuggestedQuestionClick(event) {
+        const question = event.currentTarget;
+        const questionText = question.getAttribute('data-question');
+        if (questionText) {
+            document.getElementById('messageInput').value = questionText;
+            this.sendMessage();
+            this.hideSuggestedQuestions();
+        }
+    }
+
+    showSuggestedQuestions() {
+        const chatMessages = document.getElementById('chatMessages');
+        
+        // Remove existing suggested questions if any
+        const existingSuggestions = chatMessages.querySelectorAll('.suggested-questions');
+        existingSuggestions.forEach(suggestion => suggestion.remove());
+        
+        // Get the last bot message to determine context
+        const lastBotMessage = this.getLastBotMessage();
+        const suggestions = this.getContextualSuggestions(lastBotMessage);
+        
+        // Create new suggested questions container
+        const suggestionsDiv = document.createElement('div');
+        suggestionsDiv.className = 'suggested-questions';
+        
+        let suggestionsHTML = '';
+        suggestions.forEach(suggestion => {
+            suggestionsHTML += `
+                <div class="suggested-question" data-question="${suggestion.text}">
+                    <i class="${suggestion.icon} me-2"></i>
+                    ${suggestion.text}
+                </div>
+            `;
+        });
+        
+        suggestionsDiv.innerHTML = suggestionsHTML + `
+            <!-- More Questions Button -->
+            <div class="more-questions-btn" onclick="toggleMoreQuestions()">
+                <i class="fas fa-ellipsis-h me-2"></i>
+                More questions...
+            </div>
+            
+            <!-- Additional Questions (Hidden by default) -->
+            <div class="additional-questions" style="display: none;">
+                <div class="suggested-question" data-question="What's the risk distribution?">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    What's the risk distribution?
+                </div>
+                <div class="suggested-question" data-question="Show me high priority activities">
+                    <i class="fas fa-flag me-2"></i>
+                    Show me high priority activities
+                </div>
+                <div class="suggested-question" data-question="How many facilities need QR codes?">
+                    <i class="fas fa-qrcode me-2"></i>
+                    How many facilities need QR codes?
+                </div>
+                <div class="suggested-question" data-question="What can you help me with?">
+                    <i class="fas fa-question-circle me-2"></i>
+                    What can you help me with?
+                </div>
+            </div>
+        `;
+        
+        chatMessages.appendChild(suggestionsDiv);
+        
+        // Setup event listeners for the new questions
+        this.setupSuggestedQuestions();
+        
+        // Scroll to bottom to show the new suggestions
+        this.scrollToBottom();
+    }
+
+    getLastBotMessage() {
+        const messages = document.querySelectorAll('.bot-message');
+        if (messages.length > 0) {
+            const lastMessage = messages[messages.length - 1];
+            return lastMessage.querySelector('.message-content')?.textContent || '';
+        }
+        return '';
+    }
+
+    getContextualSuggestions(lastMessage) {
+        const message = lastMessage.toLowerCase();
+        
+        // Context-aware suggestions based on the last response
+        if (message.includes('facility') && message.includes('statistics')) {
+            return [
+                { text: "Show me activity statistics", icon: "fas fa-chart-line" },
+                { text: "Search for specific facility", icon: "fas fa-search" },
+                { text: "How many facilities need QR codes?", icon: "fas fa-qrcode" },
+                { text: "Show my activities", icon: "fas fa-user" }
+            ];
+        } else if (message.includes('activity') && message.includes('statistics')) {
+            return [
+                { text: "Show me facility statistics", icon: "fas fa-chart-bar" },
+                { text: "What's the risk distribution?", icon: "fas fa-exclamation-triangle" },
+                { text: "Show me high priority activities", icon: "fas fa-flag" },
+                { text: "Search for activities", icon: "fas fa-search" }
+            ];
+        } else if (message.includes('search') || message.includes('found')) {
+            return [
+                { text: "Show me facility statistics", icon: "fas fa-chart-bar" },
+                { text: "Show me activity statistics", icon: "fas fa-chart-line" },
+                { text: "Search for different facility", icon: "fas fa-search" },
+                { text: "Show my activities", icon: "fas fa-user" }
+            ];
+        } else if (message.includes('my activities')) {
+            return [
+                { text: "Show me facility statistics", icon: "fas fa-chart-bar" },
+                { text: "Show me activity statistics", icon: "fas fa-chart-line" },
+                { text: "Search for facilities", icon: "fas fa-search" },
+                { text: "What can you help me with?", icon: "fas fa-question-circle" }
+            ];
+        } else {
+            // Default suggestions
+            return [
+                { text: "Show me facility statistics", icon: "fas fa-chart-bar" },
+                { text: "How many activities this month?", icon: "fas fa-calendar" },
+                { text: "Search for facility", icon: "fas fa-search" },
+                { text: "Show my activities", icon: "fas fa-user" }
+            ];
+        }
+    }
+
+    hideSuggestedQuestions() {
+        const suggestedQuestions = document.querySelectorAll('.suggested-questions');
+        suggestedQuestions.forEach(questions => {
+            questions.remove();
+        });
+    }
+
+    getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+               document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+               '';
+    }
+}
+
+// Global function for toggling more questions
+function toggleMoreQuestions() {
+    const additionalQuestions = document.querySelector('.additional-questions');
+    const moreBtn = document.querySelector('.more-questions-btn');
+    
+    if (additionalQuestions && moreBtn) {
+        if (additionalQuestions.style.display === 'none') {
+            additionalQuestions.style.display = 'block';
+            moreBtn.innerHTML = '<i class="fas fa-chevron-up me-2"></i>Less questions...';
+            
+            // Setup event listeners for the newly shown questions
+            if (window.chatWidget && window.chatWidget.setupSuggestedQuestions) {
+                window.chatWidget.setupSuggestedQuestions();
+            }
+        } else {
+            additionalQuestions.style.display = 'none';
+            moreBtn.innerHTML = '<i class="fas fa-ellipsis-h me-2"></i>More questions...';
+        }
+    }
+}
+
+// Initialize floating chat widget when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    window.chatWidget = new FloatingChatWidget();
+});
+</script>

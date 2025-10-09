@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,12 +10,23 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS Files -->
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+    <link href="{% static 'css/components.css' %}" rel="stylesheet">
+    <link href="{% static 'css/forms.css' %}" rel="stylesheet">
+    <link href="{% static 'css/app-themes.css' %}" rel="stylesheet">
 
     <style>
         html, body {
             overflow-x: hidden;
             width: 100%;
             position: relative;
+        }
+        
+        /* Ensure floating chat widget positioning */
+        body {
+            position: relative !important;
         }
         
         .container {
@@ -124,7 +136,13 @@
     <!-- This is for error message -->
    {% include 'message_alert.html' %}
     <!-- End here -->
+
 </div>
+
+<!-- Floating Chat Widget - Outside main container for proper positioning -->
+{% if user.is_authenticated %}
+    {% include 'chatbot/chat_widget_floating.html' %}
+{% endif %}
 
 
 <script>

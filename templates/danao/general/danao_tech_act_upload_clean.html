@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block content %}
+<body class="app-danao">
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <!-- Main Form Card -->
+            <div class="card-enhanced">
+                <div class="card-header-enhanced">
+                    <div class="text-center">
+                        <h3 class="mb-0">Upload Technical Activity</h3>
+                        <p class="mb-0 text-muted">Danao Operations Management</p>
+                    </div>
+                </div>
+                
+                <div class="card-body-enhanced">
+                    <form method='post' enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Activity Name -->
+                        <div class="form-group-enhanced">
+                            <label for="{{ form.name.id_for_label }}" class="form-label-enhanced required">Activity Name</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="form-error">{{ form.name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Location -->
+                        <div class="form-group-enhanced">
+                            <label for="{{ form.location.id_for_label }}" class="form-label-enhanced required">Location</label>
+                            {{ form.location }}
+                            {% if form.location.errors %}
+                                <div class="form-error">{{ form.location.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Risk Assessment Fields -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-enhanced">
+                                    <label for="{{ form.potential_risk.id_for_label }}" class="form-label-enhanced">Potential Risk</label>
+                                    {{ form.potential_risk }}
+                                    {% if form.potential_risk.errors %}
+                                        <div class="form-error">{{ form.potential_risk.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group-enhanced">
+                                    <label for="{{ form.probability_of_occurrence.id_for_label }}" class="form-label-enhanced">Probability</label>
+                                    {{ form.probability_of_occurrence }}
+                                    {% if form.probability_of_occurrence.errors %}
+                                        <div class="form-error">{{ form.probability_of_occurrence.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-enhanced">
+                                    <label for="{{ form.impact.id_for_label }}" class="form-label-enhanced">Impact</label>
+                                    {{ form.impact }}
+                                    {% if form.impact.errors %}
+                                        <div class="form-error">{{ form.impact.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group-enhanced">
+                                    <label for="{{ form.levels_of_priority.id_for_label }}" class="form-label-enhanced">Priority Level</label>
+                                    {{ form.levels_of_priority }}
+                                    {% if form.levels_of_priority.errors %}
+                                        <div class="form-error">{{ form.levels_of_priority.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Remarks -->
+                        <div class="form-group-enhanced">
+                            <label for="{{ form.remarks.id_for_label }}" class="form-label-enhanced">Remarks/Comments</label>
+                            <textarea name="{{ form.remarks.name }}" class="textarea-enhanced" rows="4" placeholder="Enter detailed remarks about this technical activity..."></textarea>
+                            {% if form.remarks.errors %}
+                                <div class="form-error">{{ form.remarks.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Image Upload -->
+                        <div class="form-group-enhanced">
+                            <label class="form-label-enhanced">Upload Images</label>
+                            <div class="file-upload-enhanced" onclick="document.getElementById('imageFiles').click()">
+                                <div class="file-upload-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div class="file-upload-text">Click to upload images</div>
+                                <div class="file-upload-hint">Supports JPG, PNG, GIF (max 15MB each, up to 20 images)</div>
+                            </div>
+                            <input type="file" name="image" multiple id="imageFiles" style="display: none;" accept="image/*">
+                            <small class="form-help-text">You can select multiple images at once</small>
+                        </div>
+
+                        <!-- Image Preview Area -->
+                        <div id="imagePreview" class="row mt-3" style="display: none;">
+                            <div class="col-12">
+                                <h6>Selected Images:</h6>
+                                <div id="previewContainer"></div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'activity_listDanao' %}" class="btn btn-secondary-enhanced">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                            <button type="submit" class="btn btn-primary-enhanced">
+                                <i class="fas fa-save"></i> Save Activity
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add enhanced classes to form elements
+    const formInputs = document.querySelectorAll('input, select, textarea');
+    formInputs.forEach(input => {
+        if (!input.classList.contains('form-control-enhanced')) {
+            input.className += ' form-control-enhanced';
+        }
+    });
+
+    // Image upload preview
+    const fileInput = document.getElementById('imageFiles');
+    const fileUpload = document.querySelector('.file-upload-enhanced');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewContainer = document.getElementById('previewContainer');
+    
+    fileInput.addEventListener('change', function() {
+        const files = this.files;
+        previewContainer.innerHTML = '';
+        
+        if (files.length > 0) {
+            imagePreview.style.display = 'block';
+            
+            Array.from(files).forEach((file, index) => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const col = document.createElement('div');
+                        col.className = 'col-md-3 mb-3';
+                        col.innerHTML = `
+                            <div class="image-container">
+                                <img src="${e.target.result}" class="img-fluid rounded" style="height: 150px; object-fit: cover;">
+                                <div class="image-overlay">
+                                    <small class="text-white d-block text-center">${file.name}</small>
+                                </div>
+                            </div>
+                        `;
+                        previewContainer.appendChild(col);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        } else {
+            imagePreview.style.display = 'none';
+        }
+    });
+
+    // File drag and drop
+    fileUpload.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+    });
+    
+    fileUpload.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+    });
+    
+    fileUpload.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+        fileInput.files = e.dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change'));
+    });
+});
+</script>
+</body>
+{% endblock %}

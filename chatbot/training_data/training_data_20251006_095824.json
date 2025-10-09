@@ -1,0 +1,376 @@
+[
+  {
+    "user_message": "Good morning",
+    "bot_response": "Hello! I'm your OMS Assistant for the Danao region.\n\nI can help you with:\n\u2022 **Live Data Queries** - Ask me to show statistics, search facilities, or list activities\n\u2022 **Facility Management** - QR codes, facility tracking, location management  \n\u2022 **Technical Activities** - Activity logging, image uploads, documentation\n\u2022 **Quality Assessment** - Evaluations, assessments, reports\n\u2022 **Personal Data** - Your activities, uploads, and history\n\n**Quick Actions - Try asking:**\n\u2022 \"Show me facility statistics\"\n\u2022 \"How many activities this month?\"\n\u2022 \"Search for facility [name]\"\n\u2022 \"Show my activities\"\n\nBased on your role (EV_D), you have access to comprehensive OMS features.\n\nHow can I help you today?",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 15,
+    "timestamp": "2025-10-06T01:42:14.703892+00:00",
+    "quality_score": 0.5
+  },
+  {
+    "user_message": "How many facilities need QR codes?",
+    "bot_response": "**Facility Summary for Danao Region:**\n\n\u2022 **Total Facilities**: 1\n\u2022 **With QR Codes**: 1\n\u2022 **Without QR Codes**: 0\n\u2022 **Added This Month**: 1\n\n**Recent Facilities:**\n\u2022 [NO QR] Test Facility (Created: 2025-10-01)",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 15,
+    "timestamp": "2025-10-06T01:42:33.113381+00:00",
+    "quality_score": 0.8999999999999999
+  },
+  {
+    "user_message": "Show my activities",
+    "bot_response": "**Technical Activities Summary for Danao Region:**\n\n\u2022 **Total Activities**: 3\n\u2022 **This Month**: 3\n\u2022 **This Week**: 3\n\u2022 **Pending Remarks**: 0\n\n**Risk Distribution:**\n\u2022 Operational: 2\n\n**Recent Activities:**\n\u2022 [MEDIUM RISK] Uploading 20 images at Test (2025-10-02 15:18)\n\u2022 [HIGH RISK] General Inspection at Danao Site (2025-10-02 13:11)\n\u2022 [HIGH RISK] Test again at Again Area (2025-10-01 16:35)",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 15,
+    "timestamp": "2025-10-06T01:42:42.617828+00:00",
+    "quality_score": 0.8999999999999999
+  },
+  {
+    "user_message": "Search for facility",
+    "bot_response": "**Found 1 facilities matching 'facility':**\n\n\u2022 [NO QR] **Test Facility** (ID: 1, Created: 2025-10-01)\n",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 14,
+    "timestamp": "2025-10-06T00:54:39.951908+00:00",
+    "quality_score": 0.7
+  },
+  {
+    "user_message": "Show me facility statistics",
+    "bot_response": "**Facility Summary for Danao Region:**\n\n\u2022 **Total Facilities**: 1\n\u2022 **With QR Codes**: 1\n\u2022 **Without QR Codes**: 0\n\u2022 **Added This Month**: 1\n\n**Recent Facilities:**\n\u2022 [NO QR] Test Facility (Created: 2025-10-01)\n",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 13,
+    "timestamp": "2025-10-06T00:53:06.585225+00:00",
+    "quality_score": 0.8999999999999999
+  },
+  {
+    "user_message": "How many activities this month?",
+    "bot_response": "**Technical Activities Summary for Danao Region:**\n\n\u2022 **Total Activities**: 3\n\u2022 **This Month**: 3\n\u2022 **This Week**: 3\n\u2022 **Pending Remarks**: 0\n\n**Risk Distribution:**\n\u2022 Operational: 2\n\n**Recent Activities:**\n\u2022 [MEDIUM RISK] Uploading 20 images at Test (2025-10-02 15:18)\n\u2022 [HIGH RISK] General Inspection at Danao Site (2025-10-02 13:11)\n\u2022 [HIGH RISK] Test again at Again Area (2025-10-01 16:35)\n",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 12,
+    "timestamp": "2025-10-06T00:48:06.288813+00:00",
+    "quality_score": 0.8999999999999999
+  },
+  {
+    "user_message": "Show me facility statistics",
+    "bot_response": "**Facility Summary for Danao Region:**\n\n\u2022 **Total Facilities**: 1\n\u2022 **With QR Codes**: 1\n\u2022 **Without QR Codes**: 0\n\u2022 **Added This Month**: 1\n\n**Recent Facilities:**\n\u2022 [NO QR] Test Facility (Created: 2025-10-01)\n",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 11,
+    "timestamp": "2025-10-06T00:45:53.022818+00:00",
+    "quality_score": 0.8999999999999999
+  },
+  {
+    "user_message": "How many activities this month?",
+    "bot_response": "**Technical Activities Summary for Danao Region:**\n\n\u2022 **Total Activities**: 3\n\u2022 **This Month**: 3\n\u2022 **This Week**: 3\n\u2022 **Pending Remarks**: 0\n\n**Risk Distribution:**\n\u2022 Operational: 2\n\n**Recent Activities:**\n\u2022 [MEDIUM RISK] Uploading 20 images at Test (2025-10-02 15:18)\n\u2022 [HIGH RISK] General Inspection at Danao Site (2025-10-02 13:11)\n\u2022 [HIGH RISK] Test again at Again Area (2025-10-01 16:35)\n",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 10,
+    "timestamp": "2025-10-05T14:44:14.846135+00:00",
+    "quality_score": 0.8999999999999999
+  },
+  {
+    "user_message": "How many activities this month?",
+    "bot_response": "**Technical Activities Summary for Danao Region:**\n\n\u2022 **Total Activities**: 3\n\u2022 **This Month**: 3\n\u2022 **This Week**: 3\n\u2022 **Pending Remarks**: 0\n\n**Risk Distribution:**\n\u2022 Operational: 2\n\n**Recent Activities:**\n\u2022 [MEDIUM RISK] Uploading 20 images at Test (2025-10-02 15:18)\n\u2022 [HIGH RISK] General Inspection at Danao Site (2025-10-02 13:11)\n\u2022 [HIGH RISK] Test again at Again Area (2025-10-01 16:35)\n",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 10,
+    "timestamp": "2025-10-05T14:44:19.838794+00:00",
+    "quality_score": 0.8999999999999999
+  },
+  {
+    "user_message": "Show me facility statistics",
+    "bot_response": "**Facility Summary for Danao Region:**\n\n\u2022 **Total Facilities**: 1\n\u2022 **With QR Codes**: 1\n\u2022 **Without QR Codes**: 0\n\u2022 **Added This Month**: 1\n\n**Recent Facilities:**\n\u2022 [NO QR] Test Facility (Created: 2025-10-01)\n",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 9,
+    "timestamp": "2025-10-05T11:19:55.512229+00:00",
+    "quality_score": 0.8999999999999999
+  },
+  {
+    "user_message": "others",
+    "bot_response": "I'm your OMS Assistant, trained to help with Operations Management System tasks. \n\nI can assist with:\n\u2022 Facility management and QR code generation\n\u2022 Quality assessment and evaluation processes  \n\u2022 Technical activity logging and documentation\n\u2022 Report generation and data analysis\n\u2022 User permissions and access issues\n\u2022 Regional operations (C2, Danao, Mindanao)\n\u2022 **Live data queries** - Ask me to show statistics, search facilities, or list activities!\n\nHow can I help you with your OMS operations today?",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 9,
+    "timestamp": "2025-10-05T11:20:06.439511+00:00",
+    "quality_score": 0.30000000000000004
+  },
+  {
+    "user_message": "yes",
+    "bot_response": "I'm your OMS Assistant, trained to help with Operations Management System tasks. \n\nI can assist with:\n\u2022 Facility management and QR code generation\n\u2022 Quality assessment and evaluation processes  \n\u2022 Technical activity logging and documentation\n\u2022 Report generation and data analysis\n\u2022 User permissions and access issues\n\u2022 Regional operations (C2, Danao, Mindanao)\n\u2022 **Live data queries** - Ask me to show statistics, search facilities, or list activities!\n\nHow can I help you with your OMS operations today?",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 9,
+    "timestamp": "2025-10-05T11:20:09.163832+00:00",
+    "quality_score": 0.30000000000000004
+  },
+  {
+    "user_message": "How many Technical Activities I have?",
+    "bot_response": "**Technical Activities Summary for Danao Region:**\n\n\u2022 **Total Activities**: 3\n\u2022 **This Month**: 3\n\u2022 **This Week**: 3\n\u2022 **Pending Remarks**: 0\n\n**Risk Distribution:**\n\u2022 Operational: 2\n\n**Recent Activities:**\n\u2022 [MEDIUM RISK] Uploading 20 images at Test (2025-10-02 15:18)\n\u2022 [HIGH RISK] General Inspection at Danao Site (2025-10-02 13:11)\n\u2022 [HIGH RISK] Test again at Again Area (2025-10-01 16:35)\n",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 8,
+    "timestamp": "2025-10-05T10:38:32.783414+00:00",
+    "quality_score": 0.8999999999999999
+  },
+  {
+    "user_message": "Pending Assesments?",
+    "bot_response": "I'm your OMS Assistant, trained to help with Operations Management System tasks. \n\nI can assist with:\n\u2022 Facility management and QR code generation\n\u2022 Quality assessment and evaluation processes  \n\u2022 Technical activity logging and documentation\n\u2022 Report generation and data analysis\n\u2022 User permissions and access issues\n\u2022 Regional operations (C2, Danao, Mindanao)\n\u2022 **Live data queries** - Ask me to show statistics, search facilities, or list activities!\n\nHow can I help you with your OMS operations today?",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 8,
+    "timestamp": "2025-10-05T10:38:49.689589+00:00",
+    "quality_score": 0.30000000000000004
+  },
+  {
+    "user_message": "Hi",
+    "bot_response": "I'm your OMS Assistant, trained to help with Operations Management System tasks. \n\nI can assist with:\n\u2022 Facility management and QR code generation\n\u2022 Quality assessment and evaluation processes  \n\u2022 Technical activity logging and documentation\n\u2022 Report generation and data analysis\n\u2022 User permissions and access issues\n\u2022 Regional operations (C2, Danao, Mindanao)\n\u2022 **Live data queries** - Ask me to show statistics, search facilities, or list activities!\n\nHow can I help you with your OMS operations today?",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 7,
+    "timestamp": "2025-10-05T10:35:29.390442+00:00",
+    "quality_score": 0.30000000000000004
+  },
+  {
+    "user_message": "Okay",
+    "bot_response": "I'm your OMS Assistant, trained to help with Operations Management System tasks. \n\nI can assist with:\n\u2022 Facility management and QR code generation\n\u2022 Quality assessment and evaluation processes  \n\u2022 Technical activity logging and documentation\n\u2022 Report generation and data analysis\n\u2022 User permissions and access issues\n\u2022 Regional operations (C2, Danao, Mindanao)\n\u2022 **Live data queries** - Ask me to show statistics, search facilities, or list activities!\n\nHow can I help you with your OMS operations today?",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 7,
+    "timestamp": "2025-10-05T10:35:33.657652+00:00",
+    "quality_score": 0.30000000000000004
+  },
+  {
+    "user_message": "How to download report?",
+    "bot_response": "For report generation:\n        \n\u2022 **Facility Reports**: Generate facility assessment reports\n\u2022 **Activity Reports**: Create technical activity summaries\n\u2022 **Quality Reports**: Generate quality evaluation reports\n\u2022 **Regional Reports**: Create region-specific reports\n\nAccess the Reports section from your dashboard. What type of report do you need?",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 7,
+    "timestamp": "2025-10-05T10:35:47.698299+00:00",
+    "quality_score": 0.7
+  },
+  {
+    "user_message": "Tech activity report",
+    "bot_response": "For technical activities:\n        \n\u2022 **Activity Logging**: Log technical activities with timestamps\n\u2022 **Image Upload**: Upload images for activity documentation\n\u2022 **Location Tracking**: Record activity locations\n\u2022 **Activity Reports**: Generate activity reports\n\nGo to Technical Activities section to start logging activities. Need help with a specific activity type?",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 7,
+    "timestamp": "2025-10-05T10:35:57.812361+00:00",
+    "quality_score": 0.8999999999999999
+  },
+  {
+    "user_message": "Do you have any images that can lead me on how?",
+    "bot_response": "I'm your OMS Assistant, trained to help with Operations Management System tasks. \n\nI can assist with:\n\u2022 Facility management and QR code generation\n\u2022 Quality assessment and evaluation processes  \n\u2022 Technical activity logging and documentation\n\u2022 Report generation and data analysis\n\u2022 User permissions and access issues\n\u2022 Regional operations (C2, Danao, Mindanao)\n\u2022 **Live data queries** - Ask me to show statistics, search facilities, or list activities!\n\nHow can I help you with your OMS operations today?",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 7,
+    "timestamp": "2025-10-05T10:36:20.461973+00:00",
+    "quality_score": 0.5
+  },
+  {
+    "user_message": "How to download QR for facilities?",
+    "bot_response": "For facility management:\n        \n\u2022 **QR Code Generation**: Navigate to Facility Management \u2192 Generate QR Code\n\u2022 **Facility Tracking**: View and track facility status in the dashboard\n\u2022 **Image Upload**: Upload facility images for documentation\n\u2022 **Location Management**: Manage facility locations and details\n\nYour user group has access to facility management features. Would you like specific help with any of these features?",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 7,
+    "timestamp": "2025-10-05T10:36:45.566523+00:00",
+    "quality_score": 0.9999999999999999
+  },
+  {
+    "user_message": "Can you clear up the chat box?",
+    "bot_response": "I'm your OMS Assistant, trained to help with Operations Management System tasks. \n\nI can assist with:\n\u2022 Facility management and QR code generation\n\u2022 Quality assessment and evaluation processes  \n\u2022 Technical activity logging and documentation\n\u2022 Report generation and data analysis\n\u2022 User permissions and access issues\n\u2022 Regional operations (C2, Danao, Mindanao)\n\u2022 **Live data queries** - Ask me to show statistics, search facilities, or list activities!\n\nHow can I help you with your OMS operations today?",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 7,
+    "timestamp": "2025-10-05T10:37:16.716221+00:00",
+    "quality_score": 0.5
+  },
+  {
+    "user_message": "Facility management",
+    "bot_response": "I'm your OMS Assistant, trained to help with Operations Management System tasks. \n\nI can assist with:\n\u2022 Facility management and QR code generation\n\u2022 Quality assessment and evaluation processes  \n\u2022 Technical activity logging and documentation\n\u2022 Report generation and data analysis\n\u2022 User permissions and access issues\n\u2022 Regional operations (C2, Danao, Mindanao)\n\u2022 **Live data queries** - Ask me to show statistics, search facilities, or list activities!\n\nHow can I help you with your OMS operations today?",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 7,
+    "timestamp": "2025-10-05T10:37:35.002196+00:00",
+    "quality_score": 0.5
+  },
+  {
+    "user_message": "Statistics",
+    "bot_response": "**OMS Statistics for Danao Region:**\n\n**Facilities:**\n\u2022 Total: 1\n\u2022 With QR Codes: 1 (100.0% coverage)\n\u2022 Without QR Codes: 0\n\n**Activities:**\n\u2022 Total: 3\n\u2022 This Month: 3\n\u2022 High Risk: 2\n\u2022 Critical Priority: 1\n\n*Generated: 2025-10-05 10:37:55*",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 7,
+    "timestamp": "2025-10-05T10:37:55.471386+00:00",
+    "quality_score": 0.9999999999999999
+  },
+  {
+    "user_message": "hello",
+    "bot_response": "I'm your OMS Assistant, trained to help with Operations Management System tasks. \n\nI can assist with:\n\u2022 Facility management and QR code generation\n\u2022 Quality assessment and evaluation processes  \n\u2022 Technical activity logging and documentation\n\u2022 Report generation and data analysis\n\u2022 User permissions and access issues\n\u2022 Regional operations (C2, Danao, Mindanao)\n\u2022 **Live data queries** - Ask me to show statistics, search facilities, or list activities!\n\nHow can I help you with your OMS operations today?",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 6,
+    "timestamp": "2025-10-05T10:24:51.035874+00:00",
+    "quality_score": 0.30000000000000004
+  },
+  {
+    "user_message": "facilities",
+    "bot_response": "I'm your OMS Assistant, trained to help with Operations Management System tasks. \n\nI can assist with:\n\u2022 Facility management and QR code generation\n\u2022 Quality assessment and evaluation processes  \n\u2022 Technical activity logging and documentation\n\u2022 Report generation and data analysis\n\u2022 User permissions and access issues\n\u2022 Regional operations (C2, Danao, Mindanao)\n\u2022 **Live data queries** - Ask me to show statistics, search facilities, or list activities!\n\nHow can I help you with your OMS operations today?",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 6,
+    "timestamp": "2025-10-05T10:25:10.333751+00:00",
+    "quality_score": 0.30000000000000004
+  },
+  {
+    "user_message": "okay",
+    "bot_response": "I'm your OMS Assistant, trained to help with Operations Management System tasks. \n\nI can assist with:\n\u2022 Facility management and QR code generation\n\u2022 Quality assessment and evaluation processes  \n\u2022 Technical activity logging and documentation\n\u2022 Report generation and data analysis\n\u2022 User permissions and access issues\n\u2022 Regional operations (C2, Danao, Mindanao)\n\u2022 **Live data queries** - Ask me to show statistics, search facilities, or list activities!\n\nHow can I help you with your OMS operations today?",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 6,
+    "timestamp": "2025-10-05T10:25:19.181413+00:00",
+    "quality_score": 0.30000000000000004
+  },
+  {
+    "user_message": "hello",
+    "bot_response": "I'm your OMS Assistant, trained to help with Operations Management System tasks. \n\nI can assist with:\n\u2022 Facility management and QR code generation\n\u2022 Quality assessment and evaluation processes  \n\u2022 Technical activity logging and documentation\n\u2022 Report generation and data analysis\n\u2022 User permissions and access issues\n\u2022 Regional operations (C2, Danao, Mindanao)\n\u2022 **Live data queries** - Ask me to show statistics, search facilities, or list activities!\n\nHow can I help you with your OMS operations today?",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 6,
+    "timestamp": "2025-10-05T10:26:07.451497+00:00",
+    "quality_score": 0.30000000000000004
+  },
+  {
+    "user_message": "How to download tech activities?",
+    "bot_response": "How to download tech activities.",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 3,
+    "timestamp": "2025-10-05T10:08:15.521382+00:00",
+    "quality_score": 0.7
+  },
+  {
+    "user_message": "Yeah",
+    "bot_response": "Get it? Assistant : No....",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 3,
+    "timestamp": "2025-10-05T10:08:26.371480+00:00",
+    "quality_score": 0.5
+  },
+  {
+    "user_message": "Why No...",
+    "bot_response": "I see!",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 3,
+    "timestamp": "2025-10-05T10:08:35.787381+00:00",
+    "quality_score": 0.2
+  },
+  {
+    "user_message": "We see!",
+    "bot_response": "No!",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 3,
+    "timestamp": "2025-10-05T10:08:40.884518+00:00",
+    "quality_score": 0.2
+  },
+  {
+    "user_message": "Why No!",
+    "bot_response": "...",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 3,
+    "timestamp": "2025-10-05T10:08:47.108647+00:00",
+    "quality_score": 0.2
+  },
+  {
+    "user_message": "How to download report?",
+    "bot_response": "You need to wait for a while.",
+    "user_groups": [
+      "EV"
+    ],
+    "region": "C2",
+    "session_id": 2,
+    "timestamp": "2025-10-05T09:59:39.635142+00:00",
+    "quality_score": 0.7
+  },
+  {
+    "user_message": "How to download report on Tech activities?",
+    "bot_response": "It's an AI..",
+    "user_groups": [
+      "EV_D"
+    ],
+    "region": "Danao",
+    "session_id": 1,
+    "timestamp": "2025-10-05T09:57:39.514021+00:00",
+    "quality_score": 0.5
+  }
+]

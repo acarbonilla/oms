@@ -522,6 +522,24 @@ def generate_pdf(request):
     width, height = letter
     y_position = height - 50  # Start position
 
+    def add_watermark(pdf, width, height):
+        try:
+            watermark_path = finders.find("report_logo/fm_logo.png")
+            if watermark_path:
+                pdf.saveState()
+                pdf.setFillAlpha(0.15)  # Slightly more visible transparency
+                # Center-center positioning: calculate center coordinates
+                logo_width, logo_height = 500, 300  # Bigger watermark size
+                center_x = (width - logo_width) / 2
+                center_y = (height - logo_height) / 2
+                pdf.drawImage(ImageReader(watermark_path), center_x, center_y, width=logo_width, height=logo_height, mask='auto')
+                pdf.restoreState()
+        except Exception as e:
+            print(f"Error adding watermark: {e}")
+
+    # Add watermark to first page
+    add_watermark(pdf, width, height)
+
     pdf.setFont("Helvetica-Bold", 16)
     pdf.drawString(200, y_position, "C2 Recent Image Report - " + str(current_year))
     y_position -= 40
@@ -537,6 +555,7 @@ def generate_pdf(request):
 
         if y_position < 100:  # Prevent overflow
             pdf.showPage()
+            add_watermark(pdf, width, height)  # Add watermark to new page
             y_position = height - 50
             pdf.setFont("Helvetica", 12)
 
@@ -584,11 +603,15 @@ def generate_selected_pdf(request):
 
     def add_watermark(pdf, width, height):
         try:
-            watermark_path = finders.find("report_logo/fm_2.png")
+            watermark_path = finders.find("report_logo/fm_logo.png")
             if watermark_path:
                 pdf.saveState()
-                pdf.setFillAlpha(0.1)  # Transparency
-                pdf.drawImage(ImageReader(watermark_path), width / 3, height / 3, width=300, height=150, mask='auto')
+                pdf.setFillAlpha(0.15)  # Slightly more visible transparency
+                # Center-center positioning: calculate center coordinates
+                logo_width, logo_height = 500, 300  # Bigger watermark size
+                center_x = (width - logo_width) / 2
+                center_y = (height - logo_height) / 2
+                pdf.drawImage(ImageReader(watermark_path), center_x, center_y, width=logo_width, height=logo_height, mask='auto')
                 pdf.restoreState()
         except Exception as e:
             print(f"Error adding watermark: {e}")
@@ -1233,6 +1256,22 @@ def tech_activity_pdf(request):
     pdf = canvas.Canvas(buffer, pagesize=page_size_tuple)
     width, height = page_size_tuple
 
+    # Define watermark function
+    def add_watermark(pdf, width, height):
+        try:
+            watermark_path = finders.find("report_logo/fm_logo.png")
+            if watermark_path:
+                pdf.saveState()
+                pdf.setFillAlpha(0.15)  # Slightly more visible transparency
+                # Center-center positioning: calculate center coordinates
+                logo_width, logo_height = 500, 300  # Bigger watermark size
+                center_x = (width - logo_width) / 2
+                center_y = (height - logo_height) / 2
+                pdf.drawImage(ImageReader(watermark_path), center_x, center_y, width=logo_width, height=logo_height, mask='auto')
+                pdf.restoreState()
+        except Exception as e:
+            print(f"Error adding watermark: {e}")
+
     # Define colors and styles
     colors_dict = {
         'primary': colors.HexColor('#4f46e5'),  # Indigo
@@ -1245,6 +1284,9 @@ def tech_activity_pdf(request):
 
     def add_page_header(page_num, activity=None):
         """Add styled header to each page matching the Danao design"""
+        # Add watermark to every page
+        add_watermark(pdf, width, height)
+        
         # Header background
         header_height = 100
         pdf.setFillColor(colors.white)

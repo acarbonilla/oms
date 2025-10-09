@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'c2',
     'danao',
     'mindanao',
+    'chatbot',
 
     # Editor
     'ckeditor',
@@ -207,3 +208,6 @@ LOGGING = {
         },
     },
 }
+
+# Groq AI Configuration
+GROQ_API_KEY = env('GROQ_API_KEY', default=None)

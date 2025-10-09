@@ -543,6 +543,24 @@ def generate_pdfDanao(request):
     width, height = letter
     y_position = height - 50  # Start position
 
+    def add_watermark(pdf, width, height):
+        try:
+            watermark_path = finders.find("report_logo/fm_logo.png")
+            if watermark_path:
+                pdf.saveState()
+                pdf.setFillAlpha(0.15)  # Slightly more visible transparency
+                # Center-center positioning: calculate center coordinates
+                logo_width, logo_height = 500, 300  # Bigger watermark size
+                center_x = (width - logo_width) / 2
+                center_y = (height - logo_height) / 2
+                pdf.drawImage(ImageReader(watermark_path), center_x, center_y, width=logo_width, height=logo_height, mask='auto')
+                pdf.restoreState()
+        except Exception as e:
+            print(f"Error adding watermark: {e}")
+
+    # Add watermark to first page
+    add_watermark(pdf, width, height)
+
     pdf.setFont("Helvetica-Bold", 16)
     pdf.drawString(200, y_position, "Danao Recent Image Report - " + str(current_year))
     y_position -= 40
@@ -558,6 +576,7 @@ def generate_pdfDanao(request):
 
         if y_position < 100:  # Prevent overflow
             pdf.showPage()
+            add_watermark(pdf, width, height)  # Add watermark to new page
             y_position = height - 50
             pdf.setFont("Helvetica", 12)
 
@@ -604,11 +623,15 @@ def generate_selected_pdfDanao(request):
 
     def add_watermark(pdf, width, height):
         try:
-            watermark_path = finders.find("report_logo/fm_2.png")
+            watermark_path = finders.find("report_logo/fm_logo.png")
             if watermark_path:
                 pdf.saveState()
-                pdf.setFillAlpha(0.1)
-                pdf.drawImage(ImageReader(watermark_path), width / 3, height / 3, width=300, height=150, mask='auto')
+                pdf.setFillAlpha(0.15)  # Slightly more visible transparency
+                # Center-center positioning: calculate center coordinates
+                logo_width, logo_height = 500, 300  # Bigger watermark size
+                center_x = (width - logo_width) / 2
+                center_y = (height - logo_height) / 2
+                pdf.drawImage(ImageReader(watermark_path), center_x, center_y, width=logo_width, height=logo_height, mask='auto')
                 pdf.restoreState()
         except Exception as e:
             print(f"Error adding watermark: {e}")
@@ -1226,6 +1249,22 @@ def danao_tech_activity_pdf(request):
     pdf = canvas.Canvas(buffer, pagesize=page_size_tuple)
     width, height = page_size_tuple
 
+    # Define watermark function
+    def add_watermark(pdf, width, height):
+        try:
+            watermark_path = finders.find("report_logo/fm_logo.png")
+            if watermark_path:
+                pdf.saveState()
+                pdf.setFillAlpha(0.15)  # Slightly more visible transparency
+                # Center-center positioning: calculate center coordinates
+                logo_width, logo_height = 500, 300  # Bigger watermark size
+                center_x = (width - logo_width) / 2
+                center_y = (height - logo_height) / 2
+                pdf.drawImage(ImageReader(watermark_path), center_x, center_y, width=logo_width, height=logo_height, mask='auto')
+                pdf.restoreState()
+        except Exception as e:
+            print(f"Error adding watermark: {e}")
+
     # Define colors and styles
     colors_dict = {
         'primary': colors.HexColor('#4f46e5'),  # Indigo
@@ -1238,6 +1277,9 @@ def danao_tech_activity_pdf(request):
 
     def add_page_header(page_num, activity=None):
         """Add styled header to each page matching the image design exactly"""
+        # Add watermark to every page
+        add_watermark(pdf, width, height)
+        
         # Header background
         header_height = 100
         pdf.setFillColor(colors.white)
@@ -1245,14 +1287,14 @@ def danao_tech_activity_pdf(request):
         
         
         # Left section - Main Title
-        title_x = 70
+        title_x = 50
         title_y = height - 40
         pdf.setFillColor(colors.black)
         pdf.setFont("Helvetica-Bold", 30)
         
         # Title with line breaks to match image
-        pdf.drawString(title_x, title_y, "Facilities Inspection &")
-        pdf.drawString(title_x, title_y - 26, "Maintenance Report")
+        pdf.drawString(title_x, title_y, "Facilities Inspection & Maintenance Report")
+        # pdf.drawString(title_x, title_y - 26, "Maintenance Report")
         
         # Activity name under the title
         if activity and hasattr(activity, 'name') and activity.name:
@@ -1261,8 +1303,8 @@ def danao_tech_activity_pdf(request):
         
         
         # Right section - Document Metadata Table (4 rows with borders)
-        table_width = 400
-        table_x = width - 450  # Right-aligned, positioned to align with title
+        table_width = 300
+        table_x = width - 320  # Right-aligned, positioned to avoid overlapping with title
         table_y = height - 8
         table_height = 80  # Height for 4 rows
         
@@ -1607,25 +1649,28 @@ def danao_tech_activity_pdf(request):
     def add_cover_page():
         """Add simple cover page without styling"""
         
+        # Add watermark to cover page
+        add_watermark(pdf, width, height)
+        
         # Simple white background
         pdf.setFillColor(colors.white)
         pdf.rect(0, 0, width, height, fill=True)
         
         # Main Title - "Facilities Inspection & Maintenance Report"
         title_y = height - 200
-        pdf.setFillColor(colors.HexColor('#1e40af'))  # Dark blue color
+        pdf.setFillColor(colors.black)  # Dark blue color
         pdf.setFont("Helvetica-Bold", 34)
         pdf.drawString(40, title_y, "Facilities Inspection & Maintenance Report")
         
         # Subtitle 1 - "JWS Facilities Management"
         subtitle1_y = title_y - 60
-        pdf.setFillColor(colors.HexColor('#1e40af'))  # Dark blue color
+        pdf.setFillColor(colors.black)  # Dark blue color
         pdf.setFont("Helvetica-Bold", 20)
         pdf.drawString(40, subtitle1_y, "JWS Facilities Management")
         
         # Subtitle 2 - "VisMin"
         subtitle2_y = subtitle1_y - 50
-        pdf.setFillColor(colors.HexColor('#1e40af'))  # Dark blue color
+        pdf.setFillColor(colors.black)  # Dark blue color
         pdf.setFont("Helvetica-Bold", 16)
         pdf.drawString(40, subtitle2_y, "VisMin")
         

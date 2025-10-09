@@ -1,0 +1,89 @@
+/* ========================================
+   OMS SYSTEM - APP THEMES CSS
+   Color themes for C2, Danao, and Mindanao apps
+   ======================================== */
+
+/* ========================================
+   C2 APP THEME
+   ======================================== */
+.app-c2 {
+    --primary-color: #007bff;
+    --primary-dark: #0056b3;
+    --primary-light: #66b3ff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --accent-color: #007bff;
+    --background-color: #ffffff;
+    --surface-color: #f8f9fa;
+    --border-color: #dee2e6;
+    --text-color: #212529;
+    --text-muted: #6c757d;
+    --shadow-color: rgba(0,123,255,0.15);
+}
+
+/* ========================================
+   DANAO APP THEME
+   ======================================== */
+.app-danao {
+    --primary-color: #17a2b8;
+    --primary-dark: #138496;
+    --primary-light: #5bc0de;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --accent-color: #17a2b8;
+    --background-color: #ffffff;
+    --surface-color: #f8f9fa;
+    --border-color: #dee2e6;
+    --text-color: #212529;
+    --text-muted: #6c757d;
+    --shadow-color: rgba(23,162,184,0.15);
+}
+
+/* ========================================
+   MINDANAO APP THEME
+   ======================================== */
+.app-mindanao {
+    --primary-color: #e83e8c;
+    --primary-dark: #c2185b;
+    --primary-light: #f06292;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --accent-color: #e83e8c;
+    --background-color: #ffffff;
+    --surface-color: #f8f9fa;
+    --border-color: #dee2e6;
+    --text-color: #212529;
+    --text-muted: #6c757d;
+    --shadow-color: rgba(232,62,140,0.15);
+}
+
+/* Theme-specific button styles */
+.app-c2 .btn-primary-enhanced {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.app-danao .btn-primary-enhanced {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    box-shadow: 0 ４px 15px var(--shadow-color);
+}
+
+.app-mindanao .btn-primary-enhanced {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    box-shadow: 0 4px 15px var(--shadow-color);
+}

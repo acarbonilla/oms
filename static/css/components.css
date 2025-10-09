@@ -1,0 +1,308 @@
+/* ========================================
+   OMS SYSTEM - COMPONENTS CSS
+   Reusable UI components for all apps
+   ======================================== */
+
+/* ========================================
+   CARDS
+   ======================================== */
+.card-enhanced {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.6s ease-out;
+    background: white;
+    overflow: hidden;
+}
+
+.card-enhanced:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.card-header-enhanced {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-bottom: 2px solid #dee2e6;
+    padding: 1.5rem;
+    font-weight: 600;
+    color: #495057;
+}
+
+.card-body-enhanced {
+    padding: 2rem;
+}
+
+/* ========================================
+   BUTTONS
+   ======================================== */
+.btn-enhanced {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-enhanced:hover::before {
+    left: 100%;
+}
+
+.btn-enhanced:hover {
+    transform: translateY(-2px);
+}
+
+/* Button variants */
+.btn-primary-enhanced {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.btn-success-enhanced {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: white;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.btn-danger-enhanced {
+    background: linear-gradient(135deg, #dc3545, #bd2130);
+    color: white;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+.btn-secondary-enhanced {
+    background: linear-gradient(135deg, #6c757d, #545b62);
+    color: white;
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+}
+
+/* ========================================
+   TABLES
+   ======================================== */
+.table-enhanced {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    background: white;
+}
+
+.table-enhanced thead {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.table-enhanced th {
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+}
+
+.table-enhanced td {
+    padding: 1rem;
+    border-top: 1px solid #dee2e6;
+    vertical-align: middle;
+    transition: background-color 0.2s ease;
+}
+
+.table-enhanced tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.table-enhanced tbody tr:nth-child(even) {
+    background-color: #fdfdfd;
+}
+
+/* ========================================
+   FORMS
+   ======================================== */
+.form-control-enhanced {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #fafafa;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.form-control-enhanced:focus {
+    border-color: #007bff;
+    background: white;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25), 
+                inset 0 1px 3px rgba(0,0,0,0.1);
+    transform: scale(1.02);
+}
+
+.form-control-enhanced:hover {
+    border-color: #007bff);
+    background: white;
+}
+
+/* ========================================
+   ALERTS
+   ======================================== */
+.alert-enhanced {
+    border: none;
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    margin: 1rem 0;
+    position: relative;
+    animation: slideInRight 0.5s ease-out;
+}
+
+.alert-enhanced::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #007bff;
+}
+
+.alert-success-enhanced {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    color: #155724;
+}
+
+.alert-danger-enhanced {
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+    color: #721c24;
+}
+
+.alert-warning-enhanced {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    color: #856404;
+}
+
+.alert-info-enhanced {
+    background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+    color: #0c5460;
+}
+
+/* ========================================
+   NAVIGATION
+   ======================================== */
+.navbar-enhanced {
+    background: linear-gradient(135deg, #343a40, #212529);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 1rem 0;
+}
+
+.navbar-enhanced .nav-link {
+    color: white !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-radius: 6px;
+    margin: 0 0.25rem;
+    padding: 0.5rem 1rem !important;
+}
+
+.navbar-enhanced .nav-link:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-2px);
+}
+
+.navbar-enhanced .nav-link.active {
+    background: rgba(255,255,255,0.2);
+    font-weight: 600;
+}
+
+/* ========================================
+   PAGINATION
+   ======================================== */
+.page-link-enhanced {
+    color: #007bff;
+    border: 1px solid #dee2e6;
+    padding: 0.75rem 1rem;
+    margin: 0 0.1rem;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.page-link-enhanced:hover,
+.page-link-enhanced.active {
+    background: #007bff;
+    border-color: #007bff;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ========================================
+   PROGRESS BARS
+   ======================================== */
+.progress-enhanced {
+    height: 8px;
+    border-radius: 8px;
+    background: #e9ecef;
+    overflow: hidden;
+}
+
+.progress-bar-enhanced {
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    transition: width 0.6s ease;
+    animation: slideInRight 0.8s ease-out;
+}
+
+/* ========================================
+   FILE UPLOAD
+   ======================================== */
+.file-upload-enhanced {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.file-upload-enhanced:hover {
+    border-color: #007bff;
+    background: #e3f2fd;
+}
+
+.file-upload-enhanced.dragover {
+    border-color: #28a745;
+    background: #d4edda;
+    transform: scale(1.02);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+@media (max-width: 768px) {
+    .card-enhanced:hover {
+        transform: none;
+    }
+    
+    .btn-enhanced:hover {
+        transform: none;
+    }
+    
+    .navbar-enhanced .nav-link {
+        margin: 0.25rem 0;
+    }
+}

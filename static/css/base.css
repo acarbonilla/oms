@@ -1,0 +1,329 @@
+/* ========================================
+   OMS SYSTEM - BASE CSS STYLES
+   Centralized styles for all apps (c2, danao, mindanao)
+   ======================================== */
+
+/* ========================================
+   RESET & BASE STYLES
+   ======================================== */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+}
+
+/* ========================================
+   ENHANCED ANIMATIONS
+   ======================================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from { 
+        transform: translateX(-30px); 
+        opacity: 0; 
+    }
+    to { 
+        transform: translateX(0); 
+        opacity: 1; 
+    }
+}
+
+@keyframes slideInRight {
+    from { 
+        transform: translateX(30px); 
+        opacity: 0; 
+    }
+    to { 
+        transform: translateX(0); 
+        opacity: 1; 
+    }
+}
+
+@keyframes slideOutRight {
+    from { 
+        transform: translateX(0); 
+        opacity: 1; 
+    }
+    to { 
+        transform: translateX(30px); 
+        opacity: 0; 
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(0, 123, 255, 0.8), 0 0 30px rgba(0, 123, 255, 0.6);
+    }
+    100% {
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+}
+
+@keyframes rainbow {
+    0% { color: #ff0000; }
+    16% { color: #ff8000; }
+    32% { color: #ffff00; }
+    48% { color: #80ff00; }
+    64% { color: #00ff00; }
+    80% { color: #0080ff; }
+    100% { color: #0000ff; }
+}
+
+/* ========================================
+   COMMON COMPONENT STYLES
+   ======================================== */
+
+/* Page Wrapper */
+.page-wrapper {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+/* Card Styles */
+.card-animated {
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.card-animated:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+/* Button Styles */
+.btn-animated {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-animated:hover {
+    animation: pulse 0.5s ease-in-out;
+}
+
+.btn-glow:hover {
+    animation: glow 1.5s ease-in-out infinite;
+}
+
+/* Form Styles */
+.form-group-animated {
+    animation: slideIn 0.5s ease-out;
+}
+
+.form-control-animated {
+    transition: all 0.3s ease;
+}
+
+.form-control-animated:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    transform: scale(1.02);
+}
+
+/* Image Styles */
+.image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.image-container img {
+    transition: transform 0.3s ease;
+}
+
+.image-container:hover img {
+    transform: scale(1.05);
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.image-container:hover .image-overlay {
+    opacity: 1;
+}
+
+/* Loading States */
+.loading {
+    position: relative;
+}
+
+.loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+/* Progress Bars */
+.progress-animated .progress-bar {
+    animation: slideInRight 0.8s ease-out;
+}
+
+/* Modal Styles */
+.modal-animated {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.modal-content-animated {
+    animation: slideIn 0.6s ease-out;
+}
+
+/* Table Styles */
+.table-animated td {
+    animation: slideIn 0.4s ease-out;
+    animation-fill-mode: both;
+}
+
+.table-animated tr:nth-child(1) td { animation-delay: 0.1s; }
+.table-animated tr:nth-child(2) td { animation-delay: 0.2s; }
+.table-animated tr:nth-child(3) td { animation-delay: 0.3s; }
+.table-animated tr:nth-child(4) td { animation-delay: 0.4s; }
+.table-animated tr:nth-child(5) td { animation-delay: 0.5s; }
+
+/* Alert Styles */
+.alert-animated {
+    animation: slideInRight 0.5s ease-out;
+}
+
+/* Navigation Styles */
+.nav-animated {
+    animation: slideIn 0.6s ease-out;
+}
+
+.nav-item-animated {
+    transition: all 0.3s ease;
+}
+
+.nav-item-animated:hover {
+    transform: translateY(-2px);
+}
+
+/* Utility Classes */
+.fade-in-up { animation: fadeInUp 0.6s ease-out; }
+.slide-in { animation: slideIn 0.5s ease-out; }
+.slide-in-right { animation: slideInRight 0.5s ease-out; }
+.pulse-animated { animation: pulse 1s ease-in-out infinite; }
+.bounce-animated { animation: bounce 1s ease-in-out infinite; }
+.glow-animated { animation: glow 1.5s ease-in-out infinite; }
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+    .card-animated:hover {
+        transform: none;
+    }
+    
+    .btn-animated:hover {
+        animation: none;
+    }
+    
+    .image-container:hover img {
+        transform: none;
+    }
+}
+
+/* ========================================
+   APP-SPECIFIC COLOR THEMES
+   ======================================== */
+
+/* C2 App Theme */
+.app-c2 {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+}
+
+/* Danao App Theme */
+.app-danao {
+    --primary-color: #17a2b8;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+}
+
+/* Mindanao App Theme */
+.app-mindanao {
+    --primary-color: #e83e8c;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+@media print {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+    
+    .btn, .navbar, .sidebar {
+        display: none !important;
+    }
+}
