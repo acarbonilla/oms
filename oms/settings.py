@@ -211,3 +211,27 @@ LOGGING = {
 
 # Groq AI Configuration
 GROQ_API_KEY = env('GROQ_API_KEY', default=None)
+
+# HTTPS/SSL Security Settings for Production
+if not DEBUG:
+    # Redirect all HTTP requests to HTTPS
+    SECURE_SSL_REDIRECT = True
+    
+    # HSTS Settings (HTTP Strict Transport Security)
+    # This tells browsers to only access the site via HTTPS for 1 year
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # Ensure cookies are only sent over HTTPS
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    
+    # If behind a reverse proxy (nginx, Apache, load balancer)
+    # This helps Django detect when the original request was HTTPS
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    # Additional security headers
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
