@@ -550,7 +550,7 @@ def generate_pdfDanao(request):
                 pdf.saveState()
                 pdf.setFillAlpha(0.15)  # Slightly more visible transparency
                 # Center-center positioning: calculate center coordinates
-                logo_width, logo_height = 500, 300  # Bigger watermark size
+                logo_width, logo_height = 350, 280  # Better proportioned watermark size
                 center_x = (width - logo_width) / 2
                 center_y = (height - logo_height) / 2
                 pdf.drawImage(ImageReader(watermark_path), center_x, center_y, width=logo_width, height=logo_height, mask='auto')
@@ -628,7 +628,7 @@ def generate_selected_pdfDanao(request):
                 pdf.saveState()
                 pdf.setFillAlpha(0.15)  # Slightly more visible transparency
                 # Center-center positioning: calculate center coordinates
-                logo_width, logo_height = 500, 300  # Bigger watermark size
+                logo_width, logo_height = 350, 280  # Better proportioned watermark size
                 center_x = (width - logo_width) / 2
                 center_y = (height - logo_height) / 2
                 pdf.drawImage(ImageReader(watermark_path), center_x, center_y, width=logo_width, height=logo_height, mask='auto')
@@ -1257,7 +1257,7 @@ def danao_tech_activity_pdf(request):
                 pdf.saveState()
                 pdf.setFillAlpha(0.15)  # Slightly more visible transparency
                 # Center-center positioning: calculate center coordinates
-                logo_width, logo_height = 500, 300  # Bigger watermark size
+                logo_width, logo_height = 350, 280  # Better proportioned watermark size
                 center_x = (width - logo_width) / 2
                 center_y = (height - logo_height) / 2
                 pdf.drawImage(ImageReader(watermark_path), center_x, center_y, width=logo_width, height=logo_height, mask='auto')
