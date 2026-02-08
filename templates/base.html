@@ -138,12 +138,6 @@
 
 </div>
 
-<!-- Floating Chat Widget - Outside main container for proper positioning -->
-{% if user.is_authenticated %}
-    {% include 'chatbot/chat_widget_floating.html' %}
-{% endif %}
-
-
 <script>
     document.getElementById("footer-year").textContent = new Date().getFullYear();
 </script>
